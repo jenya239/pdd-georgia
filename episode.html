@@ -1,0 +1,59 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ПДД Грузии — выпуск</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/app.css"></head>
+<body><main id="m"><p class="mut">Загрузка…</p></main>
+<script src="assets/common.js"></script>
+<script>
+(async () => {
+  PDD.header("eps");
+  const [D, E] = await Promise.all([PDD.load(), PDD.loadEps()]);
+  const id = new URLSearchParams(location.search).get("id") || "ep01";
+  const r = E.released.find(x => x.id === id);
+  const m = PDD.$("#m");
+  if (!r) { m.innerHTML = `<h1>Выпуск не найден</h1><p><a href="index.html">К списку выпусков</a></p>`; return; }
+  document.title = `Выпуск ${r.num}. ${r.title} — ПДД Грузии`;
+  const idx = E.released.indexOf(r), prev = E.released[idx - 1], next = E.released[idx + 1];
+  const esc = PDD.esc;
+  const core = r.tickets_core.map(i => D.byId[i]), linked = r.tickets_linked.map(i => D.byId[i]);
+  m.innerHTML = `<div class="small mut"><a href="index.html">Выпуски</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}</div>
+   <h1>${esc(r.title)}</h1>
+   <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
+   <p>${esc(r.lead)}</p>
+   <h2>Главное</h2>
+   <ol class="points">${r.points.map(p => `<li>${esc(p.t)} <span class="cite">${esc(p.c)}</span></li>`).join("")}</ol>
+   <h3>Текст закона к выпуску</h3>
+   <p class="small mut">Цитаты из русского перевода Matsne, ред. 25.06.2026. Юридическую силу имеет грузинский текст.</p>
+   ${r.law_quotes.map(q => `<details class="law"><summary>${esc(q.ref)}${q.title ? " — " + esc(q.title) : ""}</summary><div class="lawtext">${esc(q.text)}</div></details>`).join("")}
+   <h2>Билеты к выпуску</h2>
+   <div id="tk"></div>
+   <div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
+  const tk = PDD.$("#tk");
+  if (!core.length && !linked.length) {
+    tk.innerHTML = `<div class="note">${esc(r.no_tickets_note || "К этому выпуску в базе нет привязанных билетов.")}</div>`;
+    return;
+  }
+  const s = PDD.summary([...core, ...linked].map(t => t.id));
+  tk.innerHTML = `<p class="small mut">Нажмите вариант (или клавиши <kbd>1</kbd>–<kbd>4</kbd> для вопроса в фокусе) — ответ проверяется сразу и сохраняется в прогресс. Решено ${s.seen} из ${s.total}.</p>`;
+  let all = [];
+  function section(title, note, list) {
+    if (!list.length) return;
+    const h = document.createElement("div");
+    h.innerHTML = `<h3>${esc(title)} (${list.length})</h3>${note ? `<p class="small mut">${esc(note)}</p>` : ""}`;
+    tk.append(h);
+    for (const t of list) { const d = document.createElement("div"); d.className = "qwrap"; tk.append(d); all.push([d, t]); }
+  }
+  section("По статьям, разобранным в выпуске", "Вопросы, в пояснении к которым есть ссылка на пункты, разобранные выше.", core);
+  section(r.id === "ep02" ? "Другие термины статьи 5" : "Привязанные к серии", r.id === "ep02" ? "В базе эти вопросы привязаны ко всему блоку терминов (E003–E010): ст. 5 — словарь, и номер пункта не указывает на конкретную серию. Часть терминов будет в следующих выпусках." : "", linked);
+  const draw = () => all.forEach(([d, t]) => { const st = d._state; PDD.renderQuestion(d, t, st && st.answered ? { mode: "instant", reveal: true, selected: st.choice } : { mode: "instant" }); });
+  draw();
+  document.addEventListener("pdd:lang", draw);
+  // клавиши 1–4: для вопроса, ближайшего к центру экрана и ещё не отвеченного
+  document.addEventListener("keydown", e => {
+    if (e.target.closest("input,select,textarea") || e.ctrlKey || e.metaKey || e.altKey) return;
+    const n = parseInt(e.key, 10); if (!(n >= 1 && n <= 4)) return;
+    const mid = innerHeight / 2; let best = null, bd = 1e9;
+    for (const [d] of all) { const b = d.getBoundingClientRect(); if (b.bottom < 0 || b.top > innerHeight) continue; if (d._state.answered) continue;
+      const dist = Math.abs((b.top + b.bottom) / 2 - mid); if (dist < bd) { bd = dist; best = d; } }
+    if (best) best._pick(n - 1);
+  });
+})();
+</script></body></html>

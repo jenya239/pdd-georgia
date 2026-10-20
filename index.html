@@ -1,0 +1,40 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ПДД Грузии — выпуски</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/app.css"></head>
+<body><main>
+<h1>ПДД Грузии: теория по закону и билеты категории B</h1>
+<p class="mut">Короткие видеовыпуски по Закону Грузии «О дорожном движении», ключевые пункты со ссылками на статьи и билеты из базы для самопроверки.</p>
+<div class="grid g3" id="quick"></div>
+<h2>Вышедшие выпуски</h2>
+<div class="eplist" id="released"></div>
+<h2>План курса (E001–E107)</h2>
+<p class="small mut">Нумерация по плану курса. Число в колонке «Билеты» — вопросы базы, автоматически привязанные к серии по ссылкам на статьи в пояснениях (или по теме, если ссылки нет). Билеты по будущим сериям уже можно решать в самопроверке.</p>
+<div class="card" style="padding:0;overflow:auto"><table class="plan" id="plan"></table></div>
+</main>
+<script src="assets/common.js"></script>
+<script>
+(async () => {
+  PDD.header("eps");
+  const [D, E] = await Promise.all([PDD.load(), PDD.loadEps()]);
+  const all = D.tickets.map(t => t.id), s = PDD.summary(all);
+  const mist = D.tickets.filter(t => (PDD.prog()[t.id] || {}).l === 0).length;
+  PDD.$("#quick").innerHTML = `
+   <div class="card"><h3 style="margin-top:0">Самопроверка</h3><p class="small mut">${D.tickets.length} вопросов, по темам и сериям. Прогресс сохраняется в браузере.</p>
+     <div class="bar"><i style="width:${(100 * s.seen / s.total).toFixed(1)}%"></i></div><p class="small">Решено ${s.seen} из ${s.total} · верно сейчас ${s.ok} · ошибок ${s.bad}</p>
+     <div class="row"><a class="btn" href="practice.html">Тренироваться</a>${mist ? `<a class="btn ghost" href="practice.html?mode=mistakes">Ошибки (${mist})</a>` : ""}</div></div>
+   <div class="card"><h3 style="margin-top:0">Пробный экзамен</h3><p class="small mut">30 случайных вопросов, 30 минут, не больше 5 ошибок.</p><a class="btn" href="exam.html">Начать</a></div>`;
+  const rel = new Set(E.released.flatMap(r => r.plan));
+  PDD.$("#released").innerHTML = E.released.map(r => `<a class="card ep" href="episode.html?id=${r.id}">
+     <img src="${r.poster}" alt=""><div><div class="small mut">Выпуск ${r.num} · ${r.plan.join("–")} · ${r.duration}</div><h3>${PDD.esc(r.title)}</h3>
+     <div class="small mut">${PDD.esc(r.lead)}</div>
+     <div class="small" style="margin-top:4px">${r.tickets_core.length + r.tickets_linked.length ? `Билетов к выпуску: ${r.tickets_core.length + r.tickets_linked.length}` : "Привязанных билетов нет"}</div></div></a>`).join("");
+  const BL = {0:"Вступление",1:"Термины (ст. 5)",2:"Участники движения",3:"Светофор и регулировщик",4:"Знаки и разметка",5:"Манёвры, скорость, обгон",6:"Перекрёстки",7:"Остановка и стоянка",8:"Особые места и участники",9:"Буксировка, перевозка",10:"Свет и сигналы",11:"Техсостояние, регистрация",12:"Права, категории, баллы",13:"Штрафы (КоАП)",14:"Вне закона: первая помощь, безопасность, эко"};
+  let html = `<tr><th>Серия</th><th>Тема</th><th class="hide-s">Источник</th><th>Билеты</th><th>Статус</th></tr>`, lastB = -1;
+  for (const p of E.plan) {
+    if (p.block !== lastB) { html += `<tr class="blockhead"><td colspan="5">Блок ${p.block}. ${BL[p.block] || ""}</td></tr>`; lastB = p.block; }
+    const r = E.released.find(x => x.plan.includes(p.e));
+    html += `<tr class="${r ? "rel" : "soon"}"><td>${p.e}</td><td>${r ? `<a href="episode.html?id=${r.id}">${PDD.esc(p.title)}</a>` : PDD.esc(p.title)}</td><td class="hide-s">${PDD.esc(p.src)}</td>
+      <td>${p.n ? `<a href="practice.html?ep=${p.e}">${p.n}</a>` : "0"}</td><td>${r ? `<span class="badge">Выпуск ${r.num}</span>` : `<span class="badge grey">скоро</span>`}</td></tr>`;
+  }
+  PDD.$("#plan").innerHTML = html;
+})();
+</script></body></html>
