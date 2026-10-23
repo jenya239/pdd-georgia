@@ -75,10 +75,12 @@ export function noteAfterReload() {
 export function mountProgressButtons(tools) {
   const wrap = document.createElement("span");
   wrap.className = "pfbtns";
-  wrap.innerHTML = `<button class="iconbtn" data-act="export" title="Скачать весь прогресс одним файлом">⤓ Сохранить прогресс</button>
-    <label class="iconbtn" title="Загрузить прогресс из файла: сначала покажем, что изменится">⤒ Загрузить прогресс<input type="file" accept="application/json,.json" hidden data-act="import"></label>`;
+  wrap.innerHTML = `<button type="button" class="iconbtn" data-act="export" aria-label="Сохранить прогресс" title="Сохранить прогресс: скачать весь прогресс одним файлом">⤓</button>
+    <button type="button" class="iconbtn" data-act="pick" aria-label="Загрузить прогресс" title="Загрузить прогресс из файла: сначала покажем, что изменится">⤒</button>
+    <input type="file" accept="application/json,.json" hidden data-act="import">`;
   tools.append(wrap);
   wrap.querySelector("[data-act=export]").onclick = exportProgress;
+  wrap.querySelector("[data-act=pick]").onclick = () => wrap.querySelector("[data-act=import]").click();
   wrap.querySelector("[data-act=import]").onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
     showPreview(await f.text());

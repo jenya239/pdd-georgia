@@ -160,6 +160,115 @@ def norms(br, base):
     mob.close()
 
 
+HEADER_PAGES = [("index.html", "eps"), ("practice.html", "practice"), ("exam.html", "exam"), ("errors.html", "errors"),
+                ("about.html", "about"), ("check.html?ep=ep04", "eps"), ("episode.html?id=ep05", "eps"),
+                ("norm/index.html", "law"), ("norm/st5-p87.html", "law")]
+# the visible top-level header items; all of them must sit on one line
+HEADER_ITEMS = """[...document.querySelectorAll('header.top .brand, header.top .menubtn, header.top nav.main > a, header.top .tools .iconbtn')]
+  .filter(e => e.offsetParent !== null && getComputedStyle(e).visibility !== 'hidden' && !e.closest('nav.main.open'))
+  .map(e => { const r = e.getBoundingClientRect(); return [e.className || e.tagName, Math.round(r.top), Math.round(r.bottom), Math.round(r.left), Math.round(r.right)]; })"""
+
+
+def header_layout(br, base):
+    """Compact one-line header on every page at desktop, tablet and phone widths; menu and icon buttons."""
+    for w in [1280, 1024, 768, 390, 320]:
+        mobile = w < 1024
+        ctx = br.new_context(viewport={"width": w, "height": 800}, **({"is_mobile": True, "has_touch": True} if w <= 390 else {}))
+        page = ctx.new_page()
+        watch(page)
+        for pg, key in HEADER_PAGES:
+            page.goto(base + pg)
+            page.wait_for_selector("header.top .tools [data-act=export]")
+            hb = page.locator("header.top").bounding_box()
+            items = page.evaluate(HEADER_ITEMS)
+            tops = {t for _, t, _, _, _ in items}
+            check(hb["height"] <= 56 and len(items) >= 4 and max(tops) - min(tops) <= 2 and all(r <= w and l >= 0 for _, _, _, l, r in items),
+                  f"{w}px {pg}: header {hb['height']:.0f}px, one line ({len(items)} items, tops {sorted(tops)})")
+            sw = page.evaluate("document.documentElement.scrollWidth")
+            check(sw <= w, f"{w}px {pg}: no horizontal overflow ({sw})")
+            cur = page.locator("header.top nav.main a[aria-current=page]")
+            check(cur.count() == 1 and "on" in (cur.get_attribute("class") or "") and cur.get_attribute("data-k") == key,
+                  f"{w}px {pg}: current page highlighted ({key})")
+            btns = page.locator("header.top .tools .iconbtn")
+            labels = btns.evaluate_all("bs => bs.map(b => [b.getAttribute('aria-label'), b.title, b.innerText.trim()])")
+            check(len(labels) == 3 and all(a and t and len(x) <= 2 for a, t, x in labels)
+                  and {a for a, _, _ in labels} == {"Сохранить прогресс", "Загрузить прогресс", "Светлая / тёмная тема"},
+                  f"{w}px {pg}: icon buttons with tooltips and aria-labels {labels}")
+            menu = page.locator("header.top .menubtn")
+            if not mobile:
+                check(not menu.is_visible() and page.locator("header.top nav.main a").first.is_visible(), f"{w}px {pg}: nav inline, no menu button")
+                continue
+            check(menu.is_visible() and menu.get_attribute("aria-expanded") == "false" and not page.locator("header.top nav.main a").first.is_visible(),
+                  f"{w}px {pg}: nav collapsed behind the menu button")
+            if pg not in ("index.html", "norm/st5-p87.html"):
+                continue
+            menu.click()
+            links = page.locator("header.top nav.main a")
+            boxes = links.evaluate_all("as => as.map(a => { const r = a.getBoundingClientRect(); return [r.left, r.right, r.height]; })")
+            check(menu.get_attribute("aria-expanded") == "true" and links.nth(5).is_visible() and all(l >= 0 and r <= w and h >= 32 for l, r, h in boxes),
+                  f"{w}px {pg}: menu opens, all 6 links visible and tappable")
+            check(page.evaluate("document.documentElement.scrollWidth") <= w, f"{w}px {pg}: open menu does not overflow")
+            if w == 390 and pg == "index.html":
+                shot(page, "header_mobile_menu_open.png")
+            page.keyboard.press("Escape")
+            check(menu.get_attribute("aria-expanded") == "false" and not links.first.is_visible()
+                  and page.evaluate("document.activeElement.classList.contains('menubtn')"), f"{w}px {pg}: Esc closes the menu, focus back on the button")
+            page.keyboard.press("Enter")
+            check(menu.get_attribute("aria-expanded") == "true", f"{w}px {pg}: Enter on the focused menu button opens it")
+            page.keyboard.press("Tab")
+            check(page.evaluate("document.activeElement.closest('nav.main') !== null"), f"{w}px {pg}: Tab moves into the menu")
+            page.mouse.click(w // 2, 700)
+            check(menu.get_attribute("aria-expanded") == "false" and not links.first.is_visible(), f"{w}px {pg}: click outside closes the menu")
+            menu.click()
+            links.nth(1).click()
+            page.wait_for_url("**/practice.html")
+            check(True, f"{w}px {pg}: menu link navigates")
+        if w == 1280:
+            page.goto(base + "episode.html?id=ep05")
+            page.wait_for_selector("header.top .tools [data-act=export]")
+            shot(page, "header_desktop_1280.png", clip={"x": 0, "y": 0, "width": 1280, "height": 120})
+            with page.expect_file_chooser() as fc:
+                page.locator("header.top [aria-label='Загрузить прогресс']").focus()
+                page.keyboard.press("Enter")
+            check(fc.value is not None, "load button opens the file chooser from the keyboard")
+            # layers above the sticky header: norm hover panel right under the header, full-screen image zoom
+            a = page.locator('article.lesson a.nref').first
+            a.scroll_into_view_if_needed()
+            page.evaluate("y => window.scrollBy(0, y)", a.bounding_box()["y"] - 60)
+            a.hover()
+            page.wait_for_selector("#npop:not([hidden])")
+            pb = page.locator("#npop").bounding_box()
+            hit = page.evaluate("([x, y]) => !!document.elementFromPoint(x, y)?.closest('#npop')", [pb["x"] + 20, pb["y"] + 5])
+            check(hit, f"norm hover panel layers above the header (panel top {pb['y']:.0f})")
+            page.keyboard.press("Escape")
+            page.evaluate("import('./assets/app/layout.mjs').then(m => m.zoom(document.querySelector('img').src))")
+            page.wait_for_selector("#zoom.on")
+            check(page.evaluate("!!document.elementFromPoint(640, 20)?.closest('#zoom')"), "full-screen image covers the header")
+        if w == 390:
+            page.goto(base + "index.html")
+            page.wait_for_selector("header.top .tools [data-act=export]")
+            shot(page, "header_mobile_390.png", clip={"x": 0, "y": 0, "width": 390, "height": 200})
+            page.goto(base + "episode.html?id=ep05")
+            page.wait_for_selector("article.lesson a.nref")
+            page.evaluate("window.scrollTo(0, 1500)")
+            check(page.locator("header.top").bounding_box()["y"] == 0, "390px: header stays on top while scrolling (sticky)")
+            link = page.locator("article.lesson a.nref").first
+            link.scroll_into_view_if_needed()
+            link.tap()
+            page.wait_for_selector("#npop.sheet:not([hidden])")
+            pb = page.locator("#npop").bounding_box()
+            check(page.evaluate("([x, y]) => !!document.elementFromPoint(x, y)?.closest('#npop')", [pb["x"] + 30, pb["y"] + 10]), "390px: norm bottom sheet above everything")
+            page.click("#npop .npop-close")
+            hint = page.locator(".fighint:not([hidden]) button").first
+            if hint.count():
+                hint.scroll_into_view_if_needed()
+                hint.click()
+                page.wait_for_selector(".figmodal")
+                check(page.evaluate("!!document.elementFromPoint(195, 20)?.closest('.figmodal')"), "390px: full-screen figure covers the header")
+                page.keyboard.press("Escape")
+        ctx.close()
+
+
 def main():
     E = json.loads((ROOT / "data/episodes.json").read_text())
     rel = {r["id"]: r for r in E["released"]}
@@ -428,14 +537,13 @@ def main():
         check(steps == need and "Готово" in page.locator(".result").inner_text(), f"drill done after {steps} answers (need {need})")
 
         # global save / load of all progress (header buttons on every page)
-        for pg in ["index.html", "practice.html", "exam.html", "errors.html", "about.html", "check.html?ep=ep04", "episode.html?id=ep05",
-                   "norm/index.html", "norm/st5-p87.html"]:
+        for pg, _ in HEADER_PAGES:
             page.goto(base + pg)
             page.wait_for_selector("header.top [data-act=export]")
             check(page.locator("#langseg, header.top [data-l]").count() == 0 and not re.search(r"\b(RU|KA|EN)\b", page.inner_text("header.top")),
                   f"{pg}: no global language switch in the header")
-            check(page.locator("header.top [data-act=export]").inner_text().strip().endswith("Сохранить прогресс")
-                  and page.locator("header.top label:has([data-act=import])").inner_text().strip().endswith("Загрузить прогресс"),
+            check(page.locator("header.top [data-act=export][aria-label='Сохранить прогресс']").count() == 1
+                  and page.locator("header.top [aria-label='Загрузить прогресс']").count() == 1,
                   f"{pg}: header has Сохранить / Загрузить прогресс")
         page.goto(base + "errors.html")
         page.wait_for_selector("header.top [data-act=export]")
@@ -540,6 +648,7 @@ def main():
         check(mp.evaluate("document.documentElement.dataset.theme") == "dark", "dark theme persists")
         shot(mp, f"{last['id']}_mobile_dark.png")
         norms(br, base)
+        header_layout(br, base)
         br.close()
     stop()
     legacy_root()

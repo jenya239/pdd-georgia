@@ -14,16 +14,30 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--font)}
 a{color:var(--acc)}
 img{max-width:100%}
+/* шапка: одна строка на любой ширине; < 1024px разделы прячутся за кнопкой «☰» */
+html{scroll-padding-top:56px}
 header.top{position:sticky;top:0;z-index:20;background:var(--bg2);border-bottom:1px solid var(--line)}
-.top .in{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:8px 16px;flex-wrap:wrap}
-.brand{font-weight:700;text-decoration:none;color:var(--fg);white-space:nowrap}
-.brand small{font-weight:400;color:var(--mut)}
-nav.main{display:flex;gap:4px;flex-wrap:wrap}
-nav.main a{text-decoration:none;color:var(--fg);padding:6px 10px;border-radius:8px}
+.top .in{position:relative;max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:6px 16px;flex-wrap:nowrap;min-height:44px}
+.brand{font-weight:700;text-decoration:none;color:var(--fg);white-space:nowrap;display:inline-flex;align-items:center;height:32px;margin-right:6px}
+nav.main{display:flex;gap:2px;flex-wrap:nowrap;min-width:0}
+nav.main a{text-decoration:none;color:var(--fg);padding:0 9px;border-radius:8px;white-space:nowrap;display:inline-flex;align-items:center;height:32px;font-size:15px}
 nav.main a.on,nav.main a:hover{background:var(--acc2);color:var(--acc)}
-.tools{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.pfbtns{display:flex;gap:8px}
-.pfbtns label.iconbtn{display:inline-flex;align-items:center}
+nav.main a.on{font-weight:600}
+.tools{margin-left:auto;display:flex;gap:4px;align-items:center;flex-wrap:nowrap}
+.pfbtns{display:flex;gap:4px}
+.top .iconbtn,.menubtn{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+.menubtn{display:none;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:8px;cursor:pointer;font:inherit;font-size:18px}
+.menubtn[aria-expanded=true]{background:var(--acc2);color:var(--acc)}
+.top a:focus-visible,.top button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+@media (max-width:1023.98px){
+  .top .in{padding:6px 12px}
+  .menubtn{display:inline-flex}
+  nav.main{display:none;position:absolute;top:100%;left:8px;right:8px;flex-direction:column;gap:2px;padding:6px;
+    background:var(--bg2);border:1px solid var(--line);border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  nav.main.open{display:flex}
+  nav.main a{height:40px;padding:0 12px;font-size:16px}
+}
+@media (min-width:768px) and (max-width:1023.98px){nav.main{left:auto;width:280px}}
 .pfdlg{max-width:620px;width:calc(100vw - 24px);border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--fg);padding:16px}
 .pfdlg::backdrop{background:rgba(0,0,0,.55)}
 .pfdlg h3{margin:0 0 8px}
@@ -120,13 +134,9 @@ footer{max-width:1040px;margin:0 auto;padding:20px 16px 40px;color:var(--mut);fo
   h1{font-size:22px}
   .ep img{width:110px}
   .qtext{font-size:16px}
-  .tools{margin-left:0;width:100%;justify-content:space-between}
-  .pfbtns{width:100%}
-  .pfbtns .iconbtn{flex:1;justify-content:center;text-align:center}
   .exgrid{grid-template-columns:repeat(6,1fr)}
   .plan .hide-s{display:none}
 }
-@media (max-width:640px){header.top{position:static}}
 
 /* ---------- текстовые уроки (lessons/epNN.html) ---------- */
 :root{--fg-road:#a7adb5;--fg-walk:#e4e7eb;--fg-verge:#e2ecdc;--fg-bed:#d9d2c3;--fg-paint:#ffffff;--fg-car:#1f5fbf;
@@ -282,3 +292,9 @@ ul.nindex li.d4{padding-left:64px}
 .katoggle[aria-pressed=true]{background:var(--acc2);border-color:var(--acc)}
 .qka{margin:6px 0 0;padding:6px 10px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:6px;font-size:15px}
 .aka:not([hidden]){display:block;margin-top:3px;font-size:13px;color:var(--mut)}
+
+/* узкие телефоны (320–390px): ничего не вылезает за ширину экрана */
+select{max-width:100%}
+.row > label{max-width:100%;min-width:0}
+.ep > div{min-width:0;overflow-wrap:anywhere}
+@media (max-width:380px){.ep img{width:84px}.ep{gap:10px}}
