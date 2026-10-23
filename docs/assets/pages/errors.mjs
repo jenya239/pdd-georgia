@@ -6,6 +6,7 @@ import { record, store } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { errorStats, groupStats, drillQueue } from "../domain/errors.mjs";
 import { MASTERY_STREAK } from "../domain/progress.mjs";
+import { idLabel, parseId, misconceptionFor } from "../domain/items.mjs";
 import { mountProgressFile } from "../app/progress-file.mjs";
 
 header("errors");
@@ -18,17 +19,28 @@ const pct = x => Math.round(100 * x) + "%";
 const GROUPS = {
   rank: { label: "Общий рейтинг", key: null },
   lesson: { label: "По урокам", key: s => s.lesson, name: k => (k ? lessonName[k] || k : "Пока не разобрано ни в одном уроке") },
-  topic: { label: "По темам базы", key: s => s.topic, name: k => D.meta.topics[k] || `Тема ${k}` },
+  topic: { label: "По темам базы", key: s => s.topic, name: k => (k === "own" ? "Наши вопросы (их нет в официальной базе)" : D.meta.topics[k] || `Тема ${k}`) },
   rule: { label: "По правилам", key: s => s.ruleKey, name: (k, g) => (k ? g.items[0].ruleLabel : "Без ссылки на закон в пояснении") },
 };
 
 function optionText(t, i) { return i == null ? "—" : `${i + 1}. ${t.a.ru[i] ?? ""}`; }
 
+const ALL = [...D.tickets, ...D.items];
+
+/** Typical errors behind the options this learner picked (distinct, most frequent first). */
+function mcLines(t, picks) {
+  const seen = new Set();
+  return picks.map(([i]) => misconceptionFor(t, +i, D.mc, D.ticketDistractors))
+    .filter(m => m && !seen.has(m.id) && seen.add(m.id))
+    .map(m => `<div class="note mc"><b>Типичная ошибка:</b> «${esc(m.belief)}». <b>Как правильно:</b> ${esc(m.truth)}.</div>`).join("");
+}
+
 function item(s) {
   const t = D.byId[s.id];
   const picks = Object.entries(s.picks).sort((a, b) => b[1] - a[1]);
+  const mcs = mcLines(t, picks.length ? picks : s.lastChoice != null ? [[String(s.lastChoice), 1]] : []);
   return `<details class="err card" data-id="${s.id}"><summary>
-     <span class="errhead"><b>№ ${s.id}</b> <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}</span>
+     <span class="errhead"><b>${esc(idLabel(s.id))}</b>${t.own ? ` <span class="badge own">наш вопрос</span>` : ""} <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}</span>
      ${s.mastered ? `<span class="badge ok">исправлено: ${MASTERY_STREAK} верно подряд</span>` : ""}
      <span class="small mut">последняя ошибка ${fmt(s.lastWrong)}${s.ruleLabel ? " · " + esc(s.ruleLabel) : ""}</span></span>
      <span class="errq">${esc(t.q.ru)}</span></summary>
@@ -36,11 +48,12 @@ function item(s) {
        <p class="small"><span class="bad">Ваш ответ:</span> ${picks.length ? picks.map(([i, n]) => `${esc(optionText(t, +i))}${n > 1 ? ` <span class="mut">(×${n})</span>` : ""}`).join("; ") : esc(optionText(t, s.lastChoice))}<br>
        <span class="ok">Правильный:</span> ${esc(optionText(t, t.c))}</p>
        ${t.why ? `<div class="note why"><b>Почему здесь ошибаются.</b> ${esc(t.why)}</div>` : ""}
+       ${mcs}
        <div class="qwrap"></div></div></details>`;
 }
 
 function list() {
-  const stats = errorStats(st.progress(), D.tickets);
+  const stats = errorStats(st.progress(), ALL);
   const by = GROUPS[q.get("by")] ? q.get("by") : "lesson";
   const left = drillQueue(st.progress(), stats.map(s => s.id));
   m.innerHTML = `<h1>Типичные ошибки</h1>
@@ -63,8 +76,8 @@ function list() {
 }
 
 function drill() {
-  const only = (q.get("ids") || "").split(",").map(Number).filter(Boolean);
-  const pool = only.length ? only : errorStats(st.progress(), D.tickets).map(s => s.id);
+  const only = (q.get("ids") || "").split(",").filter(Boolean).map(parseId).filter(id => D.byId[id]);
+  const pool = only.length ? only : errorStats(st.progress(), ALL).map(s => s.id);
   let lastId = null, cur = null;
   function step() {
     const left = drillQueue(st.progress(), pool);

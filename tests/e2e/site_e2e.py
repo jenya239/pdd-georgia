@@ -44,6 +44,11 @@ def watch(page):
     page.on("response", lambda r: r.status >= 400 and failed.append(f"{r.status} {r.url}"))
 
 
+def pid(tid):
+    """data-id → ticket number, or the own item id as is."""
+    return int(tid) if tid.isdigit() else tid
+
+
 def correct_of(page, sel=".q"):
     q = page.locator(sel).first
     tid = q.get_attribute("data-id")
@@ -79,8 +84,10 @@ def main():
     E = json.loads((ROOT / "data/episodes.json").read_text())
     rel = {r["id"]: r for r in E["released"]}
     last = max(E["released"], key=lambda r: r["num"])
-    scope_n = sum(len(r["tickets_lesson"]) for r in E["released"])
-    lesson_last = rel[last["id"]]["tickets_lesson"]
+    own_n = sum(len(r.get("own_items", [])) for r in E["released"])
+    scope_n = sum(len(r["tickets_lesson"]) for r in E["released"]) + own_n  # own questions are on by default
+    lesson_last = rel[last["id"]]["tickets_lesson"] + rel[last["id"]].get("own_items", [])
+    items = json.loads((ROOT / "data/items.json").read_text())
     base, stop = serve(ROOT)
     with sync_playwright() as p:
         br = launch(p)
@@ -145,6 +152,53 @@ def main():
             check(before is None and rec["w"] == 1 and rec["k"] == 0 and rec["p"] == {str((c + 1) % na): 1}, f"{r['id']}: wrong pick recorded {rec}")
             shot(page, f"{r['id']}_desktop_full.png", full_page=True)
 
+        # own check items on every lesson page
+        for r in E["released"]:
+            own = r.get("own_items", [])
+            page.goto(base + f"episode.html?id={r['id']}")
+            page.wait_for_selector(".points li")
+            page.wait_for_timeout(200)
+            check(len(own) > 0 and page.locator("#own-items .q").count() == len(own)
+                  and page.locator("#own-items .q .badge.own").count() == len(own), f"{r['id']}: {len(own)} own questions marked «наш вопрос»")
+        by_id = {i["id"]: i for i in items["items"]}
+        figs = [i for i in items["items"] if i.get("fig")]
+        check(len(figs) >= 5, f"{len(figs)} own items with figures")
+        page.goto(base + f"episode.html?id={figs[0]['lesson']}")
+        page.wait_for_selector("#own-items .q")
+        check(page.locator(f'#own-items .q[data-id="{figs[0]["id"]}"] .qfig svg').count() == 1, "own item figure rendered")
+        ids = page.evaluate("[...document.querySelectorAll('[id]')].map(e => e.id)")
+        check(len(ids) == len(set(ids)), "element ids unique with own figures")
+        sec = next(i for i in figs if i["fig"]["kind"] == "section")
+        page.goto(base + f"episode.html?id={sec['lesson']}")
+        page.wait_for_selector(f'#own-items .q[data-id="{sec["id"]}"] .qfig svg')
+        fills = page.evaluate(f"""[...document.querySelectorAll('#own-items .q[data-id="{sec["id"]}"] .qfig rect.strip')].map(r => getComputedStyle(r).fill)""")
+        check(len(set(fills)) >= 3, f"section figure: strip kinds styled apart {sorted(set(fills))}")
+        # wrong pick on an own item with a mapped misconception: recorded, typical error + verbatim quote shown
+        mapped = next(i for i in items["items"] if any(items["misconceptions"].get(m or "") for m in i["distractors"].values()))
+        wrong_i = int(next(k for k, m in mapped["distractors"].items() if m))
+        page.goto(base + f"episode.html?id={mapped['lesson']}")
+        page.wait_for_selector(f'#own-items .q[data-id="{mapped["id"]}"]')
+        oq = page.locator(f'#own-items .q[data-id="{mapped["id"]}"]')
+        oq.locator(".ans").nth(wrong_i).click()
+        page.wait_for_timeout(100)
+        rec = page.evaluate("JSON.parse(localStorage.getItem('pddge.progress.v1'))").get(mapped["id"])
+        check(rec is not None and rec["w"] == 1, f"own item answer recorded {rec}")
+        txt = oq.inner_text()
+        check(oq.locator(".note.mc").count() == 1 and mapped["quote"]["text"][:40] in " ".join(txt.split()), "own item: typical error + verbatim quote")
+        check(oq.locator("a[target=_blank]").count() == 0, "own item has no source link")
+        shot(page, "own_item_feedback.png", full_page=False)
+        page.evaluate("localStorage.removeItem('pddge.progress.v1')")
+        # bank ticket with an annotated distractor shows the typical error too
+        td = items["ticket_distractors"]
+        tk_id, tk_choice = next((t, int(i)) for t, d in td.items() for i, m in d.items() if m and any(int(t) in rr["tickets_core"] + rr["tickets_linked"] for rr in E["released"]))
+        tk_ep = next(rr["id"] for rr in E["released"] if int(tk_id) in rr["tickets_core"] + rr["tickets_linked"])
+        page.goto(base + f"episode.html?id={tk_ep}")
+        page.wait_for_selector(f'#tk .q[data-id="{tk_id}"]')
+        bq = page.locator(f'#tk .q[data-id="{tk_id}"]')
+        bq.locator(".ans").nth(tk_choice).click()
+        check(bq.locator(".note.mc").count() == 1, f"bank ticket {tk_id}: typical error on wrong pick")
+        page.evaluate("localStorage.removeItem('pddge.progress.v1')")
+
         # language switch
         page.goto(base + f"episode.html?id=ep02")
         page.wait_for_selector(".q")
@@ -192,10 +246,19 @@ def main():
         page.evaluate("localStorage.clear()")
         page.goto(base + f"check.html?lesson={last['id']}")
         page.wait_for_selector("#start")
+        check(page.locator("#ownopt").is_checked() and f"наших вопросов {own_n}" in page.inner_text("#m"), "check: own questions on by default")
+        page.uncheck("#ownopt")
+        page.wait_for_selector("#start")
+        check(f"всего {scope_n - own_n} " in page.inner_text("#m") and not page.locator("#ownopt").is_checked(), "check: toggle off removes own questions")
+        page.reload()
+        page.wait_for_selector("#start")
+        check(not page.locator("#ownopt").is_checked(), "check: toggle is saved")
+        page.check("#ownopt")
+        page.wait_for_selector("#start")
         page.click("#start")
         page.wait_for_selector(".q")
         first = page.locator(".q").get_attribute("data-id")
-        check(int(first) in lesson_last, "new-first: first ticket is from the current lesson")
+        check(pid(first) in lesson_last, "new-first: first ticket is from the current lesson")
         wrong = []
         for i in range(3):
             tid = answer_current(page, correct=(i != 1))
@@ -207,12 +270,18 @@ def main():
         check(f"3 из {scope_n}" in page.locator("#resume").inner_text(), f"run resumable after reload (3 из {scope_n})")
         page.click("#resume")
         page.wait_for_selector(".q")
-        k, new_first = 3, True
+        k, new_first, seen_own, own_unmarked = 3, True, set(), []
         while page.locator("#next").count():
             tid = page.locator(".q").get_attribute("data-id")
-            if k < len(lesson_last) and int(tid) not in lesson_last:
+            if k < len(lesson_last) and pid(tid) not in lesson_last:
                 new_first = False
             ok = k not in (10, 40)
+            if isinstance(pid(tid), str):
+                seen_own.add(tid)
+                if page.locator(".badge.own").count() == 0:
+                    own_unmarked.append(tid)
+                if not any(isinstance(w, str) for w in wrong):
+                    ok = False  # make sure at least one own question lands in the errors
             t2 = answer_current(page, correct=ok)
             if not ok:
                 wrong.append(t2)
@@ -220,6 +289,7 @@ def main():
             k += 1
             page.wait_for_selector(".q, .result")
         check(new_first, "all current-lesson tickets came first")
+        check(len(seen_own) >= own_n - 3 and not own_unmarked, f"own questions in the run and marked ({len(seen_own)})")
         res = page.locator(".result").inner_text()
         check(f"{scope_n - len(wrong)} из {scope_n}" in res, f"result {res}")
         runs = page.evaluate("JSON.parse(localStorage.getItem('pddge.runs.v1'))")
@@ -230,6 +300,11 @@ def main():
         page.goto(base + "errors.html")
         page.wait_for_selector("details.err")
         check(page.locator("details.err").count() == len(wrong), f"errors list has {len(wrong)} items")
+        own_wrong = [w for w in wrong if isinstance(w, str)]
+        check(own_wrong and page.locator("details.err .badge.own").count() == len(own_wrong), f"errors list marks own questions {own_wrong}")
+        page.click("[data-by=topic]")
+        page.wait_for_selector("details.err")
+        check("Наши вопросы" in page.inner_text("#list"), "errors by topic: own questions group")
         for by in ("rank", "topic", "rule", "lesson"):
             page.click(f"[data-by={by}]")
             page.wait_for_selector("details.err")

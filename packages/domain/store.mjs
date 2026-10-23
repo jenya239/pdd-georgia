@@ -11,7 +11,7 @@ export const KEYS = {
   active: "pddge.cumrun.v1",     // unfinished cumulative checks by lesson
   settings: "pddge.settings.v1",
 };
-const DEFAULT_SETTINGS = { order: "new-first" };
+const DEFAULT_SETTINGS = { order: "new-first", own: true };
 
 export function memoryBackend(init = {}) {
   const m = new Map(Object.entries(init));

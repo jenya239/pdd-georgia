@@ -182,3 +182,34 @@ fieldset.order{border:0;padding:0;margin:0;display:grid;gap:6px}
 .note.why{border-color:var(--acc);background:var(--acc2);margin:8px 0}
 .seg.groupby{flex-wrap:wrap}
 @media (max-width:640px){.fig svg{min-width:460px}}
+/* own check items («наш вопрос») */
+.badge.own{background:#efe6fb;color:#5b2ca0;font-weight:600}
+:root[data-theme=dark] .badge.own{background:#2c2140;color:#c9a7ff}
+.note.mc{border-color:var(--bad);background:var(--badbg);margin-top:8px}
+blockquote.lawquote{margin:10px 0 0;padding:8px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:6px;font-size:14px}
+.ownopt{display:block;margin-top:10px;font-size:14px}
+.qfig{margin:10px 0}
+.qfig svg.fig{max-width:360px;width:100%;height:auto;display:block}
+svg.fig .bg{fill:#cfe3c4}
+svg.fig .road,svg.fig .main{fill:#8a929c}
+svg.fig .main{fill:#6c747e}
+svg.fig .unpaved{fill:#b08a5a}
+svg.fig .yard{fill:#b9b2a6}
+svg.fig .axis{stroke:#fff;stroke-width:2;stroke-dasharray:8 6}
+svg.fig .route{fill:none;stroke:#1f5fbf;stroke-width:2.5;stroke-dasharray:5 4}
+svg.fig .arrowhead{fill:#1f5fbf}
+svg.fig .car rect{fill:#fff;stroke:#1b1f24;stroke-width:1.5}
+svg.fig .car text{font:bold 14px var(--font);fill:#1b1f24}
+svg.fig .tag{font:12px var(--font);fill:#1b1f24}
+svg.fig .lbl{font:bold 16px var(--font);fill:var(--fg)}
+svg.fig .lbl.small{font-size:13px;fill:#fff}
+svg.fig .dist{font:12px var(--font);fill:var(--fg)}
+svg.fig .k-shoulder{fill:#c8b99a}
+svg.fig .k-lane{fill:#8a929c;stroke:#fff;stroke-dasharray:10 8}
+svg.fig .k-strip{fill:#7fae6a}
+svg.fig .k-sidewalk{fill:#d9d4cc}
+svg.fig .zebra rect{fill:#fff}
+svg.fig .barrier{stroke:#c62828;stroke-width:6;stroke-dasharray:10 8}
+svg.fig .rail{stroke:#444;stroke-width:4}
+svg.fig .light rect{fill:#1b1f24}
+svg.fig .mark line{stroke:#ffd54f;stroke-width:3}

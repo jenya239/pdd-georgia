@@ -19,6 +19,7 @@ which *every* checked norm is taught. Both are compared with the live assignment
 manual include/exclude) in generated/report.json; the site keeps using the live one."""
 from __future__ import annotations
 
+import collections
 import json
 import re
 from functools import cached_property
@@ -306,7 +307,8 @@ class World:
         return err
 
     # -- report ----------------------------------------------------------------
-    def report(self):
+    def report(self, items=()):
+        """`items`: own check items (pdd.checkitems) — counted, and their distractors count as misconception use."""
         live = self.live_assignment
         der = self.derive_assignment()
         strict = self.strict_assignment()
@@ -331,6 +333,10 @@ class World:
         mis_use = {}
         for a in annotated.values():
             for m in (a.get("distractors") or {}).values():
+                if m:
+                    mis_use[m] = mis_use.get(m, 0) + 1
+        for it in items:
+            for m in it["distractors"].values():
                 if m:
                     mis_use[m] = mis_use.get(m, 0) + 1
         return {
@@ -360,6 +366,12 @@ class World:
                 "unused_misconceptions": sorted(set(self.misconceptions) - set(mis_use)),
                 "unresolved_ticket_refs": {str(t): u for t in sorted(self.questions)
                                            for u in [self.ticket_norms(t)["unresolved"]] if u},
+            },
+            "own_items": {
+                "total": len(items),
+                "by_lesson": {l: sum(1 for i in items if i["lesson"] == l) for l in self.lesson_order
+                              if any(i["lesson"] == l for i in items)},
+                "by_type": dict(sorted(collections.Counter(i["type"] for i in items).items())),
             },
             "misconception_use": dict(sorted(mis_use.items())),
         }

@@ -19,7 +19,7 @@ from pdd import paths
 from pdd.assign import assign_lessons, primary_ref, rule_key, rule_label, pitfall_for
 from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
 from pdd.lawparse import parse_law, parse_annex
-from pdd import norms as norms_mod, ontology
+from pdd import checkitems, norms as norms_mod, ontology
 from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
@@ -82,9 +82,18 @@ def generate():
         if why:
             t["why"] = why
 
+    world = load_world()
+    items = checkitems.load_items()
+    errors = checkitems.validate(items, world)
+    if errors:
+        raise ValueError("own check items are invalid:\n" + "\n".join(errors))
+
     files, copies = {}, {}
     for ep in eps:
         ep["kind"] = episode_kind(ep)
+        own = [i["id"] for i in items if i["lesson"] == ep["id"]]
+        if own:
+            ep["own_items"] = own
         ep["tickets_lesson"] = lesson_ticket_ids(ep["id"], assignment)
         core = core_ticket_ids(ep, Q)
         ep["tickets_core"] = core
@@ -112,6 +121,7 @@ def generate():
 
     meta = {"built_from": META, "count": len(tickets), "topics": topics, "stats": stat}
     files["data/tickets.json"] = dumps_compact({"meta": meta, "tickets": tickets, "laws": idx.quotes})
+    files["data/items.json"] = dumps_compact(checkitems.export(items, world))
     files["data/episodes.json"] = json.dumps({"plan": plan, "released": eps}, ensure_ascii=False, indent=1)
 
     for t in tickets:
@@ -132,13 +142,23 @@ def generate():
     return files, copies, report
 
 
+_WORLD = []
+
+
+def load_world():
+    """The course ontology over freshly generated norms (computed once per process)."""
+    if not _WORLD:
+        _WORLD.append(ontology.World(ontology.load_doc(), norms_mod.generate_norms(),
+                                     json.loads(paths.TICKETS_JSON.read_text(encoding="utf-8"))["questions"],
+                                     json.loads(paths.EPISODES_JSON.read_text(encoding="utf-8"))))
+    return _WORLD[0]
+
+
 def generated_sources() -> dict:
     """Generated files kept in the repository (content/ontology/generated): {Path: text}."""
-    norms = norms_mod.generate_norms()
-    world = ontology.World(ontology.load_doc(), norms,
-                           json.loads(paths.TICKETS_JSON.read_text(encoding="utf-8"))["questions"],
-                           json.loads(paths.EPISODES_JSON.read_text(encoding="utf-8")))
-    return {norms_mod.NORMS_JSON: norms_mod.dump(norms), ontology.REPORT_JSON: ontology.dump(world.report())}
+    world = load_world()
+    return {norms_mod.NORMS_JSON: norms_mod.dump(list(world.norms.values())),
+            ontology.REPORT_JSON: ontology.dump(world.report(checkitems.load_items()))}
 
 
 def expected_tree(files, copies) -> dict:

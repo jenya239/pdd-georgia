@@ -40,3 +40,8 @@ test("drill queue = tickets with mistakes that are not yet mastered (2 in a row)
   assert.deepEqual(drillQueue(P), [1, 2]);
   assert.deepEqual(drillQueue(P, [2, 3, 4]), [2]);
 });
+
+test("drill queue keeps own item ids as strings and bank ids as numbers", () => {
+  const bad = { s: 1, c: 0, w: 1, l: 0, t: 1, k: 0 };
+  assert.deepEqual(drillQueue({ "12": bad, "o-ep02-03": bad, "3": bad }), [3, 12, "o-ep02-03"]);
+});

@@ -6,15 +6,14 @@ export function currentLesson(released) {
   return list.length ? list[list.length - 1] : null;
 }
 
-/** Tickets of this lesson (`current`) and of all earlier lessons (`previous`). */
-export function cumulativeScope(released, lessonId) {
+/** Tickets of this lesson (`current`) and of all earlier lessons (`previous`);
+ *  with {own: true} each lesson's own check items follow its tickets. */
+export function cumulativeScope(released, lessonId, { own = false } = {}) {
   const list = releasedLessons(released);
   const idx = list.findIndex(l => l.id === lessonId);
   if (idx < 0) throw new Error(`unknown lesson ${lessonId}`);
-  return {
-    current: [...(list[idx].tickets_lesson || [])],
-    previous: list.slice(0, idx).flatMap(l => l.tickets_lesson || []),
-  };
+  const ids = l => [...(l.tickets_lesson || []), ...(own ? l.own_items || [] : [])];
+  return { current: ids(list[idx]), previous: list.slice(0, idx).flatMap(ids) };
 }
 
 export function shuffle(items, rng = Math.random) {

@@ -43,3 +43,11 @@ test("scope status: tickets in scope, solved, error rate", () => {
     { inScope: 4, solved: 2, correctNow: 1, attempts: 4, wrong: 3, errorRate: 0.75 });
   assert.equal(scopeStatus([1], {}).errorRate, null);
 });
+
+test("own items join the cumulative scope when enabled", () => {
+  const R = [{ id: "ep01", num: 1, tickets_lesson: [1], own_items: ["o-ep01-01"] },
+             { id: "ep02", num: 2, tickets_lesson: [2], own_items: ["o-ep02-01", "o-ep02-02"] }];
+  assert.deepEqual(cumulativeScope(R, "ep02", { own: true }), { current: [2, "o-ep02-01", "o-ep02-02"], previous: [1, "o-ep01-01"] });
+  assert.deepEqual(cumulativeScope(R, "ep02", { own: false }), { current: [2], previous: [1] });
+  assert.deepEqual(cumulativeScope(R, "ep02"), { current: [2], previous: [1] });
+});

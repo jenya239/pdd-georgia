@@ -1,11 +1,18 @@
 /** Site data (built by tools/build.py into data/*.json), fetched once per page. */
+import { itemAsTicket } from "../domain/items.mjs";
+
 let tickets = null, episodes = null;
 
-/** Tickets with `byId` index. */
+/** Bank tickets (`tickets`) and own check items (`items`, ticket-shaped) with one `byId` index;
+ *  `mc` — typical errors by id, `ticketDistractors` — typical errors behind bank ticket options. */
 export async function loadTickets() {
   if (!tickets) {
-    tickets = await fetchJson("data/tickets.json");
-    tickets.byId = Object.fromEntries(tickets.tickets.map(x => [x.id, x]));
+    const [T, I] = await Promise.all([fetchJson("data/tickets.json"), fetchJson("data/items.json")]);
+    tickets = T;
+    tickets.items = I.items.map(itemAsTicket);
+    tickets.mc = I.misconceptions;
+    tickets.ticketDistractors = I.ticket_distractors;
+    tickets.byId = Object.fromEntries([...tickets.tickets, ...tickets.items].map(x => [x.id, x]));
   }
   return tickets;
 }

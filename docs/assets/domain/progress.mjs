@@ -8,6 +8,8 @@
  *   lw last wrong time      lc last wrong choice (0-based)
  *   p  {choice: count} — how often each wrong option was picked
  */
+import { isOwnId } from "./items.mjs";
+
 export const MASTERY_STREAK = 2;
 
 const isCount = v => Number.isInteger(v) && v >= 0;
@@ -44,7 +46,7 @@ export function migrateProgress(raw) {
   const out = {};
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
   for (const [id, rec] of Object.entries(raw)) {
-    if (!/^\d+$/.test(id)) continue;
+    if (!/^\d+$/.test(id) && !isOwnId(id)) continue;
     const r = normalizeRecord(rec);
     if (r) out[id] = r;
   }

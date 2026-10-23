@@ -44,3 +44,15 @@ def test_published_episode_data_has_no_source_only_keys(built):
     E = json.loads(built[0]["data/episodes.json"])
     for r in E["released"]:
         assert not {"include", "exclude", "ticket_refs", "teaches"} & set(r), r["id"]
+
+
+def test_own_items_are_published_and_listed_per_episode(built):
+    import json
+    data = json.loads(built[0]["data/items.json"])
+    ids = [i["id"] for i in data["items"]]
+    assert len(ids) == len(set(ids)) >= 4
+    E = json.loads(built[0]["data/episodes.json"])
+    by_ep = {r["id"]: r.get("own_items", []) for r in E["released"]}
+    for lid in ("ep01", "ep02", "ep03", "ep04"):
+        assert by_ep[lid] and all(i.startswith(f"o-{lid}-") for i in by_ep[lid])
+    assert sorted(i for v in by_ep.values() for i in v) == sorted(ids)

@@ -33,7 +33,7 @@ test("active runs are stored per lesson and finished runs are appended", () => {
 
 test("settings default to new-first order", () => {
   const st = createStore(memoryBackend());
-  assert.deepEqual(st.settings(), { order: "new-first" });
+  assert.deepEqual(st.settings(), { order: "new-first", own: true });
   st.saveSettings({ order: "mixed" });
   assert.equal(st.settings().order, "mixed");
 });
@@ -46,4 +46,11 @@ test("export → import into another device merges state", () => {
   pc.recordAnswer(1, { ok: false, choice: 1, now: 2 });
   pc.importText(text);
   assert.deepEqual(pc.progress()[1], { s: 2, c: 1, w: 1, l: 0, t: 2, k: 0, lw: 2, lc: 1, p: { 1: 1 } });
+});
+
+test("own questions are included by default and the choice is saved", () => {
+  const s = createStore(memoryBackend());
+  assert.equal(s.settings().own, true);
+  s.saveSettings({ own: false });
+  assert.equal(s.settings().own, false);
 });

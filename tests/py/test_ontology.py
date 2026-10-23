@@ -90,4 +90,14 @@ def test_derived_assignment_respects_concepts(world):
 def test_report_is_fresh(world):
     path = O.REPORT_JSON
     assert path.exists(), "run tools/build.py"
-    assert json.loads(path.read_text(encoding="utf-8")) == json.loads(O.dump(world.report()))
+    from pdd import checkitems
+    assert json.loads(path.read_text(encoding="utf-8")) == json.loads(O.dump(world.report(checkitems.load_items())))
+
+
+def test_report_counts_own_items_and_their_misconceptions(world):
+    from pdd import checkitems
+    items = checkitems.load_items()
+    rep = world.report(items)
+    assert rep["own_items"]["total"] == len(items)
+    assert sum(rep["own_items"]["by_type"].values()) == len(items)
+    assert rep["gaps"]["unused_misconceptions"] == []

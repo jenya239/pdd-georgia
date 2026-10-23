@@ -58,3 +58,9 @@ test("mergeProgress sums counters and keeps the latest state", () => {
     6: { s: 1, c: 1, w: 0, l: 1, t: 3, k: 1 },
   });
 });
+
+test("progress keeps records of own items", () => {
+  const rec = { s: 1, c: 1, w: 0, l: 1, t: 5 };
+  const out = migrateProgress({ "o-ep03-02": rec, "o-x": rec, "7": rec });
+  assert.deepEqual(Object.keys(out).sort(), ["7", "o-ep03-02"]);
+});

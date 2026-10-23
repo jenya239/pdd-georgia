@@ -1,5 +1,6 @@
 /** Error statistics and the "разобрать ошибки" drill (pure). */
 import { isMastered } from "./progress.mjs";
+import { parseId, compareIds } from "./items.mjs";
 
 export function errorStats(progress, tickets) {
   const out = [];
@@ -28,6 +29,6 @@ export function groupStats(stats, keyOf) {
 
 /** Tickets with mistakes that are not yet answered correctly MASTERY_STREAK times in a row. */
 export function drillQueue(progress, ids = null) {
-  const pool = ids ?? Object.keys(progress).map(Number).sort((a, b) => a - b);
+  const pool = ids ?? Object.keys(progress).map(parseId).sort(compareIds);
   return pool.filter(id => progress[id] && progress[id].w > 0 && !isMastered(progress[id]));
 }
