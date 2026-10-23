@@ -1,6 +1,7 @@
 /* ПДД Грузии — общий код: данные, прогресс, язык, тема, отрисовка вопроса. */
 "use strict";
 const PDD = (() => {
+  const SCRIPT_URL = document.currentScript.src;
   const LS = { prog: "pddge.progress.v1", lang: "pddge.lang", theme: "pddge.theme" };
   const LANGS = { ru: "RU", ka: "KA", en: "EN" };
   let DATA = null, EPS = null;
@@ -20,11 +21,10 @@ const PDD = (() => {
 
   // ---------- прогресс ----------
   function prog() { try { return JSON.parse(localStorage.getItem(LS.prog)) || {}; } catch (e) { return {}; } }
-  function record(id, ok) {
-    const p = prog(); const r = p[id] || { s: 0, c: 0, w: 0 };
-    r.s++; ok ? r.c++ : r.w++; r.l = ok ? 1 : 0; r.t = Date.now(); p[id] = r;
-    localStorage.setItem(LS.prog, JSON.stringify(p));
-  }
+  // Правила записи ответа — в чистом модуле assets/lib/progress.mjs, хранение — в assets/lib/store.mjs.
+  const STORE = import(new URL("lib/store.mjs", SCRIPT_URL)).then(m => m.createStore(localStorage));
+  /** Записать ответ (choice — индекс выбранного варианта, с 0). Возвращает Promise с новой записью. */
+  function record(id, ok, choice) { return STORE.then(st => st.recordAnswer(id, { ok: !!ok, choice, now: Date.now() })); }
   function resetProgress() { localStorage.removeItem(LS.prog); }
   function summary(ids) {
     const p = prog(); let seen = 0, ok = 0, bad = 0;
@@ -43,7 +43,7 @@ const PDD = (() => {
 
   function header(active) {
     const h = document.createElement("header"); h.className = "top";
-    const nav = [["index.html", "Выпуски", "eps"], ["practice.html", "Самопроверка", "practice"], ["exam.html", "Экзамен", "exam"], ["about.html", "О данных", "about"]];
+    const nav = [["index.html", "Выпуски", "eps"], ["practice.html", "Самопроверка", "practice"], ["exam.html", "Экзамен", "exam"], ["errors.html", "Ошибки", "errors"], ["about.html", "О данных", "about"]];
     h.innerHTML = `<div class="in"><a class="brand" href="index.html">ПДД Грузии <small>· категория B</small></a>
       <nav class="main">${nav.map(([u, t, k]) => `<a href="${u}" class="${k === active ? "on" : ""}">${t}</a>`).join("")}</nav>
       <div class="tools"><span class="seg" id="langseg" title="Язык текста вопросов">${Object.entries(LANGS).map(([k, v]) => `<button data-l="${k}">${v}</button>`).join("")}</span>
@@ -105,11 +105,11 @@ const PDD = (() => {
       if (state.choice != null) btns[state.choice].classList.add("sel");
       btns.forEach((b, i) => b.onclick = () => { btns.forEach(x => x.classList.remove("sel")); b.classList.add("sel"); state.choice = i; opts.onAnswer && opts.onAnswer(i, i === t.c); });
     } else if (opts.reveal) { reveal(opts.selected ?? null); }
-    else btns.forEach((b, i) => b.onclick = () => { if (state.answered) return; const ok = reveal(i); if (!opts.noRecord) record(t.id, ok); opts.onAnswer && opts.onAnswer(i, ok); });
+    else btns.forEach((b, i) => b.onclick = () => { if (state.answered) return; const ok = reveal(i); if (!opts.noRecord) record(t.id, ok, i); opts.onAnswer && opts.onAnswer(i, ok); });
     el._pick = i => { if (i < btns.length && !btns[i].disabled) btns[i].click(); };
     el._state = state;
     return el;
   }
 
-  return { load, loadEps, header, renderQuestion, record, prog, summary, resetProgress, getLang, setLang, esc, $, shuffle, plural, nq, zoom };
+  return { load, loadEps, header, renderQuestion, record, store: () => STORE, prog, summary, resetProgress, getLang, setLang, esc, $, shuffle, plural, nq, zoom };
 })();

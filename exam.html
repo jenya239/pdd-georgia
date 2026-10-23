@@ -73,7 +73,7 @@
     const secs = Math.min(LIMIT, Math.round((Date.now() - t0) / 1000));
     const res = qs.map((t, k) => ({ t, a: ans[k], ok: ans[k] === t.c }));
     const ok = res.filter(r => r.ok).length, err = N - ok;
-    res.forEach(r => { if (r.a != null) PDD.record(r.t.id, r.ok); });
+    res.forEach(r => { if (r.a != null) PDD.record(r.t.id, r.ok, r.a); });
     const h = hist(); h.push({ d: Date.now(), ok, pass: err <= MAXERR, s: secs }); localStorage.setItem(HKEY, JSON.stringify(h.slice(-50)));
     $("#run").style.display = "none"; const R = $("#res"); R.style.display = "";
     const unans = ans.filter(a => a == null).length;

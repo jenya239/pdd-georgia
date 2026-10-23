@@ -3,6 +3,8 @@
 Запуск: python3 tools/build.py (из папки site). Нужны ../../tickets/tickets_ru.json, ../../structure.md, ../../sources/."""
 import json, os, re, shutil, collections
 from lawparse import parse_law, parse_annex, SRC
+from assign import assign_lessons, primary_ref, rule_key, rule_label, pitfall_for
+from episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.dirname(HERE)
@@ -102,22 +104,30 @@ for m in re.finditer(r"^\| (E\d{3})(?:–(E\d{3}))? \| (\d+) \| ([^|]+) \| ([^|]
 cnt = collections.Counter(e for t in tickets for e in t["ep"])
 for p in plan: p["n"] = cnt.get(p["e"], 0)
 
-# ---------- выпущенные выпуски ----------
+# ---------- выпущенные выпуски и основной урок каждого билета ----------
 eps = json.load(open(os.path.join(HERE, "episodes_src.json"), encoding="utf-8"))
-byid = {t["id"]: t for t in tickets}
+assignment = assign_lessons(Q, lesson_specs(eps))
+pitfalls = {e["id"]: e.get("pitfalls", {}) for e in eps}
+for x, t in zip(Q, tickets):
+    ref = primary_ref(x)
+    t["lesson"] = assignment.get(x["id"])
+    if ref:
+        t["rule"] = {"key": rule_key(ref), "label": rule_label(ref)}
+    why = pitfall_for(ref, pitfalls.get(t["lesson"], {})) if t["lesson"] else None
+    if why:
+        t["why"] = why
 for ep in eps:
-    core = []
-    keyset = {(a, str(p)) for a, p in ep.get("ticket_refs", [])}
-    for x in Q:
-        if any((r["article"], str(r["paragraph"])) in keyset for r in x["law_refs"]): core.append(x["id"])
-    linked = [t["id"] for t in tickets if any(e in t["ep"] for e in ep["plan"])]
+    ep["kind"] = episode_kind(ep)
+    ep["tickets_lesson"] = lesson_ticket_ids(ep["id"], assignment)
+    core = core_ticket_ids(ep, Q)
     ep["tickets_core"] = core
-    ep["tickets_linked"] = [i for i in linked if i not in core]
+    ep["tickets_linked"] = linked_ticket_ids(ep, Q, core, ep["tickets_lesson"])
     ep["law_quotes"] = [{"ref": f"ст. {a}" + (f", п. {p}" if p else ""), "title": ru[a]["title"],
                          "text": law_ru(a, p)} for a, p in ep.get("quote_refs", [])]
     ep["law_quotes"] += [{"ref": f"{ANNEX_NAME[an]}, п. {it}", "title": "", "text": ar[an][it]} for an, it in ep.get("annex_quotes", [])]
     for q in ep["law_quotes"]: assert q["text"], q
-    ep.pop("ticket_refs", None); ep.pop("quote_refs", None); ep.pop("annex_quotes", None)
+    for k in ("ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "include", "exclude", "pitfalls", "linked"):
+        ep.pop(k, None)
 
 meta = {"built_from": "teoria.on.ge (кат. B/B1), выгрузка 20.10.2026; закон: Matsne, ред. 25.06.2026",
         "count": len(tickets), "topics": topics, "stats": stat}
@@ -133,4 +143,5 @@ for t in tickets:
         if not os.path.exists(s): missing += 1; continue
         if not os.path.exists(d): shutil.copy2(s, d)
 print(json.dumps(dict(stat), ensure_ascii=False), "laws:", len(laws), "img missing:", missing, "plan:", len(plan))
-for ep in eps: print(ep["id"], "core", ep["tickets_core"], "linked", len(ep["tickets_linked"]))
+for ep in eps: print(ep["id"], ep["kind"], "core", ep["tickets_core"], "linked", len(ep["tickets_linked"]), "lesson", len(ep["tickets_lesson"]))
+print("unassigned:", sum(1 for t in tickets if not t["lesson"]))

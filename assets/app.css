@@ -114,3 +114,71 @@ footer{max-width:1040px;margin:0 auto;padding:20px 16px 40px;color:var(--mut);fo
   .plan .hide-s{display:none}
 }
 @media (max-width:640px){header.top{position:static}}
+
+/* ---------- текстовые уроки (lessons/epNN.html) ---------- */
+:root{--fg-road:#a7adb5;--fg-walk:#e4e7eb;--fg-verge:#e2ecdc;--fg-bed:#d9d2c3;--fg-paint:#ffffff;--fg-car:#1f5fbf;
+  --fg-house:#d7c6a8;--fg-roof:#b0533a;--fg-rail:#4a4f57;--fg-sleeper:#8a6d4b}
+[data-theme=dark]{--fg-road:#4a515b;--fg-walk:#252c35;--fg-verge:#1c2620;--fg-bed:#3a352c;--fg-paint:#e8e8e8;--fg-car:#6ea8ff;
+  --fg-house:#6b5d48;--fg-roof:#a4553f;--fg-rail:#b7bcc4;--fg-sleeper:#6d5a43}
+.lead{font-size:17px}
+.lesson{max-width:780px}
+.chat{display:grid;gap:10px;margin:16px 0}
+.say{display:flex;gap:10px;align-items:flex-start}
+.ava{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px}
+.say.a .ava{background:#b04a8c}.say.m .ava{background:#2c7a6b}.say.t .ava{background:#5b54c4}
+.bub{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.say.t .bub{background:var(--acc2);border-color:transparent}
+.who{display:block;font-size:12px;color:var(--mut);margin-bottom:2px}
+.lq{margin:14px 0;padding:10px 14px;border-left:3px solid var(--acc);background:var(--bg2);border-radius:0 8px 8px 0}
+.lq p{margin:0}
+.lq cite{display:block;font-size:12px;color:var(--mut);font-style:normal;margin-top:4px}
+.gl{background:var(--acc2);border-radius:4px;padding:0 3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.unsure{background:var(--warnbg);color:var(--warn);border-radius:4px;padding:0 4px;font-weight:600}
+.parts li,.flaws li{margin:6px 0}
+.signs{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}
+.sg{display:flex;flex-direction:column;align-items:center;gap:2px;width:120px;text-align:center;font-size:13px}
+.sgimg{background:#fff;border-radius:8px;padding:6px;display:block;border:1px solid var(--line)}
+.sgimg img{width:64px;height:64px;object-fit:contain;display:block}
+.ownq{margin:12px 0}
+.ownq .fb{margin-top:10px}
+.ownq .fb[hidden]{display:none}
+.fig{margin:16px 0;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:8px;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto;min-width:520px}
+.fig figcaption{font-size:13px;color:var(--mut);margin-top:6px}
+.fig .road{fill:var(--fg-road)}.fig .walk{fill:var(--fg-walk)}.fig .verge{fill:var(--fg-verge)}.fig .bed{fill:var(--fg-bed)}
+.fig rect.paint{fill:var(--fg-paint)}
+.fig line.paint{stroke:var(--fg-paint);stroke-width:3}
+.fig line.paint.dash{stroke-dasharray:18 14}
+.fig line.paint.thick{stroke-width:6}
+.fig .car{fill:var(--fg-car)}.fig .glass{fill:#cfe3ff;opacity:.85}
+.fig .move,.fig .dim,.fig .dimw,.fig .railing{stroke:var(--fg);stroke-width:2}
+.fig .move{stroke-width:2.5}
+.fig .dim.bad{stroke:var(--bad)}
+.fig .arrowhead{fill:var(--fg)}
+.fig .t{fill:var(--fg);font:600 16px var(--font)}
+.fig .t.small{font-size:14px;font-weight:500}
+.fig .t.mut{fill:var(--mut)}.fig .t.bad{fill:var(--bad)}.fig .t.ok{fill:var(--ok)}
+.fig .nozone{fill:var(--badbg)}.fig .nohatch{stroke:var(--bad);stroke-width:3}
+.fig .band{fill:var(--acc2);opacity:.8}.fig .edge{stroke:var(--acc);stroke-width:2;stroke-dasharray:6 4}
+.fig .pole{stroke:var(--mut);stroke-width:3}.fig .pole2{fill:var(--mut)}
+.fig .plate{fill:#fff;stroke:var(--line)}.fig .plate2{fill:var(--bg2);stroke:var(--fg);stroke-width:1.5}
+.fig .barrier{stroke:#d3302a;stroke-width:6;stroke-dasharray:10 7}
+.fig .rail{stroke:var(--fg-rail);stroke-width:4}.fig .sleeper{fill:var(--fg-sleeper)}
+.fig .house{fill:var(--fg-house)}.fig .roof{fill:var(--fg-roof)}
+.fig .shadow{fill:#000;opacity:.25}.fig .sep{stroke:var(--line);stroke-width:2}.fig .slash{stroke:var(--bad);stroke-width:3}
+.badge.ok{background:var(--okbg);color:var(--ok)}
+.badge.kind.text{background:var(--okbg);color:var(--ok)}
+/* ---------- накопительная проверка и ошибки ---------- */
+.cumcard{margin-top:24px}
+#quick .cumcard{margin-top:0}
+fieldset.order{border:0;padding:0;margin:0;display:grid;gap:6px}
+.trend td{font-weight:400}
+.err{margin:8px 0;padding:10px 14px}
+.err summary{cursor:pointer}
+.errhead{display:inline-flex;gap:8px;flex-wrap:wrap;align-items:center}
+.errq{display:block;margin-top:4px}
+.errbody{margin-top:10px}
+.errbody .ok{color:var(--ok);font-weight:600}.errbody .bad{color:var(--bad);font-weight:600}
+.note.why{border-color:var(--acc);background:var(--acc2);margin:8px 0}
+.seg.groupby{flex-wrap:wrap}
+@media (max-width:640px){.fig svg{min-width:460px}}
