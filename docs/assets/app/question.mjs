@@ -1,17 +1,11 @@
 /** Renders one exam question (a bank ticket or an own check item) with instant or exam-mode answering. */
 import { esc } from "./dom.mjs";
-import { LANGS, getLang } from "./prefs.mjs";
 import { loadedTickets } from "./data.mjs";
 import { record } from "./progress.mjs";
 import { zoom } from "./layout.mjs";
 import { figureSvg } from "../domain/figure.mjs";
-import { misconceptionFor } from "../domain/items.mjs";
+import { misconceptionFor, questionText } from "../domain/items.mjs";
 import { lk, lawDetails } from "../domain/normlinks.mjs";
-
-function textFor(t, lang) {
-  const untr = (t.nu || []).includes(lang);
-  return { q: t.q[lang] || t.q.ru, a: t.a[lang] || t.a.ru, untr };
-}
 
 function lawBlock(t) {
   if (!t.law || !t.law.length) return "";
@@ -37,16 +31,16 @@ function explanation(t) {
     : `<div class="expl small mut">Пояснения в исходной базе нет.</div>`) + lawBlock(t);
 }
 
-function head(t, opts, tx, lang) {
+function head(t, opts, tx, toggle) {
   if (t.own) {
     return `${opts.index != null ? `<b>${opts.index + 1}${opts.total ? " / " + opts.total : ""}</b>` : ""}
-      <span class="badge own" title="Вопрос составлен нами по тексту закона; в официальной базе билетов его нет">наш вопрос</span><span class="badge grey">${esc(t.typeLabel)}</span>
-      ${lang !== "ru" ? `<span class="badge warn">только на русском</span>` : ""}`;
+      <span class="badge own" title="Вопрос составлен нами по тексту закона; в официальной базе билетов его нет">наш вопрос</span><span class="badge grey">${esc(t.typeLabel)}</span>`;
   }
   const topic = loadedTickets().meta.topics[t.t] || "";
   return `${opts.index != null ? `<b>${opts.index + 1}${opts.total ? " / " + opts.total : ""}</b>` : ""}
       <span>Билет № ${t.id}</span><span class="badge grey">${esc(topic)}</span>
-      ${tx.untr ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён">нет перевода на ${LANGS[lang]} — текст на грузинском</span>` : ""}
+      ${tx.untranslated ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён">нет перевода на русский — текст на грузинском</span>` : ""}
+      ${toggle ? `<button type="button" class="katoggle" aria-pressed="false" title="Показать грузинский текст вопроса и ответов">оригинал (KA)</button>` : ""}
       ${opts.mode !== "exam" ? `<a class="small" href="${esc(t.src)}" target="_blank" rel="noopener">источник</a>` : ""}`;
 }
 
@@ -56,14 +50,21 @@ function head(t, opts, tx, lang) {
  * Sets el._pick(i) (keyboard answering) and el._state {answered, choice}.
  */
 export function renderQuestion(el, t, opts = {}) {
-  const lang = getLang(), tx = textFor(t, lang);
+  const tx = questionText(t), ka = opts.mode !== "exam" ? tx.ka : null;  // no original during a running mock exam
   el.innerHTML = `<div class="q card" data-id="${esc(t.id)}">
-    <div class="qhead">${head(t, opts, tx, lang)}</div>
-    <div class="qtext" ${t.own ? 'lang="ru"' : tx.untr || lang === "ka" ? 'lang="ka"' : ""}>${esc(tx.q)}</div>
+    <div class="qhead">${head(t, opts, tx, !!ka)}</div>
+    <div class="qtext" lang="${tx.lang}">${esc(tx.q)}</div>
+    ${ka ? `<div class="qka" lang="ka" hidden>${esc(ka.q)}</div>` : ""}
     ${t.fig ? `<div class="qfig">${figureSvg(t.fig)}</div>` : ""}
     ${t.img ? `<img class="qimg" src="${esc(t.img)}" alt="Иллюстрация к билету ${esc(t.id)}" loading="lazy">` : ""}
-    <div class="answers">${tx.a.map((a, i) => `<button class="ans" data-i="${i}"><span class="k">${i + 1}</span><span>${esc(a)}</span></button>`).join("")}</div>
+    <div class="answers">${tx.a.map((a, i) => `<button class="ans" data-i="${i}"><span class="k">${i + 1}</span><span>${esc(a)}${ka ? `<span class="aka" lang="ka" hidden>${esc(ka.a[i])}</span>` : ""}</span></button>`).join("")}</div>
     <div class="fb"></div></div>`;
+  const tg = el.querySelector(".katoggle");
+  if (tg) tg.onclick = () => {
+    const on = tg.getAttribute("aria-pressed") !== "true";
+    tg.setAttribute("aria-pressed", String(on));
+    el.querySelectorAll(".qka, .aka").forEach(x => { x.hidden = !on; });
+  };
   const img = el.querySelector(".qimg");
   if (img) img.onclick = () => zoom(img.src);
   const btns = [...el.querySelectorAll(".ans")];

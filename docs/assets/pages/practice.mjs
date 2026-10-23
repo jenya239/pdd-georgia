@@ -63,7 +63,6 @@ import { parseId, compareIds } from "../domain/items.mjs";
   };
   $("#next").onclick = () => { if (i + 1 < list.length) { i++; show(); scrollTo({ top: 0 }); } else finish(); };
   $("#stop").onclick = () => { $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
-  document.addEventListener("pdd:lang", () => { if ($("#run").style.display !== "none" && cur && list[i]) { const st = cur._state; renderQuestion(cur, list[i], st.answered ? { mode: "instant", reveal: true, selected: st.choice, index: i, total: list.length } : { mode: "instant", index: i, total: list.length, onAnswer: (_, g) => { g ? ok++ : bad++; stat(); $("#next").disabled = false; } }); } });
   document.addEventListener("keydown", e => {
     if ($("#run").style.display === "none" || e.target.closest("select,input")) return;
     const n = parseInt(e.key, 10);

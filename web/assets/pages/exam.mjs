@@ -44,7 +44,6 @@ import { shuffle } from "../domain/scope.mjs";
   $("#prev").onclick = () => go(i - 1);
   $("#finish").onclick = () => { const left = ans.filter(a => a == null).length; if (!left || confirm(`Без ответа ${left} — завершить экзамен?`)) finish(false); };
   $("#start").onclick = start;
-  document.addEventListener("pdd:lang", () => { if (!done && $("#run").style.display !== "none") go(i); });
   document.addEventListener("keydown", e => {
     if ($("#run").style.display === "none" || e.target.closest("select,input")) return;
     const n = parseInt(e.key, 10);

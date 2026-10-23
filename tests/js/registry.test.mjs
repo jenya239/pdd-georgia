@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
-import { STORAGE, KEYS } from "../../packages/domain/registry.mjs";
+import { STORAGE, KEYS, RETIRED } from "../../packages/domain/registry.mjs";
 import { createStore, memoryBackend } from "../../packages/domain/store.mjs";
 
 const ROOT = new URL("../../", import.meta.url).pathname;
@@ -15,7 +15,6 @@ const SAMPLES = {
   active: { ep06: { id: "r2", lesson: "ep06", ids: [5, 7], answers: { 5: 1 } } },
   settings: { order: "mixed", own: false },
   exams: [{ d: 100, ok: 27, pass: true, s: 1200 }, { d: 200, ok: 22, pass: false, s: 1700 }],
-  lang: "ka",
   theme: "dark",
 };
 
@@ -36,7 +35,7 @@ test("registry: ids and keys are unique, every entry is described", () => {
 });
 
 test("registry: code uses no storage key that is not registered, and spells keys only in the registry", () => {
-  const registered = new Set(STORAGE.map(s => s.key));
+  const registered = new Set([...STORAGE, ...RETIRED].map(s => s.key));
   for (const f of SOURCES) {
     const src = readFileSync(f, "utf8"), rel = relative(ROOT, f);
     for (const m of src.matchAll(/["'`](pddge\.[\w.-]+)["'`]/g)) {
@@ -70,4 +69,14 @@ test("round trip: merge into an empty browser restores everything too", () => {
   const dst = memoryBackend();
   createStore(dst).importText(createStore(src).exportText(1, "test"), "merge");
   for (const s of STORAGE) assert.equal(dst.getItem(s.key), src.getItem(s.key), s.key);
+});
+
+test("retired keys: not registered any more, removed from the browser when the store opens", () => {
+  assert.deepEqual(RETIRED.map(r => r.key), ["pddge.lang"]);
+  for (const r of RETIRED) assert.ok(r.why && !STORAGE.some(s => s.key === r.key), r.key);
+  const be = memoryBackend({ "pddge.lang": "ka", [KEYS.theme]: "dark" });
+  const st = createStore(be);
+  assert.equal(be.getItem("pddge.lang"), null);
+  assert.equal(be.getItem(KEYS.theme), "dark");
+  assert.equal("lang" in JSON.parse(st.exportText(1, "t")).data, false);
 });

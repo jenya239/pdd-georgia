@@ -2,13 +2,14 @@
  * The progress file: the whole learner state (every key of registry.mjs) as one versioned JSON (pure).
  *   { format, schema, app, exportedAt, data: { <registry id>: value } }
  * Older files are migrated: schema 1 (top-level progress/runs/active/settings) and a bare progress map.
+ * Sections of retired keys (registry RETIRED, e.g. "lang" from ≤ 0.6) are ignored like any unknown section.
  */
 import { migrateProgress, mergeProgress, isMastered } from "./progress.mjs";
 import { isOwnId } from "./items.mjs";
 import { SCHEMA_VERSION } from "./registry.mjs";
 
 export const FORMAT = "pddge-progress";
-const LANGS = ["ru", "ka", "en"], THEMES = ["light", "dark"];
+const THEMES = ["light", "dark"];
 const NOT_OURS = "Это не файл прогресса ПДД Грузии.";
 
 const isObj = v => !!v && typeof v === "object" && !Array.isArray(v);
@@ -20,7 +21,6 @@ const CLEAN = {
   active: v => (isObj(v) ? v : undefined),
   settings: v => (isObj(v) ? v : undefined),
   exams: v => (Array.isArray(v) ? v.filter(e => isObj(e) && typeof e.d === "number") : undefined),
-  lang: v => (LANGS.includes(v) ? v : undefined),
   theme: v => (THEMES.includes(v) ? v : undefined),
 };
 
@@ -74,7 +74,8 @@ export function mergeState(current, incoming) {
     settings: { ...(incoming.settings || {}), ...(current.settings || {}) },
     exams: unionBy(current.exams, incoming.exams, e => e.d).sort((x, y) => x.d - y.d),
   };
-  for (const k of ["lang", "theme"]) { const v = current[k] ?? incoming[k]; if (v != null) out[k] = v; }
+  const theme = current.theme ?? incoming.theme;
+  if (theme != null) out.theme = theme;
   return out;
 }
 
@@ -95,7 +96,6 @@ export function summarize(s) {
     active: Object.keys(s.active || {}).length,
     exams: (s.exams || []).length,
     settings: Object.keys(s.settings || {}).length > 0,
-    lang: s.lang ?? null,
     theme: s.theme ?? null,
   };
 }

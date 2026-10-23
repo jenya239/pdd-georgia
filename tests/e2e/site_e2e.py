@@ -3,7 +3,7 @@
 Run:  /workspace/.pwvenv/bin/python tests/e2e/site_e2e.py [--root=docs] [--shots=DIR]
 Exit code 0 = all checks passed. Screenshots go to --shots (default: none), never into docs/.
 """
-import json, os, sys, tempfile
+import json, os, re, sys, tempfile
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -279,14 +279,28 @@ def main():
         check(bq.locator(".note.mc").count() == 1, f"bank ticket {tk_id}: typical error on wrong pick")
         page.evaluate("localStorage.removeItem('pddge.progress.v1')")
 
-        # language switch
-        page.goto(base + f"episode.html?id=ep02")
-        page.wait_for_selector(".q")
-        ru = page.locator(".q .qtext").nth(2).inner_text()
-        page.click("#langseg button[data-l=ka]")
-        ka = page.locator(".q .qtext").nth(2).inner_text()
-        page.click("#langseg button[data-l=ru]")
-        check(ru != ka and any("\u10d0" <= ch <= "\u10ff" for ch in ka), "language switch re-renders questions in Georgian")
+        # per-question «оригинал (KA)» toggle (no global language switch)
+        page.goto(base + "episode.html?id=ep05")
+        page.wait_for_selector("#tk .q")
+        q = page.locator("#tk .q:has(.katoggle)").first
+        tid = int(q.get_attribute("data-id"))
+        T = page.evaluate(f"{LOAD_T}.then(D => D.byId[{tid}])")
+        ru = q.locator(".qtext").inner_text()
+        check(q.locator(".qka").is_hidden() and q.locator(".aka:visible").count() == 0, f"ticket {tid}: Georgian original hidden by default")
+        q.locator(".katoggle").click()
+        check(q.locator(".qka").is_visible() and " ".join(q.locator(".qka").inner_text().split()) == " ".join(T["q"]["ka"].split())
+              and q.locator(".qtext").inner_text() == ru == T["q"]["ru"].strip(), f"ticket {tid}: toggle shows the Georgian question under the Russian")
+        ws = lambda x: " ".join(x.split())
+        check([ws(a) for a in q.locator(".aka:visible").all_inner_texts()] == [ws(a) for a in T["a"]["ka"]]
+              and q.locator(".katoggle").get_attribute("aria-pressed") == "true", f"ticket {tid}: and the Georgian options")
+        shot(page, "ticket_ka_toggle.png", clip=q.bounding_box())
+        q.locator(".katoggle").click()
+        check(q.locator(".qka").is_hidden(), f"ticket {tid}: toggle back hides the original")
+        own = page.locator('.q[data-id^="o-"]')
+        check(own.count() > 0 and own.locator(".katoggle").count() == 0, "own questions have no KA toggle")
+        q.locator(".ans").first.click()
+        check(q.locator(".katoggle").count() == 1, "toggle stays after answering")
+        page.evaluate("localStorage.removeItem('pddge.progress.v1')")
 
         # practice
         page.goto(base + "practice.html")
@@ -303,12 +317,19 @@ def main():
         page.uncheck("#nountr")
         page.click("#go")
         page.wait_for_selector("#qbox .badge.warn")
-        check(True, "practice: untranslated eco question badge")
+        check("нет перевода" in page.inner_text("#qbox .badge.warn") and page.locator("#qbox .katoggle").count() == 0
+              and page.get_attribute("#qbox .qtext", "lang") == "ka", "practice: untranslated eco question in Georgian with the badge, no toggle")
+        page.goto(base + "practice.html")
+        page.wait_for_selector("#set option", state="attached")
+        page.click("#go")
+        page.wait_for_selector("#qbox .ans")
+        check(page.locator("#qbox .katoggle").count() == 1, "practice: KA toggle on the ticket")
 
         # exam
         page.goto(base + "exam.html")
         page.click("#start")
         page.wait_for_selector("#qbox .ans")
+        check(page.locator("#qbox .katoggle, #qbox .qka").count() == 0, "running mock exam: no KA toggle")
         for k in range(30):
             page.keyboard.press(str(1 + (k % 2)))
             page.keyboard.press("ArrowRight")
@@ -317,6 +338,8 @@ def main():
         page.click("#finish")
         page.wait_for_selector("#res .result")
         check(page.locator("#rev .q").count() >= 0, "exam result + review")
+        nrev = page.locator("#rev .q").count()
+        check(nrev == 0 or page.locator("#rev .q .katoggle").count() >= 1, f"exam review: KA toggle ({nrev} reviewed)")
         bad = page.evaluate("""async()=>{const D=await (await fetch('data/tickets.json')).json(); const srcs=D.tickets.filter(t=>t.img).map(t=>t.img);
            const res=await Promise.all(srcs.map(s=>new Promise(r=>{const i=new Image(); i.onload=()=>r(i.naturalWidth>0?null:s); i.onerror=()=>r(s); i.src=s;})));
            return {n:srcs.length, bad:res.filter(Boolean)}}""")
@@ -405,16 +428,19 @@ def main():
         check(steps == need and "Готово" in page.locator(".result").inner_text(), f"drill done after {steps} answers (need {need})")
 
         # global save / load of all progress (header buttons on every page)
-        for pg in ["index.html", "practice.html", "exam.html", "errors.html", "about.html", "check.html?ep=ep04", "episode.html?id=ep05"]:
+        for pg in ["index.html", "practice.html", "exam.html", "errors.html", "about.html", "check.html?ep=ep04", "episode.html?id=ep05",
+                   "norm/index.html", "norm/st5-p87.html"]:
             page.goto(base + pg)
             page.wait_for_selector("header.top [data-act=export]")
+            check(page.locator("#langseg, header.top [data-l]").count() == 0 and not re.search(r"\b(RU|KA|EN)\b", page.inner_text("header.top")),
+                  f"{pg}: no global language switch in the header")
             check(page.locator("header.top [data-act=export]").inner_text().strip().endswith("Сохранить прогресс")
                   and page.locator("header.top label:has([data-act=import])").inner_text().strip().endswith("Загрузить прогресс"),
                   f"{pg}: header has Сохранить / Загрузить прогресс")
         page.goto(base + "errors.html")
         page.wait_for_selector("header.top [data-act=export]")
         page.evaluate("""() => { localStorage.setItem('pddge.exams.v1', JSON.stringify([{d: 5, ok: 27, pass: true, s: 1000}]));
-            localStorage.setItem('pddge.lang', 'ka'); localStorage.setItem('pddge.theme', 'light'); localStorage.setItem('pddge.settings.v1', JSON.stringify({order: 'mixed', own: true})); }""")
+            localStorage.setItem('pddge.theme', 'light'); localStorage.setItem('pddge.settings.v1', JSON.stringify({order: 'mixed', own: true})); }""")
         keys = page.evaluate("import('./assets/domain/registry.mjs').then(m => m.STORAGE.map(s => s.key))")
         snap = page.evaluate("ks => Object.fromEntries(ks.map(k => [k, localStorage.getItem(k)]))", keys)
         with page.expect_download() as dl:
@@ -423,7 +449,7 @@ def main():
         dl.value.save_as(tmp)
         bundle = json.loads(tmp.read_text())
         check(bundle["format"] == "pddge-progress" and bundle["schema"] == 2 and bundle["app"] and bundle["exportedAt"]
-              and {"progress", "runs", "exams", "lang", "theme", "settings"} <= set(bundle["data"]), f"export bundle: schema 2, sections {sorted(bundle['data'])}")
+              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 2, sections {sorted(bundle['data'])}")
         page.evaluate("localStorage.clear()")
         page.reload()
         page.wait_for_selector("header.top [data-act=import]", state="attached")
@@ -448,6 +474,22 @@ def main():
         check("более новой версией" in page.inner_text("#pfdlg [data-err]") and page.evaluate("localStorage.getItem('pddge.progress.v1')") == snap[keys[0]],
               "newer-schema file rejected, data untouched")
         page.click("#pfdlg [data-act=close]")
+        # an old (≤ 0.6) export with the retired «lang» section imports fine; the stale browser key is cleaned
+        page.evaluate("localStorage.setItem('pddge.lang', 'ka')")
+        page.reload()
+        page.wait_for_selector("header.top [data-act=import]", state="attached")
+        check(page.evaluate("localStorage.getItem('pddge.lang')") is None, "stale pddge.lang removed from the browser")
+        old = Path(tempfile.mkdtemp()) / "old.json"
+        old.write_text(json.dumps({"format": "pddge-progress", "schema": 2, "app": "0.6", "exportedAt": "2026-10-23T10:00:00Z",
+                                   "data": {"progress": {"5": {"s": 1, "c": 1, "w": 0, "l": 1, "t": 1, "k": 1}}, "lang": "en", "theme": "dark"}}))
+        page.set_input_files("header.top [data-act=import]", str(old))
+        page.wait_for_selector("#pfdlg[open] [data-preview]")
+        page.check("#pfdlg input[value=replace]")
+        with page.expect_navigation():
+            page.click("#pfdlg [data-act=apply]")
+        page.wait_for_selector("header.top [data-act=export]")
+        got = page.evaluate("[localStorage.getItem('pddge.progress.v1'), localStorage.getItem('pddge.lang'), localStorage.getItem('pddge.theme')]")
+        check(got[0] and json.loads(got[0]).get("5", {}).get("c") == 1 and got[1] is None and got[2] == "dark", f"old export with «lang» imports OK, lang ignored {got}")
 
         # about
         page.goto(base + "about.html")

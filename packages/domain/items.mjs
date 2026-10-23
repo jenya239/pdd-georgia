@@ -22,6 +22,14 @@ export function itemAsTicket(it) {
     nu: [], law: [], ex: null, src: null, _r: it._r || null };
 }
 
+/** Question text to show: Russian (+ the Georgian original for the «оригинал (KA)» toggle);
+ *  tickets untranslated in the source base (nu ∋ "ru") are shown in Georgian; own items are Russian only. */
+export function questionText(t) {
+  if (t.own) return { q: t.q.ru, a: t.a.ru, lang: "ru", untranslated: false, ka: null };
+  if ((t.nu || []).includes("ru")) return { q: t.q.ka || t.q.ru, a: t.a.ka || t.a.ru, lang: "ka", untranslated: true, ka: null };
+  return { q: t.q.ru, a: t.a.ru, lang: "ru", untranslated: false, ka: t.q.ka && t.a.ka ? { q: t.q.ka, a: t.a.ka } : null };
+}
+
 /** The typical error behind a wrong choice, if the choice is annotated. */
 export function misconceptionFor(t, choice, mcMap, ticketDistractors) {
   if (choice == null || choice === t.c) return null;

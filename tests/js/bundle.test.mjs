@@ -9,7 +9,6 @@ const STATE = {
   active: { ep04: { id: "r2", lesson: "ep04", ids: [5], answers: {} } },
   settings: { order: "mixed" },
   exams: [{ d: 50, ok: 26, pass: true, s: 900 }],
-  lang: "en",
   theme: "dark",
 };
 
@@ -60,7 +59,7 @@ test("merge: progress summed, runs and exams united, local unfinished runs and p
     active: { ep04: { id: "other" }, ep03: { id: "r3" } },
     settings: { order: "new-first", own: false },
     exams: [STATE.exams[0], { d: 10, ok: 20, pass: false, s: 1000 }],
-    lang: "ka", theme: "light",
+    theme: "light",
   };
   const m = mergeState(STATE, incoming);
   assert.deepEqual(m.progress[5], { s: 2, c: 1, w: 1, l: 0, t: 9, k: 0, lw: 9, lc: 2, p: { 2: 1 } });
@@ -69,9 +68,8 @@ test("merge: progress summed, runs and exams united, local unfinished runs and p
   assert.equal(m.active.ep03.id, "r3");
   assert.deepEqual(m.settings, { order: "mixed", own: false });
   assert.deepEqual(m.exams.map(e => e.d), [10, 50]);
-  assert.equal(m.lang, "en");
   assert.equal(m.theme, "dark");
-  assert.equal(mergeState({}, { lang: "ka" }).lang, "ka", "an unset local preference is taken from the file");
+  assert.equal(mergeState({}, { theme: "light" }).theme, "light", "an unset local preference is taken from the file");
 });
 
 test("replace: the file's state wins entirely, sections absent from the file are cleared", () => {
@@ -81,8 +79,8 @@ test("replace: the file's state wins entirely, sections absent from the file are
 });
 
 test("summary and preview count what the learner cares about", () => {
-  assert.deepEqual(summarize(STATE), { tickets: 1, own: 0, wrong: 0, mastered: 0, runs: 1, active: 1, exams: 1, settings: true, lang: "en", theme: "dark" });
-  assert.deepEqual(summarize({}), { tickets: 0, own: 0, wrong: 0, mastered: 0, runs: 0, active: 0, exams: 0, settings: false, lang: null, theme: null });
+  assert.deepEqual(summarize(STATE), { tickets: 1, own: 0, wrong: 0, mastered: 0, runs: 1, active: 1, exams: 1, settings: true, theme: "dark" });
+  assert.deepEqual(summarize({}), { tickets: 0, own: 0, wrong: 0, mastered: 0, runs: 0, active: 0, exams: 0, settings: false, theme: null });
   const incoming = { progress: { 8: { s: 2, c: 0, w: 2, l: 0, t: 3, k: 0 }, "o-ep05-01": { s: 2, c: 2, w: 0, l: 1, t: 3, k: 2 } } };
   const pv = previewImport(STATE, incoming, "merge");
   assert.equal(pv.before.tickets, 1);
@@ -93,4 +91,14 @@ test("summary and preview count what the learner cares about", () => {
   assert.equal(pv.after.tickets, 2);
   assert.equal(pv.after.runs, 1);
   assert.equal(previewImport(STATE, incoming, "replace").after.runs, 0);
+});
+
+test("retired «lang» (global question language, removed in 0.7): old exports still import, the key is dropped", () => {
+  const old = { format: FORMAT, schema: 2, app: "0.6", exportedAt: "x", data: { ...STATE, lang: "ka" } };
+  const p = parseBundle(JSON.stringify(old));
+  assert.deepEqual(p.state, STATE);
+  assert.equal("lang" in p.state, false);
+  assert.equal("lang" in mergeState(STATE, { lang: "en" }), false);
+  assert.equal("lang" in summarize({ lang: "ka" }), false);
+  assert.equal("lang" in makeBundle({ ...STATE, lang: "ka" }, 1, "t").data, false);
 });

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isOwnId, parseId, itemAsTicket, misconceptionFor, TYPE_LABEL, idLabel, compareIds } from "../../packages/domain/items.mjs";
+import { isOwnId, parseId, itemAsTicket, misconceptionFor, TYPE_LABEL, idLabel, compareIds, questionText } from "../../packages/domain/items.mjs";
 
 const ITEM = { id: "o-ep04-01", lesson: "ep04", type: "diagram", type_label: "схема", q: "Где стоять?",
   options: ["А", "Б"], answer: 1, explain: "Потому что.", rule: { key: "37.6", label: "ст. 37, п. 6 «а.а»" },
@@ -52,4 +52,13 @@ test("ids are labelled for lists: bank number or own item", () => {
 
 test("compareIds puts bank tickets first", () => {
   assert.deepEqual([ "o-ep02-01", 30, "o-ep01-02", 4].sort(compareIds), [4, 30, "o-ep01-02", "o-ep02-01"]);
+});
+
+test("questionText: Russian with the Georgian original on demand; untranslated tickets in Georgian; own items RU only; no EN", () => {
+  const T = { id: 1, q: { ru: "Вопрос?", ka: "კითხვა?", en: "Question?" }, a: { ru: ["Да", "Нет"], ka: ["კი", "არა"], en: ["Yes", "No"] }, nu: [] };
+  assert.deepEqual(questionText(T), { q: "Вопрос?", a: ["Да", "Нет"], lang: "ru", untranslated: false, ka: { q: "კითხვა?", a: ["კი", "არა"] } });
+  const eco = { ...T, q: { ru: "ეკო?", ka: "ეკო?", en: "ეკო?" }, a: { ru: ["ა"], ka: ["ა"], en: ["ა"] }, nu: ["ru", "en"] };
+  assert.deepEqual(questionText(eco), { q: "ეკო?", a: ["ა"], lang: "ka", untranslated: true, ka: null });
+  assert.deepEqual(questionText(itemAsTicket(ITEM)), { q: "Где стоять?", a: ["А", "Б"], lang: "ru", untranslated: false, ka: null });
+  assert.equal(questionText({ ...T, q: { ru: "В?" }, a: { ru: ["Да"] } }).ka, null, "no Georgian text → no original");
 });

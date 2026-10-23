@@ -4,7 +4,7 @@
  */
 import { applyAnswer, migrateProgress } from "./progress.mjs";
 import { makeBundle, parseBundle, applyImport, previewImport, cleanState } from "./bundle.mjs";
-import { STORAGE, KEYS, APP_VERSION } from "./registry.mjs";
+import { STORAGE, KEYS, RETIRED, APP_VERSION } from "./registry.mjs";
 
 export { KEYS };
 const DEFAULT_SETTINGS = { order: "new-first", own: true };
@@ -15,6 +15,7 @@ export function memoryBackend(init = {}) {
 }
 
 export function createStore(backend) {
+  RETIRED.forEach(r => backend.removeItem(r.key));
   const read = (key, fallback) => {
     try { const v = JSON.parse(backend.getItem(key)); return v ?? fallback; } catch (e) { return fallback; }
   };

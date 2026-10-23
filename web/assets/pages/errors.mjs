@@ -6,7 +6,7 @@ import { record, store } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { errorStats, groupStats, drillQueue } from "../domain/errors.mjs";
 import { MASTERY_STREAK } from "../domain/progress.mjs";
-import { idLabel, parseId, misconceptionFor } from "../domain/items.mjs";
+import { idLabel, parseId, misconceptionFor, questionText } from "../domain/items.mjs";
 import { lk } from "../domain/normlinks.mjs";
 
 header("errors");
@@ -23,7 +23,7 @@ const GROUPS = {
   rule: { label: "По правилам", key: s => s.ruleKey, name: (k, g) => (k ? g.items[0].ruleLabel : "Без ссылки на закон в пояснении") },
 };
 
-function optionText(t, i) { return i == null ? "—" : `${i + 1}. ${t.a.ru[i] ?? ""}`; }
+function optionText(t, i) { return i == null ? "—" : `${i + 1}. ${questionText(t).a[i] ?? ""}`; }
 
 const ALL = [...D.tickets, ...D.items];
 
@@ -43,7 +43,7 @@ function item(s) {
      <span class="errhead"><b>${esc(idLabel(s.id))}</b>${t.own ? ` <span class="badge own">наш вопрос</span>` : ""} <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}</span>
      ${s.mastered ? `<span class="badge ok">исправлено: ${MASTERY_STREAK} верно подряд</span>` : ""}
      <span class="small mut">последняя ошибка ${fmt(s.lastWrong)}${s.ruleLabel ? " · " + esc(s.ruleLabel) : ""}</span></span>
-     <span class="errq">${esc(t.q.ru)}</span></summary>
+     <span class="errq">${esc(questionText(t).q)}</span></summary>
      <div class="errbody">
        <p class="small"><span class="bad">Ваш ответ:</span> ${picks.length ? picks.map(([i, n]) => `${esc(optionText(t, +i))}${n > 1 ? ` <span class="mut">(×${n})</span>` : ""}`).join("; ") : esc(optionText(t, s.lastChoice))}<br>
        <span class="ok">Правильный:</span> ${esc(optionText(t, t.c))}</p>
@@ -109,4 +109,3 @@ function drill() {
 }
 
 q.get("drill") ? drill() : list();
-document.addEventListener("pdd:lang", () => { if (!q.get("drill")) list(); });

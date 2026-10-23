@@ -53,7 +53,7 @@ function intro() {
   if ($("#resume")) $("#resume").onclick = () => play(st.activeRun(L.id));
 }
 
-let cur = null, redraw = null;
+let cur = null;
 function play(run) {
   if (isFinished(run)) return finish(run);
   const id = nextTicket(run), t = D.byId[id], done = answeredCount(run);
@@ -62,14 +62,12 @@ function play(run) {
    <p class="small">${done + 1} из ${run.ids.length}${(t.own ? t.lesson === L.id : scope.current.includes(id)) ? ` · <span class="badge">новый урок</span>` : ` · <span class="badge grey">прежние уроки</span>`}${t.own ? ` · <span class="badge own">наш вопрос</span>` : ""}</p>
    <div id="q"></div><div class="row" style="margin-top:12px"><button class="btn" id="next" disabled>Дальше</button></div>`;
   cur = $("#q");
-  const draw = () => renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {
+  renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {
     run = answerRun(run, id, { choice, ok });
     st.saveActiveRun(run);
     await record(id, ok, choice);
     $("#next").disabled = false; $("#next").focus();
   } });
-  redraw = () => (cur._state && cur._state.answered ? renderQuestion(cur, t, { mode: "instant", reveal: true, selected: cur._state.choice }) : draw());
-  draw();
   $("#next").onclick = () => play(run);
 }
 
@@ -90,5 +88,4 @@ document.addEventListener("keydown", e => {
   if (n >= 1 && n <= 4) cur._pick(n - 1);
   else if (e.key === "Enter" && e.target.tagName !== "BUTTON" && $("#next") && !$("#next").disabled) $("#next").click();
 });
-document.addEventListener("pdd:lang", () => { if (cur && cur.isConnected && redraw) redraw(); });
 intro();

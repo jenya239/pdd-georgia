@@ -277,3 +277,8 @@ ul.nindex li.d2{padding-left:32px}
 ul.nindex li.d3{padding-left:48px}
 ul.nindex li.d4{padding-left:64px}
 .nsearch input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);min-width:min(320px,70vw)}
+/* ---- «оригинал (KA)»: Georgian question and options under the Russian ---- */
+.katoggle{border:1px solid var(--line);background:transparent;color:var(--acc);border-radius:6px;padding:1px 8px;font:inherit;font-size:12px;cursor:pointer}
+.katoggle[aria-pressed=true]{background:var(--acc2);border-color:var(--acc)}
+.qka{margin:6px 0 0;padding:6px 10px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:6px;font-size:15px}
+.aka:not([hidden]){display:block;margin-top:3px;font-size:13px;color:var(--mut)}
