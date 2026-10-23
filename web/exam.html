@@ -1,0 +1,22 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ПДД Грузии — пробный экзамен</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/app.css"></head>
+<body><main>
+<h1>Пробный экзамен</h1>
+<div id="setup">
+  <div class="card">
+    <p><b>30 случайных вопросов · 30 минут · не больше 5 ошибок</b> (нужно 25 верных из 30). Ответы во время экзамена не проверяются; разбор — после завершения. Неотвеченный вопрос считается ошибкой.</p>
+    <div class="note">Порог сдачи публикуется неоднозначно: на странице теоретического экзамена и в новости Агентства услуг МВД (sa.gov.ge) — 25 из 30 (до 5 ошибок, порог снижен в 2026 году), а на другой странице того же агентства до сих пор указано 27 из 30. Лимит в 30 минут известен из сообщений прессы, на sa.gov.ge мы его не нашли. Подбор вопросов здесь случайный по всей базе, а не по правилам официальной программы.</div>
+    <div class="row" style="margin-top:12px"><label class="chk"><input type="checkbox" id="nountr" checked> без непереведённых вопросов (51, эко-вождение)</label></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="start">Начать экзамен</button></div>
+  </div>
+  <div id="hist"></div>
+</div>
+<div id="run" style="display:none">
+  <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="timer" id="timer">30:00</span><span class="small mut" id="answered"></span><button class="iconbtn" id="finish">Завершить</button></div>
+  <div class="exgrid" id="grid"></div>
+  <div id="qbox"></div>
+  <div class="qnav"><button class="btn ghost" id="prev">← Назад</button><span class="kbd"><kbd>1</kbd>–<kbd>4</kbd> ответ · <kbd>←</kbd> <kbd>→</kbd> навигация</span><button class="btn" id="next">Дальше →</button></div>
+</div>
+<div id="res" style="display:none"></div>
+</main>
+<script type="module" src="assets/pages/exam.mjs"></script></body></html>

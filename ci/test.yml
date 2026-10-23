@@ -1,0 +1,17 @@
+# GitHub Actions workflow template. It lives in ci/ (not .github/workflows/) because the
+# token used to push this repo has no `workflow` scope. To enable it, copy it once with a
+# token/UI that can write workflows:
+#   mkdir -p .github/workflows && cp ci/test.yml .github/workflows/test.yml
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements-dev.txt && python -m playwright install --with-deps chromium
+      - run: PYTHON=python E2E_CHANNEL=chromium tools/check.sh

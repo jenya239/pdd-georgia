@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { startRun, answerRun, nextTicket, isFinished, runResult, lessonTrend } from "../../assets/lib/run.mjs";
+import { startRun, answerRun, nextTicket, isFinished, runResult, lessonTrend } from "../../packages/domain/run.mjs";
 
 const base = () => startRun({ id: "r1", lesson: "ep04", ids: [5, 6, 7], order: "new-first", now: 100 });
 

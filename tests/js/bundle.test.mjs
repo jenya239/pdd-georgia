@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { makeBundle, parseBundle, mergeState, FORMAT } from "../../assets/lib/bundle.mjs";
+import { makeBundle, parseBundle, mergeState, FORMAT } from "../../packages/domain/bundle.mjs";
 
 const STATE = {
   progress: { 5: { s: 1, c: 1, w: 0, l: 1, t: 1, k: 1 } },

@@ -1,0 +1,26 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ПДД Грузии — самопроверка</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/app.css"></head>
+<body><main>
+<h1>Самопроверка</h1>
+<div class="card" id="setup">
+  <div class="row">
+    <label>Набор: <select id="set"></select></label>
+    <label>Порядок: <select id="order"><option value="rnd">случайный</option><option value="seq">по номеру билета</option></select></label>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="chk"><input type="checkbox" id="onlynew"> только нерешённые</label>
+    <label class="chk"><input type="checkbox" id="nountr" checked> без непереведённых (51 вопрос по эко-вождению)</label>
+  </div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="go">Начать</button><span class="small mut" id="cnt"></span></div>
+</div>
+<div id="run" style="display:none">
+  <div class="row" style="justify-content:space-between;margin:12px 0 4px"><span class="stats" id="sess"></span><button class="iconbtn" id="stop">Сменить набор</button></div>
+  <div class="bar"><i id="pbar" style="width:0"></i></div>
+  <div id="qbox"></div>
+  <div class="qnav"><span class="kbd"><kbd>1</kbd>–<kbd>4</kbd> ответ · <kbd>Enter</kbd> / <kbd>→</kbd> дальше</span><button class="btn" id="next" disabled>Дальше →</button></div>
+</div>
+<h2>Прогресс по темам</h2>
+<div class="row" style="margin-bottom:8px"><span class="small mut">Хранится только в этом браузере (localStorage). «Ошибка» — если последний ответ на вопрос был неверным.</span><button class="iconbtn" id="reset">Сбросить прогресс</button></div>
+<div class="card" style="padding:6px 10px;overflow:auto"><table class="topics" id="topics"></table></div>
+</main>
+<script type="module" src="assets/pages/practice.mjs"></script></body></html>

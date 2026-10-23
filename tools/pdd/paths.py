@@ -1,0 +1,26 @@
+"""Repository paths. Everything the build reads lives inside the repository."""
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[2]
+WEB = REPO / "web"
+DOMAIN = REPO / "packages" / "domain"
+CONTENT = REPO / "content"
+DATA = REPO / "data"
+SOURCES = DATA / "sources"
+TICKETS = DATA / "tickets"
+DOCS = REPO / "docs"
+
+LAW_RU = SOURCES / "law_ru_matsne_pub36_2026-06-25.txt"
+LAW_KA = SOURCES / "law_ka_matsne_pub36_2026-06-25.txt"
+LAW_EN = SOURCES / "law_en_official_matsne_2019-06-28.txt"
+ANNEX_RU = SOURCES / "annexes_ru_matsne_pub36.txt"
+ANNEX_KA = SOURCES / "annexes_ka_matsne_pub36_2026.txt"
+TICKETS_JSON = TICKETS / "tickets_ru.json"
+TICKET_IMAGES = TICKETS / "images"
+PLAN_MD = CONTENT / "plan" / "structure.md"
+EPISODES_JSON = CONTENT / "episodes.json"
+ONTOLOGY = CONTENT / "ontology"
+CHECKITEMS = CONTENT / "checkitems"
+SIGNS = CONTENT / "assets" / "signs"
+MEDIA = CONTENT / "media"
+LESSONS = CONTENT / "lessons"

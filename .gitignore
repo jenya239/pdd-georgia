@@ -1,2 +1,19 @@
 __pycache__/
 .pytest_cache/
+node_modules/
+# raw teoria.on.ge HTML: its terms restrict republication, keep it local only
+data/tickets/raw/
+data/tickets/*.log
+# original PDF/DOC downloads of the law: kept local; the repo has the extracted text
+data/sources/*.pdf
+data/sources/*.doc
+data/sources/*.docx
+# video pipeline outputs (rebuild with video/render.py; published copies live in content/media/)
+video/episodes/*/audio/
+video/episodes/*/seg/
+video/episodes/*/stills/
+video/episodes/*/subs.ass
+video/episodes/*/music.wav
+video/episodes/*/*.mp4
+# e2e screenshots
+tests/e2e/shots/

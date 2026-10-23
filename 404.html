@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<title>ПДД Грузии</title>
+<meta name="robots" content="noindex">
+<!-- Old links (…/pdd-georgia/episode.html?id=ep01) keep working while Pages serves the branch root:
+     forward them to the same page inside docs/. -->
+<script>
+(function () {
+  var p = location.pathname, base = "/pdd-georgia/";
+  var i = p.indexOf(base);
+  var rest = i >= 0 ? p.slice(i + base.length) : p.replace(/^\//, "");
+  if (rest.indexOf("docs/") !== 0) location.replace((i >= 0 ? p.slice(0, i) + base : "/") + "docs/" + rest + location.search + location.hash);
+})();
+</script>
+</head><body><p>Страница не найдена. <a href="docs/">На главную</a></p></body></html>

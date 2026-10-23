@@ -1,0 +1,9 @@
+{
+ "_note": "Reviewed corrections applied by tools/pdd/tickets/build_tickets.py after automatic extraction. Each entry overrides the listed fields of one ticket.",
+ "959": {
+  "law_refs": [{"article": "37", "paragraph": 7}],
+  "episodes": ["E072", "E073", "E074", "E075"],
+  "episodes_method": "manual_fix_ep03",
+  "flags": ["explanation_ka cites art.36 p.7; the rule is art.37 p.7 (а,б,г) — fixed 2026-10-20"]
+ }
+}

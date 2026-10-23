@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { episodeKind, splitLesson, LESSON_MARKER, ownQuestionVerdict } from "../../assets/lib/episode.mjs";
+import { episodeKind, splitLesson, LESSON_MARKER, ownQuestionVerdict } from "../../packages/domain/episode.mjs";
 
 test("episodes are video unless declared text", () => {
   assert.equal(episodeKind({ kind: "text" }), "text");

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { errorStats, groupStats, drillQueue } from "../../assets/lib/errors.mjs";
+import { errorStats, groupStats, drillQueue } from "../../packages/domain/errors.mjs";
 
 const TICKETS = [
   { id: 1, lesson: "ep04", t: 7, rule: { key: "34.11", label: "ст. 34, п. 11" } },

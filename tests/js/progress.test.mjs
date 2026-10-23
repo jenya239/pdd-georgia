@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { applyAnswer, normalizeRecord, migrateProgress, mergeProgress, isMastered, MASTERY_STREAK } from "../../assets/lib/progress.mjs";
+import { applyAnswer, normalizeRecord, migrateProgress, mergeProgress, isMastered, MASTERY_STREAK } from "../../packages/domain/progress.mjs";
 
 test("first correct answer creates a record with streak 1", () => {
   assert.deepEqual(applyAnswer(undefined, { ok: true, choice: 2, now: 1000 }),

@@ -1,0 +1,9 @@
+# tests + build (tools/check.sh)
+pytest>=8
+jsonschema>=4.20
+playwright>=1.45
+# ticket scraper/parser (tools/pdd/tickets) — only needed to re-fetch the source
+requests>=2.31
+beautifulsoup4>=4.12
+# video pipeline (video/render.py) — separate venv recommended
+# numpy pillow matplotlib edge-tts

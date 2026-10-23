@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { releasedLessons, currentLesson, cumulativeScope, cumulativeOrder, scopeStatus } from "../../assets/lib/scope.mjs";
+import { releasedLessons, currentLesson, cumulativeScope, cumulativeOrder, scopeStatus } from "../../packages/domain/scope.mjs";
 
 const RELEASED = [
   { id: "ep03", num: 3, tickets_lesson: [30, 31] },

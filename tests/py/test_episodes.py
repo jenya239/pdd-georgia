@@ -1,9 +1,9 @@
-"""Episode assembly helpers (tools/episodes.py)."""
+"""Episode assembly helpers (tools/pdd/episodes.py)."""
 import sys, pathlib
 import pytest
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "tools"))
 
-from episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
+
+from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
 
 Q = [
     {"id": 1, "law_refs": [{"article": "5", "paragraph": 86}], "episodes": ["E005"]},

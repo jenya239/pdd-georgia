@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createStore, memoryBackend, KEYS } from "../../assets/lib/store.mjs";
+import { createStore, memoryBackend, KEYS } from "../../packages/domain/store.mjs";
 
 test("store reads the legacy v1 progress key and migrates records", () => {
   const be = memoryBackend({ [KEYS.progress]: JSON.stringify({ 3: { s: 1, c: 1, w: 0, l: 1, t: 1 } }) });

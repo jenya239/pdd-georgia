@@ -1,8 +1,8 @@
-"""Ticket -> primary lesson assignment (pure functions in tools/assign.py)."""
+"""Ticket -> primary lesson assignment (tools/pdd/assign.py)."""
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "tools"))
 
-from assign import Ref, parse_spec, subpoint_for, primary_ref, covers, assign_lessons, rule_key, rule_label
+
+from pdd.assign import Ref, parse_spec, subpoint_for, primary_ref, covers, assign_lessons, rule_key, rule_label
 
 
 def ticket(tid, laws=(), annex=(), expl=""):
@@ -136,7 +136,7 @@ def test_primary_ref_article_without_paragraph():
     assert not covers(parse_spec("39.1"), primary_ref(t))
 
 
-from assign import pitfall_for
+from pdd.assign import pitfall_for
 
 
 def test_pitfall_most_specific_spec_wins():
