@@ -78,7 +78,7 @@ def parse_annex(path):
         if cur is None or NOISE.match(ln):
             continue
         m = item.match(ln)
-        if m and len(m.group(3)) > 3:
+        if m and len(m.group(3)) > 3 and re.search(r"[^\W\d_]", m.group(3)):  # not a picture-caption row
             first = m.group(1)
             nums = [first] + re.findall(r"\d+(?:\.\d+)+", m.group(2))
             text = ln.strip()
