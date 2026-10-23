@@ -2,16 +2,25 @@
 import { isMastered } from "./progress.mjs";
 import { parseId, compareIds } from "./items.mjs";
 
-export function errorStats(progress, tickets) {
-  const out = [];
-  for (const t of tickets) {
-    const r = progress[t.id];
-    if (!r || !r.w) continue;
-    out.push({ id: t.id, attempts: r.s, wrong: r.w, rate: r.w / r.s, lastWrong: r.lw ?? null, lastChoice: r.lc ?? null,
-      picks: r.p || {}, mastered: isMastered(r), lesson: t.lesson ?? null, topic: t.t,
-      ruleKey: t.rule ? t.rule.key : null, ruleLabel: t.rule ? t.rule.label : null });
-  }
-  return out.sort((a, b) => b.rate - a.rate || b.wrong - a.wrong || (b.lastWrong || 0) - (a.lastWrong || 0));
+function statOf(t, r = { s: 0, w: 0 }, notes) {
+  const last = r.h && r.h.length ? r.h[r.h.length - 1].c : null;
+  const s = { id: t.id, attempts: r.s, wrong: r.w, rate: r.s ? r.w / r.s : 0, lastWrong: r.lw ?? null, lastChoice: r.lc ?? last ?? null,
+    picks: r.p || {}, mastered: isMastered(r), lesson: t.lesson ?? null, topic: t.t,
+    ruleKey: t.rule ? t.rule.key : null, ruleLabel: t.rule ? t.rule.label : null };
+  if (notes) s.noted = !!notes[t.id];
+  return s;
+}
+
+const rank = (a, b) => b.rate - a.rate || b.wrong - a.wrong || (b.lastWrong || 0) - (a.lastWrong || 0);
+
+/** Tickets with mistakes, worst first; with `notes` given every entry says whether the learner wrote a note. */
+export function errorStats(progress, tickets, notes = null) {
+  return tickets.filter(t => progress[t.id] && progress[t.id].w).map(t => statOf(t, progress[t.id], notes)).sort(rank);
+}
+
+/** Tickets the learner wrote a note on (with or without mistakes), ranked like errorStats. */
+export function notedStats(progress, tickets, notes) {
+  return tickets.filter(t => notes[t.id]).map(t => statOf(t, progress[t.id], notes)).sort(rank);
 }
 
 /** Groups keep the ranking inside; groups are ordered by total mistakes, unknown key last. */

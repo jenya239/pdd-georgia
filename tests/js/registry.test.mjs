@@ -9,13 +9,15 @@ const ROOT = new URL("../../", import.meta.url).pathname;
 
 /** One realistic value per registered key; a new key without a sample fails the round-trip test. */
 const SAMPLES = {
-  progress: { 5: { s: 3, c: 1, w: 2, l: 0, t: 30, k: 0, lw: 30, lc: 2, p: { 2: 1, 3: 1 } }, 7: { s: 2, c: 2, w: 0, l: 1, t: 9, k: 2 },
+  progress: { 5: { s: 3, c: 1, w: 2, l: 0, t: 30, k: 0, lw: 30, lc: 2, p: { 2: 1, 3: 1 },
+    h: [{ t: 10, c: 1, ok: 1, w: "lesson" }, { t: 20, c: 2, ok: 0, w: "check" }, { t: 30, c: 3, ok: 0, w: "exam" }] }, 7: { s: 2, c: 2, w: 0, l: 1, t: 9, k: 2 },
     "o-ep05-01": { s: 1, c: 1, w: 0, l: 1, t: 4, k: 1 } },
   runs: [{ id: "r1", lesson: "ep04", date: 11, total: 10, correct: 8, score: 80, wrong: [5, 6] }],
   active: { ep06: { id: "r2", lesson: "ep06", ids: [5, 7], answers: { 5: 1 } } },
-  settings: { order: "mixed", own: false },
+  settings: { order: "mixed", own: false, tab: "hist" },
   exams: [{ d: 100, ok: 27, pass: true, s: 1200 }, { d: 200, ok: 22, pass: false, s: 1700 }],
   theme: "dark",
+  notes: { 5: { x: "Помеха справа — только на равнозначных", t: 31 }, "o-ep05-01": { x: "своя", t: 4 } },
 };
 
 function files(dir, out = []) {

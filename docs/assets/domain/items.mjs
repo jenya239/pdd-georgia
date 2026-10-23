@@ -19,7 +19,7 @@ export function itemAsTicket(it) {
   return { id: it.id, own: true, type: it.type, typeLabel: it.type_label || TYPE_LABEL[it.type] || "",
     q: { ru: it.q }, a: { ru: [...it.options] }, c: it.answer, t: "own", lesson: it.lesson, rule: it.rule,
     fig: it.fig || null, img: null, quote: it.quote, explain: it.explain, distractors: it.distractors || {},
-    nu: [], law: [], ex: null, src: null, _r: it._r || null };
+    nu: [], law: [], ex: null, src: null, nm: it.nm || null, cn: it.cn || [], _r: it._r || null };
 }
 
 /** Question text to show: Russian (+ the Georgian original for the «оригинал (KA)» toggle);

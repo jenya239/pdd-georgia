@@ -1,7 +1,8 @@
 /**
  * The progress file: the whole learner state (every key of registry.mjs) as one versioned JSON (pure).
  *   { format, schema, app, exportedAt, data: { <registry id>: value } }
- * Older files are migrated: schema 1 (top-level progress/runs/active/settings) and a bare progress map.
+ * Older files are migrated: schema 2 (no per-attempt history `h`, no notes: records keep their counters),
+ * schema 1 (top-level progress/runs/active/settings) and a bare progress map.
  * Sections of retired keys (registry RETIRED, e.g. "lang" from ≤ 0.6) are ignored like any unknown section.
  */
 import { migrateProgress, mergeProgress, isMastered } from "./progress.mjs";
@@ -13,6 +14,19 @@ const THEMES = ["light", "dark"];
 const NOT_OURS = "Это не файл прогресса ПДД Грузии.";
 
 const isObj = v => !!v && typeof v === "object" && !Array.isArray(v);
+const NOTE_MAX = 4000;
+
+/** Notes: {ticket id: {x text, t saved at}}; empty or malformed notes are dropped. */
+export function cleanNotes(v) {
+  if (!isObj(v)) return undefined;
+  const out = {};
+  for (const [id, n] of Object.entries(v)) {
+    if (!(/^\d+$/.test(id) || isOwnId(id)) || !isObj(n) || typeof n.x !== "string" || typeof n.t !== "number") continue;
+    const x = n.x.trim().slice(0, NOTE_MAX);
+    if (x) out[id] = { x, t: n.t };
+  }
+  return out;
+}
 
 /** Per-section validators: return the clean value or undefined (section dropped). */
 const CLEAN = {
@@ -22,6 +36,7 @@ const CLEAN = {
   settings: v => (isObj(v) ? v : undefined),
   exams: v => (Array.isArray(v) ? v.filter(e => isObj(e) && typeof e.d === "number") : undefined),
   theme: v => (THEMES.includes(v) ? v : undefined),
+  notes: cleanNotes,
 };
 
 export function cleanState(data) {
@@ -52,7 +67,8 @@ export function parseBundle(text) {
     if (f.schema > SCHEMA_VERSION)
       throw new Error(`Файл сохранён более новой версией сайта (схема ${f.schema}, здесь ${SCHEMA_VERSION}). Обновите страницу (Ctrl+F5) и попробуйте снова.`);
     if (!isObj(f.data)) throw new Error("Файл повреждён: нет раздела data.");
-    return { schema: f.schema, app: f.app ?? null, exportedAt: f.exportedAt ?? null, migratedFrom: null, state: cleanState(f.data) };
+    return { schema: f.schema, app: f.app ?? null, exportedAt: f.exportedAt ?? null,
+      migratedFrom: f.schema < SCHEMA_VERSION ? f.schema : null, state: cleanState(f.data) };
   }
   const keys = Object.keys(f);
   if (keys.length && keys.every(k => /^\d+$/.test(k)))
@@ -74,6 +90,9 @@ export function mergeState(current, incoming) {
     settings: { ...(incoming.settings || {}), ...(current.settings || {}) },
     exams: unionBy(current.exams, incoming.exams, e => e.d).sort((x, y) => x.d - y.d),
   };
+  const notes = { ...(incoming.notes || {}) };
+  for (const [id, n] of Object.entries(current.notes || {})) if (!notes[id] || n.t >= notes[id].t) notes[id] = n;
+  if (Object.keys(notes).length) out.notes = notes;
   const theme = current.theme ?? incoming.theme;
   if (theme != null) out.theme = theme;
   return out;
@@ -97,6 +116,7 @@ export function summarize(s) {
     exams: (s.exams || []).length,
     settings: Object.keys(s.settings || {}).length > 0,
     theme: s.theme ?? null,
+    notes: Object.keys(s.notes || {}).length,
   };
 }
 

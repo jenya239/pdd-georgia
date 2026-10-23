@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { errorStats, groupStats, drillQueue } from "../../packages/domain/errors.mjs";
+import { errorStats, groupStats, drillQueue, notedStats } from "../../packages/domain/errors.mjs";
 
 const TICKETS = [
   { id: 1, lesson: "ep04", t: 7, rule: { key: "34.11", label: "ст. 34, п. 11" } },
@@ -44,4 +44,13 @@ test("drill queue = tickets with mistakes that are not yet mastered (2 in a row)
 test("drill queue keeps own item ids as strings and bank ids as numbers", () => {
   const bad = { s: 1, c: 0, w: 1, l: 0, t: 1, k: 0 };
   assert.deepEqual(drillQueue({ "12": bad, "o-ep02-03": bad, "3": bad }), [3, 12, "o-ep02-03"]);
+});
+
+test("tickets with notes: the «с заметками» filter lists them whether or not they have mistakes, ranked like errors", () => {
+  const notes = { 4: { x: "легко", t: 1 }, 2: { x: "трудно", t: 2 } };
+  const s = notedStats({ ...P, 4: { ...P[4], h: [{ t: 9, c: 1, ok: 1 }] } }, TICKETS, notes);
+  assert.deepEqual(s.map(x => [x.id, x.noted]), [[2, true], [4, true]]);
+  assert.equal(s[1].wrong, 0);
+  assert.equal(s[1].lastChoice, 1, "no mistakes: the last answer given");
+  assert.deepEqual(errorStats(P, TICKETS, notes).map(x => [x.id, x.noted]), [[2, true], [1, false], [3, false]]);
 });

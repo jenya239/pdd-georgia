@@ -19,7 +19,7 @@ from pdd import mt, paths
 from pdd.assign import primary_ref, rule_key, rule_label, pitfall_for
 from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids
 from pdd.lawparse import parse_law, parse_annex
-from pdd import breakdowns, checkitems, norms as norms_mod, normsite, ontology
+from pdd import breakdowns, checkitems, normids, norms as norms_mod, normsite, ontology
 from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
@@ -72,6 +72,41 @@ def attach_machine_translations(Q: list, by_id: dict) -> None:
             t.setdefault("mt", {"q": "", "a": []})["q"] = ru
         else:
             t.setdefault("mt", {"q": "", "a": []})["a"].append(ru)   # jobs list answers in order
+
+
+def norm_refs(world, norm_ids) -> list:
+    """[[slug, citation], ...] for the norms the site has pages for (order kept, duplicates dropped)."""
+    out, seen = [], set()
+    for nid in norm_ids:
+        n = world.norms.get(nid)
+        if n and nid not in seen:
+            seen.add(nid)
+            out.append([normids.slug(nid), normids.citation(n)])
+    return out
+
+
+def attach_ticket_details(tickets, items_export, items, world, eps):
+    """Data of the post-answer «Нормы» tab: checked (m) and context (x) norms, concept ids, lesson names."""
+    for t in tickets:
+        if t["id"] not in world.questions:
+            continue
+        tn = world.ticket_norms(t["id"])
+        nm = {"m": norm_refs(world, tn["norms"])}
+        if tn.get("context"):
+            nm["x"] = norm_refs(world, tn["context"])
+        if nm["m"] or nm.get("x"):
+            t["nm"] = nm
+        cn = world.ticket_concepts(t["id"])
+        if cn:
+            t["cn"] = cn
+    src = {it["id"]: it for it in items}
+    for rec in items_export["items"]:
+        it = src[rec["id"]]
+        rec["nm"] = {"m": norm_refs(world, it["norms"])}
+        rec["cn"] = list(it["concepts"])
+    used = sorted({c for x in [*tickets, *items_export["items"]] for c in x.get("cn", [])})
+    return {"concepts": {c: world.concepts[c]["label"] for c in used if c in world.concepts},
+            "lessons": {e["id"]: f"Выпуск {e['num']}. {e['title']}" for e in eps}}
 
 
 def generate():
@@ -157,7 +192,8 @@ def generate():
     _LINKS[:] = [linker]
     stat["norm_links"] = sum(c.get("linked", 0) for c in linker.report()["stats"].values())
 
-    meta = {"built_from": META, "count": len(tickets), "topics": topics, "stats": stat}
+    meta = {"built_from": META, "count": len(tickets), "topics": topics, "stats": stat,
+            **attach_ticket_details(tickets, items_export, items, world, eps)}
     files["data/tickets.json"] = dumps_compact({"meta": meta, "tickets": tickets, "laws": idx.quotes})
     files["data/items.json"] = dumps_compact(items_export)
     files["data/episodes.json"] = json.dumps({"plan": plan, "released": eps}, ensure_ascii=False, indent=1)

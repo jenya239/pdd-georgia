@@ -65,7 +65,7 @@ function play(run) {
   renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {
     run = answerRun(run, id, { choice, ok });
     st.saveActiveRun(run);
-    await record(id, ok, choice);
+    await record(id, ok, choice, "check");
     $("#next").disabled = false; $("#next").focus();
   } });
   $("#next").onclick = () => play(run);

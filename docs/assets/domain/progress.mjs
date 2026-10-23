@@ -7,12 +7,30 @@
  *   k  current streak of correct answers (reset by a mistake)
  *   lw last wrong time      lc last wrong choice (0-based)
  *   p  {choice: count} — how often each wrong option was picked
+ *   h  per-attempt history, oldest first, the last HISTORY_CAP answers: {t time, c choice, ok 1/0, w place (WHERE)}
+ *      (records from schema ≤ 2 have no `h`: their earlier answers exist only in the counters)
  */
 import { isOwnId } from "./items.mjs";
 
 export const MASTERY_STREAK = 2;
+export const HISTORY_CAP = 50;
+/** Where an answer was given (stored as the key). */
+export const WHERE = { practice: "самопроверка", lesson: "урок", check: "накопительная проверка", exam: "экзамен", drill: "разбор ошибок" };
 
 const isCount = v => Number.isInteger(v) && v >= 0;
+
+function attempt(t, c, ok, w) {
+  const a = { t, c, ok };
+  if (Object.hasOwn(WHERE, w)) a.w = w;
+  return a;
+}
+
+function normalizeHistory(h) {
+  if (!Array.isArray(h)) return null;
+  const out = h.filter(a => a && typeof a === "object" && typeof a.t === "number" && (a.c === null || isCount(a.c)) && (a.ok === 0 || a.ok === 1))
+    .map(a => attempt(a.t, a.c, a.ok, a.w));
+  return out.slice(-HISTORY_CAP);
+}
 
 export function normalizeRecord(raw) {
   if (!raw || typeof raw !== "object") return null;
@@ -25,13 +43,16 @@ export function normalizeRecord(raw) {
     const p = Object.fromEntries(Object.entries(raw.p).filter(([, n]) => isCount(n) && n > 0));
     if (Object.keys(p).length) r.p = p;
   }
+  const h = normalizeHistory(raw.h);
+  if (h && h.length) r.h = h;
   return r;
 }
 
-export function applyAnswer(rec, { ok, choice, now }) {
+export function applyAnswer(rec, { ok, choice, now, where }) {
   const prev = rec ? normalizeRecord(rec) || { s: 0, c: 0, w: 0, k: 0 } : { s: 0, c: 0, w: 0, k: 0 };
   const next = { ...prev, s: prev.s + 1, c: prev.c + (ok ? 1 : 0), w: prev.w + (ok ? 0 : 1),
-    l: ok ? 1 : 0, t: now, k: ok ? (prev.k || 0) + 1 : 0 };
+    l: ok ? 1 : 0, t: now, k: ok ? (prev.k || 0) + 1 : 0,
+    h: [...(prev.h || []), attempt(now, choice ?? null, ok ? 1 : 0, where)].slice(-HISTORY_CAP) };
   if (!ok) {
     next.lw = now;
     next.lc = choice;
@@ -65,6 +86,9 @@ function mergeRecord(a, b) {
   const p = {};
   for (const x of [a, b]) for (const [k, n] of Object.entries(x.p || {})) p[k] = (p[k] || 0) + n;
   if (Object.keys(p).length) r.p = p;
+  const seen = new Set(), h = [...(a.h || []), ...(b.h || [])].sort((x, y) => x.t - y.t)
+    .filter(x => { const k = `${x.t}:${x.c}:${x.ok}`; return !seen.has(k) && seen.add(k); });
+  if (h.length) r.h = h.slice(-HISTORY_CAP);
   return r;
 }
 

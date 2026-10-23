@@ -82,7 +82,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   }
   section(tk, r.core_title || "По статьям, разобранным в выпуске", r.core_note ? lk(r, "core_note") : "Вопросы, в пояснении к которым есть ссылка на пункты, разобранные выше.", core);
   section(tk, r.linked_title || "Привязанные к серии", lk(r, "linked_note"), linked);
-  all.forEach(([d, t]) => renderQuestion(d, t, { mode: "instant" }));
+  all.forEach(([d, t]) => renderQuestion(d, t, { mode: "instant", where: "lesson" }));
   // клавиши 1–4: для вопроса, ближайшего к центру экрана и ещё не отвеченного
   document.addEventListener("keydown", e => {
     if (e.target.closest("input,select,textarea") || e.ctrlKey || e.metaKey || e.altKey) return;

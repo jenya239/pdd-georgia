@@ -211,10 +211,34 @@ fieldset.order{border:0;padding:0;margin:0;display:grid;gap:6px}
 /* own check items («наш вопрос») */
 .badge.own{background:#efe6fb;color:#5b2ca0;font-weight:600}
 :root[data-theme=dark] .badge.own{background:#2c2140;color:#c9a7ff}
-details.br{margin-top:10px;border:1px solid var(--acc);border-radius:8px;padding:8px 12px;font-size:15px}
-details.br > summary{cursor:pointer;font-weight:600;color:var(--acc)}
-details.br .steps,details.br .whynot{margin:6px 0;padding-left:20px}
-details.br .note{margin:6px 0}
+.br{font-size:15px}
+.br .steps,.br .whynot{margin:6px 0;padding-left:20px}
+.br .note{margin:6px 0}
+/* post-answer ticket details: one tab strip under the verdict on every ticket view */
+.tdet{margin-top:10px;border:1px solid var(--line,#d0d7de);border-radius:10px}
+.dtabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;border-bottom:1px solid var(--line,#d0d7de);padding:4px 4px 0}
+.dtabs [role=tab]{flex:0 0 auto;white-space:nowrap;border:0;background:none;color:inherit;font:inherit;font-size:14px;padding:7px 11px;border-radius:7px 7px 0 0;cursor:pointer;border-bottom:2px solid transparent}
+.dtabs [role=tab][aria-selected=true]{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.dtabs [role=tab]:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.dpanel{padding:10px 12px;font-size:15px}
+.dpanel:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.dpanel > :first-child{margin-top:0}
+.dnorms{margin:4px 0 10px;padding-left:18px}
+.dnorms li{margin:6px 0}
+.dntext{font-size:14px;margin-top:3px;white-space:pre-line}
+.dntext:empty{display:none}
+.dhist{list-style:none;margin:6px 0;padding:0;font-size:14px}
+.dhist li{display:flex;flex-wrap:wrap;gap:4px 12px;padding:4px 8px;border-left:3px solid;margin:3px 0}
+.dhist li.ok{border-color:var(--ok)}
+.dhist li.bad{border-color:var(--bad)}
+.dhist .dh-v{font-weight:600}
+.dhist li.ok .dh-v{color:var(--ok)}
+.dhist li.bad .dh-v{color:var(--bad)}
+.dnote{width:100%;box-sizing:border-box;font:inherit;font-size:15px;padding:6px 8px;border-radius:6px;border:1px solid var(--line,#d0d7de);background:transparent;color:inherit;resize:vertical}
+.badge.note{background:#fff3c4;color:#6b5200}
+:root[data-theme=dark] .badge.note{background:#3a3214;color:#f0d77a}
+.notesfilter{display:inline-flex;align-items:center;gap:6px;margin-left:8px}
+.linkbtn{border:0;background:none;color:var(--acc);cursor:pointer;padding:0 4px;font:inherit;text-decoration:underline}
 .note.mc{border-color:var(--bad);background:var(--badbg);margin-top:8px}
 blockquote.lawquote{margin:10px 0 0;padding:8px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:6px;font-size:14px}
 .ownopt{display:block;margin-top:10px;font-size:14px}

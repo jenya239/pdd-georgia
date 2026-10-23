@@ -3,7 +3,7 @@
  * in the browser, memoryBackend() in tests). All domain rules live in the pure modules.
  */
 import { applyAnswer, migrateProgress } from "./progress.mjs";
-import { makeBundle, parseBundle, applyImport, previewImport, cleanState } from "./bundle.mjs";
+import { makeBundle, parseBundle, applyImport, previewImport, cleanState, cleanNotes } from "./bundle.mjs";
 import { STORAGE, KEYS, RETIRED, APP_VERSION } from "./registry.mjs";
 
 export { KEYS };
@@ -26,6 +26,7 @@ export function createStore(backend) {
   const runs = () => { const r = read(KEYS.runs, []); return Array.isArray(r) ? r : []; };
   const actives = () => obj(read(KEYS.active, {}));
   const settings = () => ({ ...DEFAULT_SETTINGS, ...obj(read(KEYS.settings, {})) });
+  const notes = () => cleanNotes(read(KEYS.notes, {})) || {};
   const exams = () => { const r = read(KEYS.exams, []); return Array.isArray(r) ? r : []; };
   /** Raw snapshot of every registered key (json parsed, text as is); absent keys are omitted. */
   const snapshot = () => {
@@ -65,6 +66,14 @@ export function createStore(backend) {
     },
     saveSettings(s) { write(KEYS.settings, { ...obj(read(KEYS.settings, {})), ...s }); },
     exams,
+    notes,
+    /** Saves the learner's note on a ticket; blank text deletes it. */
+    saveNote(id, text, now) {
+      const n = notes(), x = String(text ?? "").trim();
+      if (x) n[id] = { x, t: now }; else delete n[id];
+      write(KEYS.notes, n);
+      return n[id] ?? null;
+    },
     addExam(e, keep = 50) { write(KEYS.exams, [...exams(), e].slice(-keep)); },
     snapshot,
     /** The whole browser state as the progress file text. */

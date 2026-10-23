@@ -10,9 +10,10 @@ const BR = {
   lesson: { id: "ep02", num: 2, title: "Дорога" }, concepts: ["Разделительная полоса"],
 };
 
-test("breakdown is a closed <details> «Разбор» with steps, linked quote, wrong options, trap and links", () => {
+test("breakdown (the «Разбор» tab body) has steps, linked quote, wrong options, trap and links", () => {
   const h = breakdownHtml(BR, { "mc-x": { belief: "Любая часть дороги" } });
-  assert.match(h, /^<details class="br"><summary>Разбор<\/summary>/);
+  assert.match(h, /^<div class="br"><ol class="steps">/);
+  assert.doesNotMatch(h, /<details|<summary/);
   assert.match(h, /<ol class="steps"><li>Вопрос — <a class="nref" href="norm\/st5-p9.html" data-norm="st5-p9">ст. 5, п. 9<\/a>.<\/li><li>Ответ &lt;3&gt;.<\/li><\/ol>/);
   assert.match(h, /<blockquote class="lawquote"><div class="small mut"><a class="nref" href="norm\/st5-p9.html" data-norm="st5-p9">ст. 5, п. 9<\/a> — дословно/);
   assert.match(h, /<li><b>1\.<\/b> Это проезжая часть\. <span class="small mut">Типичная ошибка: «Любая часть дороги»<\/span><\/li>/);

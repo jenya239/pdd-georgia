@@ -4,9 +4,9 @@ import { $, esc } from "../app/dom.mjs";
 import { header } from "../app/layout.mjs";
 import { record, store } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
-import { errorStats, groupStats, drillQueue } from "../domain/errors.mjs";
+import { errorStats, groupStats, drillQueue, notedStats } from "../domain/errors.mjs";
 import { MASTERY_STREAK } from "../domain/progress.mjs";
-import { idLabel, parseId, misconceptionFor, questionText } from "../domain/items.mjs";
+import { idLabel, parseId, questionText } from "../domain/items.mjs";
 import { lk } from "../domain/normlinks.mjs";
 
 header("errors");
@@ -27,42 +27,36 @@ function optionText(t, i) { return i == null ? "—" : `${i + 1}. ${questionText
 
 const ALL = [...D.tickets, ...D.items];
 
-/** Typical errors behind the options this learner picked (distinct, most frequent first). */
-function mcLines(t, picks) {
-  const seen = new Set();
-  return picks.map(([i]) => misconceptionFor(t, +i, D.mc, D.ticketDistractors))
-    .filter(m => m && !seen.has(m.id) && seen.add(m.id))
-    .map(m => `<div class="note mc"><b>Типичная ошибка:</b> «${lk(m, "belief")}». <b>Как правильно:</b> ${lk(m, "truth")}.</div>`).join("");
-}
-
 function item(s) {
   const t = D.byId[s.id];
   const picks = Object.entries(s.picks).sort((a, b) => b[1] - a[1]);
-  const mcs = mcLines(t, picks.length ? picks : s.lastChoice != null ? [[String(s.lastChoice), 1]] : []);
   return `<details class="err card" data-id="${s.id}"><summary>
-     <span class="errhead"><b>${esc(idLabel(s.id))}</b>${t.own ? ` <span class="badge own">наш вопрос</span>` : ""} <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}</span>
+     <span class="errhead"><b>${esc(idLabel(s.id))}</b>${t.own ? ` <span class="badge own">наш вопрос</span>` : ""} <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">${s.wrong ? `ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}` : s.attempts ? `без ошибок · ответов ${s.attempts}` : "ответов нет"}</span>${s.noted ? ` <span class="badge note" title="У билета есть ваша заметка">заметка</span>` : ""}
      ${s.mastered ? `<span class="badge ok">исправлено: ${MASTERY_STREAK} верно подряд</span>` : ""}
-     <span class="small mut">последняя ошибка ${fmt(s.lastWrong)}${s.ruleLabel ? " · " + esc(s.ruleLabel) : ""}</span></span>
+     <span class="small mut">${s.wrong ? `последняя ошибка ${fmt(s.lastWrong)}` : ""}${s.ruleLabel ? " · " + esc(s.ruleLabel) : ""}</span></span>
      <span class="errq">${esc(questionText(t).q)}</span></summary>
      <div class="errbody">
-       <p class="small"><span class="bad">Ваш ответ:</span> ${picks.length ? picks.map(([i, n]) => `${esc(optionText(t, +i))}${n > 1 ? ` <span class="mut">(×${n})</span>` : ""}`).join("; ") : esc(optionText(t, s.lastChoice))}<br>
-       <span class="ok">Правильный:</span> ${esc(optionText(t, t.c))}</p>
-       ${t.why ? `<div class="note why"><b>Почему здесь ошибаются.</b> ${lk(t, "why")}</div>` : ""}
-       ${mcs}
+       ${s.attempts ? `<p class="small"><span class="${s.wrong ? "bad" : "ok"}">Ваш ответ:</span> ${picks.length ? picks.map(([i, n]) => `${esc(optionText(t, +i))}${n > 1 ? ` <span class="mut">(×${n})</span>` : ""}`).join("; ") : esc(optionText(t, s.lastChoice))}<br>
+       <span class="ok">Правильный:</span> ${esc(optionText(t, t.c))}</p>` : ""}
        <div class="qwrap"></div></div></details>`;
 }
 
 function list() {
-  const stats = errorStats(st.progress(), ALL);
+  const notes = st.notes(), nNotes = Object.keys(notes).length, onlyNotes = q.get("notes") === "1" && nNotes > 0;
+  const errs = errorStats(st.progress(), ALL, notes);
+  const stats = onlyNotes ? notedStats(st.progress(), ALL, notes) : errs;
   const by = GROUPS[q.get("by")] ? q.get("by") : "lesson";
-  const left = drillQueue(st.progress(), stats.map(s => s.id));
+  const left = drillQueue(st.progress(), errs.map(s => s.id));
+  const notesBtn = nNotes ? `<label class="small notesfilter"><input type="checkbox" id="onlynotes"${onlyNotes ? " checked" : ""}> только билеты с заметками (${nNotes})</label>` : "";
   m.innerHTML = `<h1>Типичные ошибки</h1>
-   ${stats.length ? `<p>Билетов с ошибками: ${stats.length}; ещё не исправлено (нужно ${MASTERY_STREAK} верных ответа подряд): ${left.length}.</p>
-   <div class="row">${left.length ? `<a class="btn" href="errors.html?drill=1">Разобрать ошибки (${left.length})</a>` : ""}</div>
+   ${stats.length ? `<p>${onlyNotes ? `Билетов с вашими заметками: ${stats.length} (с ошибками и без).` : `Билетов с ошибками: ${stats.length}; ещё не исправлено (нужно ${MASTERY_STREAK} верных ответа подряд): ${left.length}.`}</p>
+   <div class="row">${left.length ? `<a class="btn" href="errors.html?drill=1">Разобрать ошибки (${left.length})</a>` : ""}${notesBtn}</div>
    <div class="seg groupby" role="tablist" style="margin:14px 0">${Object.entries(GROUPS).map(([k, g]) => `<button class="${k === by ? "on" : ""}" data-by="${k}">${g.label}</button>`).join("")}</div>
-   <p class="small mut">Порядок: сначала самая высокая доля ошибок, затем — больше повторных ошибок, затем — свежие. Нажмите на билет, чтобы увидеть ваш и правильный ответ, пояснение и текст закона. Заметка «почему ошибаются» есть только там, где её даёт текст урока.</p>
+   <p class="small mut">Порядок: сначала самая высокая доля ошибок, затем — больше повторных ошибок, затем — свежие. Нажмите на билет: ваш и правильный ответ, затем вкладки — пояснение, разбор, нормы, ваша история ответов, типичная ошибка и ваша заметка.</p>
    <div id="list"></div>`
-   : `<p>Ошибок пока нет. Они появятся здесь после ответов в <a href="practice.html">самопроверке</a>, <a href="exam.html">экзамене</a> или накопительной проверке.</p>`}`;
+   : `<p>Ошибок пока нет. Они появятся здесь после ответов в <a href="practice.html">самопроверке</a>, <a href="exam.html">экзамене</a> или накопительной проверке.</p>${notesBtn ? `<div class="row">${notesBtn}</div>` : ""}`}`;
+  const nb = $("#onlynotes");
+  if (nb) nb.onchange = () => { nb.checked ? q.set("notes", "1") : q.delete("notes"); history.replaceState(null, "", "?" + q); list(); };
   m.querySelectorAll("[data-by]").forEach(b => b.onclick = () => { q.set("by", b.dataset.by); history.replaceState(null, "", "?" + q); list(); });
   const L = $("#list"); if (!L) return;
   const g = GROUPS[by];
@@ -93,7 +87,7 @@ function drill() {
      <div id="q"></div><div class="row" style="margin-top:12px"><button class="btn" id="next" disabled>Дальше</button></div>`;
     cur = $("#q");
     renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {
-      const r = await record(id, ok, choice);
+      const r = await record(id, ok, choice, "drill");
       const fb = cur.querySelector(".fb"), n = document.createElement("p");
       n.className = "small"; n.textContent = ok ? `Серия верных: ${r.k} из ${MASTERY_STREAK}.` : "Ошибка: серия сброшена, билет вернётся позже.";
       fb.prepend(n);

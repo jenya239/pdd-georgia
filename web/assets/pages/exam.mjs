@@ -56,7 +56,7 @@ import { shuffle } from "../domain/scope.mjs";
     const secs = Math.min(LIMIT, Math.round((Date.now() - t0) / 1000));
     const res = qs.map((t, k) => ({ t, a: ans[k], ok: ans[k] === t.c }));
     const ok = res.filter(r => r.ok).length, err = N - ok;
-    res.forEach(r => { if (r.a != null) record(r.t.id, r.ok, r.a); });
+    res.forEach(r => { if (r.a != null) record(r.t.id, r.ok, r.a, "exam"); });
     store.addExam({ d: Date.now(), ok, pass: err <= MAXERR, s: secs });
     $("#run").style.display = "none"; const R = $("#res"); R.style.display = "";
     const unans = ans.filter(a => a == null).length;

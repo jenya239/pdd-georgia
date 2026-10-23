@@ -170,19 +170,18 @@ HEADER_ITEMS = """[...document.querySelectorAll('header.top .brand, header.top .
 
 
 def breakdowns(br, base):
-    """Pilot «Разбор»: a closed block under the answered ticket; tickets without one are unchanged."""
+    """Pilot «Разбор»: a tab of the post-answer panel; tickets without one have no such tab."""
     page = br.new_page(viewport={"width": 1280, "height": 1000})
     watch(page)
     page.goto(base + "practice.html?ids=54")
     page.wait_for_selector("#set option[value=ids]", state="attached")
     page.click("#go")
     page.wait_for_selector('.q[data-id="54"] .ans')
-    check(page.locator("details.br").count() == 0, "breakdown hidden before answering")
+    check(page.locator(".br, .tdet").count() == 0, "breakdown hidden before answering")
     answer_current(page, correct=False)
-    d = page.locator(".q details.br")
-    check(d.count() == 1 and d.locator("summary").inner_text() == "Разбор" and d.get_attribute("open") is None,
-          "answered ticket 54: closed «Разбор» block")
-    d.locator("summary").click()
+    page.click('.q .tdet [role=tab][data-tab="br"]')
+    d = page.locator('.q .tdet [data-panel="br"]')
+    check(d.is_visible() and d.locator(".br").count() == 1, "answered ticket 54: «Разбор» tab")
     check(d.locator("blockquote.lawquote a.nref[href='norm/st5-p37.html']").count() == 1, "breakdown quote links its norm")
     check(d.locator(".whynot li").count() == 2 and d.locator("a[href='episode.html?id=ep03']").count() == 1,
           "breakdown: one line per wrong option + lesson link")
@@ -193,7 +192,7 @@ def breakdowns(br, base):
     page.click("#go")
     page.wait_for_selector('.q[data-id="1"] .ans')
     answer_current(page)
-    check(page.locator(".q .fb .verdict").count() == 1 and page.locator("details.br").count() == 0, "ticket without breakdown unchanged")
+    check(page.locator(".q .fb .verdict").count() == 1 and page.locator('.tdet [data-tab="br"], .br').count() == 0, "ticket without breakdown: no «Разбор» tab")
     page.close()
 
 
@@ -206,7 +205,8 @@ def machine_translation(br, base):
     page.click("#go")
     page.wait_for_selector('.q[data-id="1"] .ans')
     answer_current(page)
-    e = page.locator(".q .expl")
+    page.click('.q .tdet [role=tab][data-tab="ex"]')
+    e = page.locator('.q .tdet [data-panel="ex"] .expl')
     check("машинный перевод" in e.locator(".small").first.inner_text() and e.locator(".exru a.nref").count() >= 1,
           "ticket 1: explanation in Russian machine translation with norm links")
     d = e.locator("details.exka")
@@ -216,6 +216,124 @@ def machine_translation(br, base):
     e.evaluate("e => e.scrollIntoView({block: 'end'})")
     shot(page, "explanation_mt.png")
     page.close()
+
+
+TAB_ORDER = ["ex", "br", "norms", "hist", "mc", "note"]
+
+
+def panel_ok(q):
+    """The one post-answer panel: tabs in the fixed order, one selected, a panel per tab, note tab always there."""
+    tabs = q.locator(".tdet [role=tablist] [role=tab]")
+    ids = [tabs.nth(i).get_attribute("data-tab") for i in range(tabs.count())]
+    sel = [tabs.nth(i).get_attribute("aria-selected") for i in range(tabs.count())]
+    panels = q.locator(".tdet [role=tabpanel]")
+    vis = [panels.nth(i).is_visible() for i in range(panels.count())]
+    return (q.locator(".tdet").count() == 1 and len(ids) >= 2 and ids == [t for t in TAB_ORDER if t in ids] and "note" in ids
+            and sel.count("true") == 1 and panels.count() == len(ids) and vis.count(True) == 1)
+
+
+def ticket_details(br, base):
+    """Unified post-answer panel: same structure everywhere, history from two views, a note that survives export/import."""
+    ctx = br.new_context(viewport={"width": 1280, "height": 1000})
+    page = ctx.new_page()
+    watch(page)
+    page.goto(base + "practice.html?ids=54")
+    page.wait_for_selector("#set option[value=ids]", state="attached")
+    page.click("#go")
+    page.wait_for_selector('.q[data-id="54"] .ans')
+    check(page.locator(".tdet").count() == 0, "details: nothing before answering")
+    answer_current(page, correct=False)
+    q = page.locator('.q[data-id="54"]')
+    check(panel_ok(q), "practice: details panel under the verdict")
+    labels = q.locator(".tdet [role=tab]").all_inner_texts()
+    check(labels[:3] == ["Пояснение", "Разбор", "Нормы"] and "Моя история" in labels and "Заметка" in labels, f"ticket 54 tabs {labels}")
+    q.locator('.tdet [data-tab="norms"]').click()
+    page.wait_for_function("document.querySelector('.tdet [data-panel=norms] .dntext')?.textContent.length > 20")
+    check(q.locator('.tdet [data-panel="norms"] a.nref[href="norm/st36-p4-v.html"]').count() >= 1
+          and q.locator('.tdet [data-panel="norms"] a[href="episode.html?id=ep03"]').count() == 1, "norms tab: permalinks, verbatim text, lesson link")
+    # keyboard: arrows move between tabs, End → last; the choice is remembered
+    q.locator('.tdet [role=tab][aria-selected=true]').focus()
+    page.keyboard.press("ArrowRight")
+    check(q.locator('.tdet [role=tab][aria-selected=true]').get_attribute("data-tab") == "hist"
+          and page.evaluate("document.activeElement.dataset.tab") == "hist", "keyboard: ArrowRight → next tab, focused")
+    hist = q.locator('.tdet [data-panel="hist"] .dhist li')
+    check(hist.count() == 1 and "самопроверка" in hist.first.inner_text() and "неверно" in hist.first.inner_text(), "history: the practice attempt")
+    page.keyboard.press("End")
+    check(q.locator('.tdet [role=tab][aria-selected=true]').get_attribute("data-tab") == "note", "keyboard: End → «Заметка»")
+    check(page.evaluate("JSON.parse(localStorage.getItem('pddge.settings.v1')).tab") == "note", "last tab stored in settings")
+    q.locator(".dnote").fill("Помеха справа — уступить.")
+    q.locator("[data-save]").click()
+    check("сохранена" in q.locator("[data-status]").inner_text() and q.locator(".notemark").is_visible()
+          and q.locator('.tdet [data-tab="note"]').inner_text() == "Заметка •", "note saved, marker shown")
+    # second view: the lesson page — note marker before answering, remembered tab, two attempts in history
+    page.goto(base + "episode.html?id=ep03")
+    page.wait_for_selector('#tk .q[data-id="54"] .ans')
+    lq = page.locator('#tk .q[data-id="54"]')
+    check(lq.locator(".notemark").is_visible() and lq.locator(".tdet").count() == 0, "lesson: note marker on the unanswered ticket, no panel yet")
+    c = page.evaluate(f"{LOAD_T}.then(D => D.byId[54].c)")
+    lq.locator(".ans").nth(c).click()
+    check(panel_ok(lq) and lq.locator('.tdet [role=tab][aria-selected=true]').get_attribute("data-tab") == "note"
+          and lq.locator(".dnote").input_value() == "Помеха справа — уступить.", "lesson: same panel, opens on the remembered tab with the note")
+    lq.locator('.tdet [data-tab="hist"]').click()
+    items = lq.locator('.tdet [data-panel="hist"] .dhist li').all_inner_texts()
+    check(len(items) == 2 and "урок" in items[0] and "верно" in items[0] and "самопроверка" in items[1], f"history from two views, newest first {items}")
+    lq.evaluate("e => e.scrollIntoView({block: 'center'})")
+    shot(page, "details_desktop.png")
+    # own item: the applicable subset
+    own = page.locator("#own-items .q").first
+    if own.count():
+        own.locator(".ans").first.click()
+        tabs = [own.locator(".tdet [role=tab]").nth(i).get_attribute("data-tab") for i in range(own.locator(".tdet [role=tab]").count())]
+        check(panel_ok(own) and "br" not in tabs and "norms" in tabs, f"own item: same panel, its subset {tabs}")
+    # errors page: marker + «only with notes» filter
+    page.goto(base + "errors.html")
+    page.wait_for_selector("details.err")
+    check(page.locator('details.err[data-id="54"] .badge.note').count() == 1, "errors: note marker on the ticket")
+    page.check("#onlynotes")
+    page.wait_for_selector("details.err")
+    check(page.locator("details.err").count() == 1 and "notes=1" in page.url, "errors: filter «only with notes»")
+    # export → clear → import keeps the note and the history
+    with page.expect_download() as dl:
+        page.click("header.top [data-act=export]")
+    tmp = Path(tempfile.mkdtemp()) / "notes.json"
+    dl.value.save_as(tmp)
+    data = json.loads(tmp.read_text())["data"]
+    check(data.get("notes", {}).get("54", {}).get("x") == "Помеха справа — уступить." and len(data["progress"]["54"]["h"]) == 2, "export: note + history")
+    page.evaluate("localStorage.clear()")
+    page.reload()
+    page.wait_for_selector("header.top [data-act=import]", state="attached")
+    page.set_input_files("header.top [data-act=import]", str(tmp))
+    page.wait_for_selector("#pfdlg[open] [data-preview]")
+    check(page.inner_text("#pfdlg [data-preview] tr[data-k=notes]").split("\t")[2].strip() == "1", "import preview counts notes")
+    with page.expect_navigation():
+        page.click("#pfdlg [data-act=apply]")
+    page.goto(base + "practice.html?ids=54")
+    page.wait_for_selector("#set option[value=ids]", state="attached")
+    page.click("#go")
+    page.wait_for_selector('.q[data-id="54"] .ans')
+    answer_current(page)
+    q = page.locator('.q[data-id="54"]')
+    q.locator('.tdet [data-tab="note"]').click()
+    check(q.locator(".dnote").input_value() == "Помеха справа — уступить." and q.locator('.tdet [data-panel="hist"] .dhist li').count() == 3,
+          "after import: note kept, history continues")
+    ctx.close()
+    # mobile: the tab strip scrolls, the page does not
+    mob = br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    mp = mob.new_page()
+    watch(mp)
+    mp.goto(base + "practice.html?ids=54")
+    mp.wait_for_selector("#set option[value=ids]", state="attached")
+    mp.click("#go")
+    mp.wait_for_selector('.q[data-id="54"] .ans')
+    answer_current(mp, correct=False)
+    mq = mp.locator('.q[data-id="54"]')
+    mq.locator('.tdet [data-tab="hist"]').click()
+    sw = mp.evaluate("document.documentElement.scrollWidth")
+    check(panel_ok(mq) and sw <= 390, f"mobile: details panel, no page overflow ({sw})")
+    mq.locator(".tdet").evaluate("e => e.scrollIntoView({block: 'start'})")
+    mp.evaluate("window.scrollBy(0, -120)")
+    shot(mp, "details_mobile.png")
+    mob.close()
 
 
 def header_layout(br, base):
@@ -421,6 +539,7 @@ def main():
         page.wait_for_timeout(100)
         rec = page.evaluate("JSON.parse(localStorage.getItem('pddge.progress.v1'))").get(mapped["id"])
         check(rec is not None and rec["w"] == 1, f"own item answer recorded {rec}")
+        oq.locator('.tdet [role=tab][data-tab="norms"]').click()
         txt = oq.inner_text()
         check(oq.locator(".note.mc").count() == 1 and mapped["quote"]["text"][:40] in " ".join(txt.split()), "own item: typical error + verbatim quote")
         check(oq.locator("a[target=_blank]").count() == 0, "own item has no source link")
@@ -492,12 +611,16 @@ def main():
             page.keyboard.press(str(1 + (k % 2)))
             page.keyboard.press("ArrowRight")
         check(page.inner_text("#answered") == "Отвечено 30 из 30", "exam: 30 answered")
+        check(page.locator("#qbox .tdet, #qbox .verdict, #qbox .notemark").count() == 0, "running mock exam: no verdict, no details panel")
         page.once("dialog", lambda d: d.accept())
         page.click("#finish")
         page.wait_for_selector("#res .result")
         check(page.locator("#rev .q").count() >= 0, "exam result + review")
         nrev = page.locator("#rev .q").count()
         check(nrev == 0 or page.locator("#rev .q .katoggle").count() >= 1, f"exam review: KA toggle ({nrev} reviewed)")
+        if nrev:
+            check(page.locator("#rev .q .tdet").count() == nrev and panel_ok(page.locator("#rev .q").first), "exam review: details panel on every reviewed ticket")
+            check("экзамен" in page.locator("#rev .q").first.locator('.tdet [data-panel="hist"]').inner_html(), "exam answers recorded with «экзамен»")
         bad = page.evaluate("""async()=>{const D=await (await fetch('data/tickets.json')).json(); const srcs=D.tickets.filter(t=>t.img).map(t=>t.img);
            const res=await Promise.all(srcs.map(s=>new Promise(r=>{const i=new Image(); i.onload=()=>r(i.naturalWidth>0?null:s); i.onerror=()=>r(s); i.src=s;})));
            return {n:srcs.length, bad:res.filter(Boolean)}}""")
@@ -544,6 +667,8 @@ def main():
                 if not any(isinstance(w, str) for w in wrong):
                     ok = False  # make sure at least one own question lands in the errors
             t2 = answer_current(page, correct=ok)
+            if k == 0:
+                check(panel_ok(page.locator(".q").first), "cumulative check: details panel after the answer")
             if not ok:
                 wrong.append(t2)
             page.click("#next")
@@ -573,6 +698,7 @@ def main():
         d.locator("summary").click()
         page.wait_for_selector("details.err[open] .q .verdict")
         check(d.locator(".ans.ok").count() == 1 and "Правильный" in d.inner_text(), "error details: wrong vs correct + explanation")
+        check(panel_ok(d) and d.locator(".errbody > .note").count() == 0, "errors list: details panel, no duplicate notes above it")
         prog = page.evaluate("JSON.parse(localStorage.getItem('pddge.progress.v1'))")
         need = sum(max(0, 2 - r.get("k", 0)) for r in prog.values() if r["w"] > 0)
         page.click("text=Разобрать ошибки")
@@ -580,6 +706,8 @@ def main():
         steps = 0
         while page.locator(".q").count() and steps < 30:
             answer_current(page, correct=True)
+            if steps == 0:
+                check(panel_ok(page.locator(".q").first), "drill: details panel after the answer")
             page.click("#next")
             steps += 1
             page.wait_for_selector(".q, .result")
@@ -605,8 +733,8 @@ def main():
         tmp = Path(tempfile.mkdtemp()) / "progress.json"
         dl.value.save_as(tmp)
         bundle = json.loads(tmp.read_text())
-        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 2 and bundle["app"] and bundle["exportedAt"]
-              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 2, sections {sorted(bundle['data'])}")
+        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 3 and bundle["app"] and bundle["exportedAt"]
+              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 3, sections {sorted(bundle['data'])}")
         page.evaluate("localStorage.clear()")
         page.reload()
         page.wait_for_selector("header.top [data-act=import]", state="attached")
@@ -700,6 +828,7 @@ def main():
         header_layout(br, base)
         breakdowns(br, base)
         machine_translation(br, base)
+        ticket_details(br, base)
         br.close()
     stop()
     legacy_root()

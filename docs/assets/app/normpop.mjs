@@ -19,6 +19,9 @@ function load(slug) {
   return chunks.get(c).then(d => d[slug]);
 }
 
+/** The text of a norm ({c citation, t title, ru, ka, img}) from the same lazy chunks the panel uses. */
+export const normEntry = slug => load(slug);
+
 function build() {
   panel = document.createElement("div");
   panel.className = "npop"; panel.id = "npop"; panel.hidden = true;
