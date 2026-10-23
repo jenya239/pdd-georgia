@@ -7,6 +7,7 @@ import { renderQuestion } from "../app/question.mjs";
 import { errorStats, groupStats, drillQueue } from "../domain/errors.mjs";
 import { MASTERY_STREAK } from "../domain/progress.mjs";
 import { idLabel, parseId, misconceptionFor } from "../domain/items.mjs";
+import { lk } from "../domain/normlinks.mjs";
 
 header("errors");
 const [D, E, st] = await Promise.all([loadTickets(), loadEpisodes(), store]);
@@ -31,7 +32,7 @@ function mcLines(t, picks) {
   const seen = new Set();
   return picks.map(([i]) => misconceptionFor(t, +i, D.mc, D.ticketDistractors))
     .filter(m => m && !seen.has(m.id) && seen.add(m.id))
-    .map(m => `<div class="note mc"><b>Типичная ошибка:</b> «${esc(m.belief)}». <b>Как правильно:</b> ${esc(m.truth)}.</div>`).join("");
+    .map(m => `<div class="note mc"><b>Типичная ошибка:</b> «${lk(m, "belief")}». <b>Как правильно:</b> ${lk(m, "truth")}.</div>`).join("");
 }
 
 function item(s) {
@@ -46,7 +47,7 @@ function item(s) {
      <div class="errbody">
        <p class="small"><span class="bad">Ваш ответ:</span> ${picks.length ? picks.map(([i, n]) => `${esc(optionText(t, +i))}${n > 1 ? ` <span class="mut">(×${n})</span>` : ""}`).join("; ") : esc(optionText(t, s.lastChoice))}<br>
        <span class="ok">Правильный:</span> ${esc(optionText(t, t.c))}</p>
-       ${t.why ? `<div class="note why"><b>Почему здесь ошибаются.</b> ${esc(t.why)}</div>` : ""}
+       ${t.why ? `<div class="note why"><b>Почему здесь ошибаются.</b> ${lk(t, "why")}</div>` : ""}
        ${mcs}
        <div class="qwrap"></div></div></details>`;
 }
@@ -88,7 +89,7 @@ function drill() {
     lastId = id;
     m.innerHTML = `<div class="small mut"><a href="errors.html">Типичные ошибки</a> · разбор</div><h1>Разбор ошибок</h1>
      <p class="small">Осталось ${left.length}. Билет уходит из разбора после ${MASTERY_STREAK} верных ответов подряд; у этого сейчас ${k} из ${MASTERY_STREAK}.</p>
-     ${t.why ? `<details class="small"><summary>Подсказка из урока</summary><div class="note why">${esc(t.why)}</div></details>` : ""}
+     ${t.why ? `<details class="small"><summary>Подсказка из урока</summary><div class="note why">${lk(t, "why")}</div></details>` : ""}
      <div id="q"></div><div class="row" style="margin-top:12px"><button class="btn" id="next" disabled>Дальше</button></div>`;
     cur = $("#q");
     renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {

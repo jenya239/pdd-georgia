@@ -5,6 +5,7 @@ import { header } from "../app/layout.mjs";
 import { store, summary } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { TYPE_LABEL } from "../domain/items.mjs";
+import { lk, lawDetails } from "../domain/normlinks.mjs";
 (async () => {
   header("eps");
   const [D, E] = await Promise.all([loadTickets(), loadEpisodes()]);
@@ -20,14 +21,14 @@ import { TYPE_LABEL } from "../domain/items.mjs";
   const isText = episodeKind(r) === "text";
   const lesson = isText ? splitLesson(await (await fetch(r.lesson)).text()) : null;
   const lawPart = `<h2>Главное</h2>
-   <ol class="points">${r.points.map(p => `<li>${esc(p.t)} <span class="cite">${esc(p.c)}</span></li>`).join("")}</ol>
+   <ol class="points">${r.points.map(p => `<li>${lk(p, "t")} <span class="cite">${lk(p, "c")}</span></li>`).join("")}</ol>
    <h3>Текст закона к выпуску</h3>
    <p class="small mut">Цитаты из русского перевода Matsne, ред. 25.06.2026. Юридическую силу имеет грузинский текст.</p>
-   ${r.law_quotes.map(q => `<details class="law"><summary>${esc(q.ref)}${q.title ? " — " + esc(q.title) : ""}</summary><div class="lawtext">${esc(q.text)}</div></details>`).join("")}`;
+   ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
   const kindLine = `<div class="small mut"><a href="index.html">Выпуски</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
   m.innerHTML = isText
-    ? `${kindLine}<h1>${esc(r.title)}</h1><p class="lead">${esc(r.lead)}</p>
+    ? `${kindLine}<h1>${esc(r.title)}</h1><p class="lead">${lk(r, "lead")}</p>
    <article class="lesson">${lesson.before}</article>
    ${lawPart}
    <h2>Билеты к выпуску</h2>
@@ -38,7 +39,7 @@ import { TYPE_LABEL } from "../domain/items.mjs";
     : `${kindLine}
    <h1>${esc(r.title)}</h1>
    <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
-   <p>${esc(r.lead)}</p>
+   <p>${lk(r, "lead")}</p>
    ${lawPart}
    <h2>Билеты к выпуску</h2>
    <div id="tk"></div>
@@ -62,7 +63,7 @@ import { TYPE_LABEL } from "../domain/items.mjs";
   function section(box, title, note, list) {
     if (!list.length) return;
     const h = document.createElement("div");
-    h.innerHTML = `<h3>${esc(title)} (${list.length})</h3>${note ? `<p class="small mut">${esc(note)}</p>` : ""}`;
+    h.innerHTML = `<h3>${esc(title)} (${list.length})</h3>${note ? `<p class="small mut">${note}</p>` : ""}`;
     box.append(h);
     for (const t of list) { const d = document.createElement("div"); d.className = "qwrap"; box.append(d); all.push([d, t]); }
   }
@@ -79,8 +80,8 @@ import { TYPE_LABEL } from "../domain/items.mjs";
     const s = summary([...core, ...linked].map(t => t.id));
     tk.innerHTML = `<p class="small mut">Нажмите вариант (или клавиши <kbd>1</kbd>–<kbd>4</kbd> для вопроса в фокусе) — ответ проверяется сразу и сохраняется в прогресс. Решено ${s.seen} из ${s.total}.</p>`;
   }
-  section(tk, r.core_title || "По статьям, разобранным в выпуске", r.core_note || "Вопросы, в пояснении к которым есть ссылка на пункты, разобранные выше.", core);
-  section(tk, r.linked_title || "Привязанные к серии", r.linked_note || "", linked);
+  section(tk, r.core_title || "По статьям, разобранным в выпуске", r.core_note ? lk(r, "core_note") : "Вопросы, в пояснении к которым есть ссылка на пункты, разобранные выше.", core);
+  section(tk, r.linked_title || "Привязанные к серии", lk(r, "linked_note"), linked);
   const draw = () => all.forEach(([d, t]) => { const st = d._state; renderQuestion(d, t, st && st.answered ? { mode: "instant", reveal: true, selected: st.choice } : { mode: "instant" }); });
   draw();
   document.addEventListener("pdd:lang", draw);

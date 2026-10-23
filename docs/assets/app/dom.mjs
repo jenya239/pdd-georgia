@@ -6,3 +6,11 @@ export const plural = (n, f) => {
   return f[(m10 === 1 && m100 !== 11) ? 0 : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) ? 1 : 2];
 };
 export const nq = n => n + " " + plural(n, ["вопрос", "вопроса", "вопросов"]);
+
+/** A short status message at the bottom of the screen. */
+export function toast(text) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.setAttribute("role", "status"); t.textContent = text;
+  document.body.append(t);
+  setTimeout(() => t.remove(), 3500);
+}

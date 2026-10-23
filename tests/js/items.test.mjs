@@ -28,6 +28,7 @@ test("an own item looks like a ticket to the renderers", () => {
   assert.deepEqual(t.nu, []);
   assert.equal(t.fig.kind, "approach");
   assert.equal(t.img, null);
+  assert.deepEqual(itemAsTicket({ ...ITEM, _r: { explain: [[0, 4, "st5"]] } })._r, { explain: [[0, 4, "st5"]] });  // norm links survive
 });
 
 test("misconception for a wrong pick: own items and annotated bank tickets", () => {

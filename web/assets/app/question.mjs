@@ -6,6 +6,7 @@ import { record } from "./progress.mjs";
 import { zoom } from "./layout.mjs";
 import { figureSvg } from "../domain/figure.mjs";
 import { misconceptionFor } from "../domain/items.mjs";
+import { lk, lawDetails } from "../domain/normlinks.mjs";
 
 function textFor(t, lang) {
   const untr = (t.nu || []).includes(lang);
@@ -15,23 +16,24 @@ function textFor(t, lang) {
 function lawBlock(t) {
   if (!t.law || !t.law.length) return "";
   const { laws } = loadedTickets();
-  return t.law.map(k => { const L = laws[k]; return `<details class="law"><summary>${esc(L.ref)}${L.title ? " — " + esc(L.title) : ""}</summary><div class="lawtext">${esc(L.text)}</div></details>`; }).join("") +
+  return t.law.map(k => lawDetails(laws[k])).join("") +
     `<div class="small mut">Текст действующей редакции (25.06.2026, рус. перевод Matsne). Пункт подобран автоматически по ссылке в грузинском пояснении и проверен по совпадению с грузинским текстом закона; подпункт смотрите в пояснении.</div>`;
 }
 
 function ownExplanation(t) {
-  return `<div class="expl own"><div>${esc(t.explain)}</div>
-    <blockquote class="lawquote"><div class="small mut">${esc(t.quote.ref)} — дословно, рус. перевод Matsne, ред. 25.06.2026</div>«${esc(t.quote.text)}»</blockquote></div>`;
+  const q = t.quote, ref = q.n ? `<a class="nref" href="norm/${esc(q.n)}.html" data-norm="${esc(q.n)}">${esc(q.ref)}</a>` : esc(q.ref);
+  return `<div class="expl own"><div>${lk(t, "explain")}</div>
+    <blockquote class="lawquote"><div class="small mut">${ref} — дословно, рус. перевод Matsne, ред. 25.06.2026</div>«${lk(q, "text")}»</blockquote></div>`;
 }
 
 function mcNote(t, choice) {
   const D = loadedTickets(), m = misconceptionFor(t, choice, D.mc, D.ticketDistractors);
-  return m ? `<div class="note mc"><b>Типичная ошибка:</b> «${esc(m.belief)}». <b>Как правильно:</b> ${esc(m.truth)}.</div>` : "";
+  return m ? `<div class="note mc"><b>Типичная ошибка:</b> «${lk(m, "belief")}». <b>Как правильно:</b> ${lk(m, "truth")}.</div>` : "";
 }
 
 function explanation(t) {
   if (t.own) return ownExplanation(t);
-  return (t.ex ? `<div class="expl"><div class="small mut">Пояснение из базы (только на грузинском):</div><div class="ka" lang="ka">${esc(t.ex)}</div></div>`
+  return (t.ex ? `<div class="expl"><div class="small mut">Пояснение из базы (только на грузинском):</div><div class="ka" lang="ka">${lk(t, "ex")}</div></div>`
     : `<div class="expl small mut">Пояснения в исходной базе нет.</div>`) + lawBlock(t);
 }
 

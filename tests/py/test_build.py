@@ -33,7 +33,7 @@ def test_docs_is_fresh(built):
 def test_pages_have_no_inline_scripts(built):
     files = built[0]
     for name, data in files.items():
-        if name.endswith(".html") and "/" not in name:
+        if name.endswith(".html") and ("/" not in name or name.startswith("norm/")):
             html = data.decode() if isinstance(data, bytes) else data
             assert re.findall(r"<script(?![^>]*\bsrc=)[^>]*>", html) == [], name
             assert 'type="module"' in html, name

@@ -3,6 +3,7 @@
  * previewText / importText; the rules live in ../domain/bundle.mjs and ../domain/registry.mjs).
  */
 import { store } from "./progress.mjs";
+import { toast } from "./dom.mjs";
 
 const ROWS = [["tickets", "Билеты с ответами"], ["own", "Наши вопросы с ответами"], ["wrong", "Сейчас с ошибкой"],
   ["mastered", "Освоено (серия верных)"], ["runs", "Завершённые накопительные проверки"], ["active", "Незавершённые проверки"],
@@ -10,12 +11,6 @@ const ROWS = [["tickets", "Билеты с ответами"], ["own", "Наши
 const cell = v => (v === true ? "есть" : v === false || v === null ? "—" : String(v));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
-function toast(text) {
-  const t = document.createElement("div");
-  t.className = "toast"; t.setAttribute("role", "status"); t.textContent = text;
-  document.body.append(t);
-  setTimeout(() => t.remove(), 3500);
-}
 
 export function exportProgress() {
   const now = Date.now(), blob = new Blob([store.exportText(now)], { type: "application/json" });

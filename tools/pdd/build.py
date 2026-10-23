@@ -19,7 +19,7 @@ from pdd import paths
 from pdd.assign import primary_ref, rule_key, rule_label, pitfall_for
 from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids
 from pdd.lawparse import parse_law, parse_annex
-from pdd import checkitems, norms as norms_mod, ontology
+from pdd import checkitems, norms as norms_mod, normsite, ontology
 from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
@@ -87,7 +87,7 @@ def generate():
     if errors:
         raise ValueError("own check items are invalid:\n" + "\n".join(errors))
 
-    files, copies = {}, {}
+    files, copies, lessons = {}, {}, {}
     for ep in eps:
         ep["kind"] = episode_kind(ep)
         own = [i["id"] for i in items if i["lesson"] == ep["id"]]
@@ -106,7 +106,7 @@ def generate():
         if ep["kind"] == "text":
             lesson_dir = paths.LESSONS / ep["id"]
             html = load_lesson(lesson_dir).render()
-            files[ep["lesson"]] = html
+            lessons[ep["id"]] = html
             prefix = f"lessons/{ep['id']}/"
             for name in lesson_asset_refs(html, prefix):
                 src = lesson_dir / name
@@ -118,9 +118,20 @@ def generate():
             elif rel and rel.startswith("media/"):
                 copies[rel] = paths.MEDIA / rel[len("media/"):]
 
+    items_export = checkitems.export(items, world)
+    linker = normsite.link_content(world.norms, world, eps, lessons, tickets, Q, idx.quotes, items_export)
+    for ep in eps:
+        if ep["id"] in lessons:
+            files[ep["lesson"]] = lessons[ep["id"]]
+    norm_pages, norm_copies, _ = normsite.norm_files(world.norms, world, linker, eps, tickets, items_export)
+    files.update(norm_pages)
+    copies.update(norm_copies)
+    _LINKS[:] = [linker]
+    stat["norm_links"] = sum(c.get("linked", 0) for c in linker.report()["stats"].values())
+
     meta = {"built_from": META, "count": len(tickets), "topics": topics, "stats": stat}
     files["data/tickets.json"] = dumps_compact({"meta": meta, "tickets": tickets, "laws": idx.quotes})
-    files["data/items.json"] = dumps_compact(checkitems.export(items, world))
+    files["data/items.json"] = dumps_compact(items_export)
     files["data/episodes.json"] = json.dumps({"plan": plan, "released": eps}, ensure_ascii=False, indent=1)
 
     for t in tickets:
@@ -142,6 +153,8 @@ def generate():
 
 
 _WORLD = []
+_LINKS = []                    # the last build's normlink.Linker (its decisions → links.json)
+LINKS_JSON = paths.REPO / "content/ontology/generated/links.json"
 
 
 def load_world():
@@ -157,7 +170,15 @@ def generated_sources() -> dict:
     """Generated files kept in the repository (content/ontology/generated): {Path: text}."""
     world = load_world()
     return {norms_mod.NORMS_JSON: norms_mod.dump(list(world.norms.values())),
-            ontology.REPORT_JSON: ontology.dump(world.report(checkitems.load_items()))}
+            ontology.REPORT_JSON: ontology.dump(world.report(checkitems.load_items())),
+            LINKS_JSON: links_report()}
+
+
+def links_report() -> str:
+    """Auto-linking statistics: per content type, how many norm references were linked / left plain and why."""
+    if not _LINKS:
+        generate()
+    return json.dumps(_LINKS[0].report(), ensure_ascii=False, indent=1) + "\n"
 
 
 def expected_tree(files, copies) -> dict:
