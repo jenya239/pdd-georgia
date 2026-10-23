@@ -70,6 +70,6 @@ def test_own_items_are_published_and_listed_per_episode(built):
     assert len(ids) == len(set(ids)) >= 4
     E = json.loads(built[0]["data/episodes.json"])
     by_ep = {r["id"]: r.get("own_items", []) for r in E["released"]}
-    for lid in ("ep01", "ep02", "ep03", "ep04"):
+    for lid in ("ep01", "ep02", "ep03", "ep04", "ep05", "ep06"):
         assert by_ep[lid] and all(i.startswith(f"o-{lid}-") for i in by_ep[lid])
     assert sorted(i for v in by_ep.values() for i in v) == sorted(ids)

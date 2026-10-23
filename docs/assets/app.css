@@ -21,7 +21,18 @@ header.top{position:sticky;top:0;z-index:20;background:var(--bg2);border-bottom:
 nav.main{display:flex;gap:4px;flex-wrap:wrap}
 nav.main a{text-decoration:none;color:var(--fg);padding:6px 10px;border-radius:8px}
 nav.main a.on,nav.main a:hover{background:var(--acc2);color:var(--acc)}
-.tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.tools{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pfbtns{display:flex;gap:8px}
+.pfbtns label.iconbtn{display:inline-flex;align-items:center}
+.pfdlg{max-width:620px;width:calc(100vw - 24px);border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--fg);padding:16px}
+.pfdlg::backdrop{background:rgba(0,0,0,.55)}
+.pfdlg h3{margin:0 0 8px}
+.pfdlg .pfmode label{display:block;margin:6px 0;font-size:14px}
+.pfdlg .pftable{overflow:auto;margin:8px 0}
+.pfdlg th{text-align:left;font-size:13px;padding:4px 6px}
+.pfdlg .bad{color:var(--bad)}
+.row.end{justify-content:flex-end}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;z-index:60;font-size:14px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:transparent;color:var(--fg);padding:5px 9px;font:inherit;font-size:13px;cursor:pointer}
 .seg button.on{background:var(--acc);color:#fff}
@@ -110,6 +121,8 @@ footer{max-width:1040px;margin:0 auto;padding:20px 16px 40px;color:var(--mut);fo
   .ep img{width:110px}
   .qtext{font-size:16px}
   .tools{margin-left:0;width:100%;justify-content:space-between}
+  .pfbtns{width:100%}
+  .pfbtns .iconbtn{flex:1;justify-content:center;text-align:center}
   .exgrid{grid-template-columns:repeat(6,1fr)}
   .plan .hide-s{display:none}
 }
@@ -163,6 +176,9 @@ footer{max-width:1040px;margin:0 auto;padding:20px 16px 40px;color:var(--mut);fo
 .fig .rail{stroke:var(--fg-rail);stroke-width:4}.fig .sleeper{fill:var(--fg-sleeper)}
 .fig .house{fill:var(--fg-house)}.fig .roof{fill:var(--fg-roof)}
 .fig .shadow{fill:#000;opacity:.25}.fig .sep{stroke:var(--line);stroke-width:2}.fig .slash{stroke:var(--bad);stroke-width:3}
+.fig .ppl{fill:none;stroke:var(--fg);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.fig .head{fill:var(--fg)}
+.fig .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}.fig .box.hl{fill:var(--acc2);stroke:var(--acc)}.fig .box.no{fill:var(--badbg);stroke:var(--bad)}.fig .box.eq{fill:var(--okbg);stroke:var(--ok)}
+.fig .tree{stroke:var(--mut);stroke-width:2;fill:none}.fig .gap{fill:var(--warnbg);stroke:var(--warn);stroke-width:1.5;stroke-dasharray:5 4}.fig .t.warn{fill:var(--warn)}
 .badge.ok{background:var(--okbg);color:var(--ok)}
 .badge.kind.text{background:var(--okbg);color:var(--ok)}
 /* ---------- накопительная проверка и ошибки ---------- */
@@ -197,6 +213,7 @@ svg.fig .route{fill:none;stroke:#1f5fbf;stroke-width:2.5;stroke-dasharray:5 4}
 svg.fig .arrowhead{fill:#1f5fbf}
 svg.fig .car rect{fill:#fff;stroke:#1b1f24;stroke-width:1.5}
 svg.fig .car text{font:bold 14px var(--font);fill:#1b1f24}
+svg.fig .car.tram rect{fill:#ffe08a;stroke:#7a4b00;stroke-width:2}
 svg.fig .tag{font:12px var(--font);fill:#1b1f24}
 svg.fig .lbl{font:bold 16px var(--font);fill:var(--fg)}
 svg.fig .lbl.small{font-size:13px;fill:#fff}
@@ -207,7 +224,7 @@ svg.fig .k-strip{fill:#7fae6a}
 svg.fig .k-sidewalk{fill:#d9d4cc}
 svg.fig .zebra rect{fill:#fff}
 svg.fig .barrier{stroke:#c62828;stroke-width:6;stroke-dasharray:10 8}
-svg.fig .rail{stroke:#444;stroke-width:4}
+svg.fig .rail{stroke:#444;stroke-width:3}
 svg.fig .light rect{fill:#1b1f24}
 svg.fig .mark line{stroke:#ffd54f;stroke-width:3}
 /* wide lesson figures on small screens: scroll hint + fullscreen view */

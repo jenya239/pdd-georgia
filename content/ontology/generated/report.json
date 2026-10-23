@@ -8,34 +8,40 @@
    "article": 69,
    "law": 1003
   },
-  "concepts": 61,
+  "concepts": 81,
   "introduced": {
    "ep01": 6,
    "ep02": 12,
    "ep03": 10,
-   "ep04": 15
+   "ep04": 15,
+   "ep05": 9,
+   "ep06": 16
   },
-  "assumed": 9,
-  "untaught": 9,
-  "misconceptions": 37,
-  "annotated_tickets": 65,
-  "distractors": 98,
-  "distractors_mapped": 93
+  "assumed": 5,
+  "untaught": 8,
+  "misconceptions": 50,
+  "annotated_tickets": 78,
+  "distractors": 135,
+  "distractors_mapped": 126
  },
  "assignment": {
   "derived": {
    "ep01": 0,
    "ep02": 9,
    "ep03": 13,
-   "ep04": 26
+   "ep04": 26,
+   "ep05": 3,
+   "ep06": 14
   },
   "strict": {
    "ep01": 0,
    "ep02": 8,
    "ep03": 15,
-   "ep04": 15
+   "ep04": 15,
+   "ep05": 3,
+   "ep06": 10
   },
-  "blocked": 17,
+  "blocked": 13,
   "blocked_tickets": {
    "21": {
     "lesson": "ep04",
@@ -44,40 +50,12 @@
     ],
     "note": "исключён из ep04 вручную"
    },
-   "47": {
-    "lesson": "ep03",
-    "missing": [
-     "tram-priority"
-    ],
-    "note": "исключён из ep03 вручную: трамваи"
-   },
-   "53": {
-    "lesson": "ep03",
-    "missing": [
-     "tram-priority"
-    ],
-    "note": "исключён из ep03 вручную: трамваи"
-   },
    "59": {
     "lesson": "ep04",
     "missing": [
      "trajectory-right-rule"
     ],
     "note": "исключён из ep04 вручную"
-   },
-   "69": {
-    "lesson": "ep03",
-    "missing": [
-     "tram-priority"
-    ],
-    "note": "исключён из ep03 вручную: трамваи"
-   },
-   "75": {
-    "lesson": "ep03",
-    "missing": [
-     "tram-priority"
-    ],
-    "note": "исключён из ep03 вручную: трамваи, отключённый светофор"
    },
    "224": {
     "lesson": "ep04",
@@ -168,22 +146,22 @@
    },
    {
     "ticket": 47,
-    "derived": null,
+    "derived": "ep06",
     "strict": "ep03"
    },
    {
     "ticket": 53,
-    "derived": null,
+    "derived": "ep06",
     "strict": "ep03"
    },
    {
     "ticket": 69,
-    "derived": null,
+    "derived": "ep06",
     "strict": "ep03"
    },
    {
     "ticket": 75,
-    "derived": null,
+    "derived": "ep06",
     "strict": "ep03"
    },
    {
@@ -276,16 +254,8 @@
  "gaps": {
   "assumed_concepts": [
    {
-    "id": "driver",
-    "label": "Водитель"
-   },
-   {
     "id": "give-way",
     "label": "Уступить дорогу (не создавать помех)"
-   },
-   {
-    "id": "mechanical-vehicle",
-    "label": "Механическое транспортное средство"
    },
    {
     "id": "overtaking",
@@ -296,20 +266,12 @@
     "label": "Стоянка (дольше 5 минут)"
    },
    {
-    "id": "pedestrian",
-    "label": "Пешеход"
-   },
-   {
     "id": "priority",
     "label": "Преимущество (приоритет)"
    },
    {
     "id": "stopping",
     "label": "Остановка (до 5 минут)"
-   },
-   {
-    "id": "vehicle",
-    "label": "Транспортное средство"
    }
   ],
   "untaught_concepts": [
@@ -365,16 +327,6 @@
     ]
    },
    {
-    "id": "tram-priority",
-    "label": "Трамвай на равнозначном перекрёстке (вторая фраза ст. 36, п. 4 «в»)",
-    "blocks": [
-     47,
-     53,
-     69,
-     75
-    ]
-   },
-   {
     "id": "warning-sign-repeat",
     "label": "Повторные предупреждающие знаки (не ближе 50 м до опасного участка)",
     "blocks": [
@@ -405,8 +357,12 @@
    "314:3",
    "425:0",
    "425:3",
+   "521:0",
    "878:0",
-   "878:1"
+   "878:1",
+   "921:1",
+   "941:2",
+   "942:0"
   ],
   "unused_misconceptions": [],
   "unresolved_ticket_refs": {
@@ -466,20 +422,22 @@
   }
  },
  "own_items": {
-  "total": 36,
+  "total": 52,
   "by_lesson": {
    "ep01": 5,
    "ep02": 8,
    "ep03": 9,
-   "ep04": 14
+   "ep04": 14,
+   "ep05": 7,
+   "ep06": 9
   },
   "by_type": {
-   "cloze": 5,
-   "diagram": 5,
-   "flashcard": 7,
-   "max-error": 5,
-   "priority": 6,
-   "ticket": 8
+   "cloze": 8,
+   "diagram": 6,
+   "flashcard": 9,
+   "max-error": 9,
+   "priority": 8,
+   "ticket": 12
   }
  },
  "misconception_use": {
@@ -489,7 +447,11 @@
   "mc-annex-optional": 2,
   "mc-any-track-is-crossing": 1,
   "mc-barrier": 5,
+  "mc-boarding-carriageway": 2,
+  "mc-boarding-not-passenger": 4,
   "mc-carriageways-by-lanes": 7,
+  "mc-class-thresholds": 8,
+  "mc-controller-is-user": 2,
   "mc-crossing-blocking": 2,
   "mc-crossing-driver-priority": 12,
   "mc-crossing-needs-marking": 1,
@@ -499,26 +461,35 @@
   "mc-houses-settlement": 2,
   "mc-lanes-need-marking": 3,
   "mc-law-citizens-only": 2,
+  "mc-light-off-wait": 2,
   "mc-main-road-sign": 6,
+  "mc-mass-confusion": 11,
   "mc-min-speed-ignored": 2,
+  "mc-moped-age": 5,
   "mc-oncoming-side": 7,
   "mc-overtake-crossing": 4,
+  "mc-pedestrian-on-foot-only": 4,
   "mc-pedestrian-side": 2,
   "mc-railway-bypass": 3,
   "mc-railway-overtake": 3,
   "mc-railway-signs": 6,
   "mc-railway-speed": 1,
   "mc-railway-stop-order": 9,
-  "mc-right-rule": 8,
+  "mc-right-rule": 11,
   "mc-right-rule-over-main": 1,
   "mc-road-elements": 9,
+  "mc-scooter-is-mechanical": 1,
   "mc-settlement-speed": 4,
   "mc-shoulder-driving": 6,
   "mc-sign-distance": 11,
   "mc-sign-zone": 1,
   "mc-stop-near-crossing": 5,
+  "mc-tram-no-priority": 12,
   "mc-unknown-surface-main": 5,
   "mc-unpaved-equal": 4,
+  "mc-walked-bike-driver": 1,
+  "mc-walked-bike-side": 4,
+  "mc-wheelie": 3,
   "mc-yard-exit-priority": 6
  }
 }

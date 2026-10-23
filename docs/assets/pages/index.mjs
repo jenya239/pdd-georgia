@@ -40,6 +40,4 @@ import { progress, store, summary } from "../app/progress.mjs";
       <td>${p.n ? `<a href="practice.html?ep=${p.e}">${p.n}</a>` : "0"}</td><td>${r ? `<span class="badge">Выпуск ${r.num}</span>` : `<span class="badge grey">скоро</span>`}</td></tr>`;
   }
   $("#plan").innerHTML = html;
-  const { mountProgressFile } = await import("../app/progress-file.mjs");
-  mountProgressFile($("#file"), st, { onImport: () => setTimeout(() => location.reload(), 1500) });
 })();

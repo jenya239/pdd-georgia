@@ -214,15 +214,18 @@ class World:
         return sorted(set(self.concepts_for_norms(tn["norms"])) | set(self.annotation(tid).get("concepts", [])))
 
     def derive_assignment(self):
+        """A ticket goes to the first lesson that teaches its primary norm and by which all its concepts are known.
+        If no covering lesson has them all, it is blocked at the first covering lesson (with what is missing there)."""
         assigned, blocked = {}, {}
         for tid in sorted(self.questions):
             tn = self.ticket_norms(tid)
-            lesson = next((l for l in self.lesson_order if self.lesson_covers(l, tn["primary"])), None)
-            if lesson is None:
+            covering = [l for l in self.lesson_order if self.lesson_covers(l, tn["primary"])]
+            if not covering:
                 continue
-            missing = sorted(set(self.ticket_concepts(tid)) - self.available_concepts(lesson))
-            if missing:
-                blocked[tid] = {"lesson": lesson, "missing": missing}
+            need = set(self.ticket_concepts(tid))
+            lesson = next((l for l in covering if need <= self.available_concepts(l)), None)
+            if lesson is None:
+                blocked[tid] = {"lesson": covering[0], "missing": sorted(need - self.available_concepts(covering[0]))}
             else:
                 assigned[tid] = lesson
         return {"assigned": assigned, "blocked": blocked}

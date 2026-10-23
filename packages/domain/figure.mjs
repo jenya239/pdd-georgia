@@ -52,7 +52,15 @@ function crossing(f) {
     const head = [[ex, ey], [ex - 10 * ux - 5 * uy, ey - 10 * uy + 5 * ux], [ex - 10 * ux + 5 * uy, ey - 10 * uy - 5 * ux]];
     body += `<path d="M${p.x},${p.y} Q${C},${C} ${ex},${ey}" class="route"/>` +
       `<polygon class="arrowhead" points="${head.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ")}"/>`;
-    body += `<g class="car" transform="translate(${p.x},${p.y}) rotate(${p.r})"><rect x="-9" y="-15" width="18" height="30" rx="4"/>` +
+    if (car.rail) {
+      // tram: rails along its whole arm (to the centre), a longer body
+      const vert = car.from === "n" || car.from === "s";
+      const rails = vert ? [p.x - 6, p.x + 6].map(x => `<line x1="${x}" y1="${car.from === "n" ? 0 : 300}" x2="${x}" y2="${C}" class="rail"/>`)
+        : [p.y - 6, p.y + 6].map(y => `<line x1="${car.from === "w" ? 0 : 300}" y1="${y}" x2="${C}" y2="${y}" class="rail"/>`);
+      body += rails.join("");
+    }
+    const [bw, bh] = car.rail ? [20, 44] : [18, 30];
+    body += `<g class="${car.rail ? "car tram" : "car"}" transform="translate(${p.x},${p.y}) rotate(${p.r})"><rect x="${-bw / 2}" y="${-bh / 2}" width="${bw}" height="${bh}" rx="4"/>` +
       `<text x="0" y="5" text-anchor="middle" transform="rotate(${-p.r})">${esc(car.id)}</text></g>`;
   }
   return svg(300, 300, "Схема перекрёстка (вид сверху, без масштаба)", body);

@@ -328,25 +328,44 @@
   "concepts": [
    "tram-priority"
   ],
-  "note": "исключён из ep03 вручную: трамваи"
+  "note": "в ep06: трамвай на равнозначном перекрёстке (наш вывод по рисунку: дороги равнозначные)",
+  "distractors": {
+   "0": "mc-right-rule",
+   "2": "mc-tram-no-priority"
+  }
  },
  "53": {
   "concepts": [
    "tram-priority"
   ],
-  "note": "исключён из ep03 вручную: трамваи"
+  "note": "в ep06: трамваи на равнозначном перекрёстке",
+  "distractors": {
+   "0": "mc-tram-no-priority",
+   "2": "mc-tram-no-priority",
+   "3": "mc-right-rule"
+  }
  },
  "69": {
   "concepts": [
    "tram-priority"
   ],
-  "note": "исключён из ep03 вручную: трамваи"
+  "note": "в ep06: два трамвая и автомобиль на равнозначном перекрёстке",
+  "distractors": {
+   "0": "mc-tram-no-priority",
+   "1": "mc-tram-no-priority"
+  }
  },
  "75": {
   "concepts": [
-   "tram-priority"
+   "tram-priority",
+   "light-off-unregulated"
   ],
-  "note": "исключён из ep03 вручную: трамваи, отключённый светофор"
+  "note": "в ep06: трамвай, отключённый светофор (ст. 36, п. 2)",
+  "distractors": {
+   "0": "mc-tram-no-priority",
+   "2": "mc-tram-no-priority",
+   "3": "mc-tram-no-priority"
+  }
  },
  "21": {
   "note": "исключён из ep04 вручную"
@@ -375,5 +394,110 @@
   "concepts": [
    "settlement-sign-look"
   ]
+ },
+ "811": {
+  "distractors": {
+   "0": "mc-boarding-carriageway",
+   "2": "mc-boarding-carriageway"
+  }
+ },
+ "941": {
+  "concepts": [
+   "pedestrian",
+   "walked-vehicle-side"
+  ],
+  "distractors": {
+   "0": "mc-walked-bike-side",
+   "2": null
+  }
+ },
+ "942": {
+  "concepts": [
+   "pedestrian",
+   "walked-vehicle-side"
+  ],
+  "distractors": {
+   "0": null,
+   "1": "mc-walked-bike-side"
+  }
+ },
+ "921": {
+  "distractors": {
+   "0": "mc-class-thresholds",
+   "1": null
+  }
+ },
+ "922": {
+  "concepts": [
+   "vehicle-masses"
+  ],
+  "distractors": {
+   "1": "mc-class-thresholds",
+   "2": "mc-class-thresholds"
+  }
+ },
+ "906": {
+  "concepts": [
+   "design-speed"
+  ],
+  "distractors": {
+   "0": "mc-class-thresholds",
+   "2": "mc-class-thresholds"
+  }
+ },
+ "905": {
+  "distractors": {
+   "0": "mc-mass-confusion",
+   "1": "mc-mass-confusion"
+  }
+ },
+ "892": {
+  "distractors": {
+   "0": "mc-mass-confusion",
+   "1": "mc-mass-confusion"
+  }
+ },
+ "893": {
+  "distractors": {
+   "1": "mc-mass-confusion",
+   "2": "mc-mass-confusion"
+  }
+ },
+ "925": {
+  "distractors": {
+   "0": "mc-mass-confusion",
+   "1": "mc-mass-confusion",
+   "3": "mc-mass-confusion"
+  }
+ },
+ "521": {
+  "concepts": [
+   "moped"
+  ],
+  "distractors": {
+   "0": null,
+   "1": "mc-moped-age",
+   "3": "mc-moped-age"
+  }
+ },
+ "537": {
+  "concepts": [
+   "moped",
+   "motorcycle",
+   "bicycle",
+   "e-scooter"
+  ],
+  "distractors": {
+   "1": "mc-wheelie"
+  }
+ },
+ "826": {
+  "concepts": [
+   "moped"
+  ],
+  "distractors": {
+   "1": "mc-wheelie",
+   "2": "mc-wheelie"
+  }
  }
 }

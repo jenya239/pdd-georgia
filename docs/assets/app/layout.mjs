@@ -1,6 +1,7 @@
-/** Page chrome: header with navigation, language and theme switches, image zoom overlay, footer. */
+/** Page chrome: header with navigation, language and theme switches, progress save/load, image zoom overlay, footer. */
 import { $ } from "./dom.mjs";
 import { LANGS, getLang, setLang, applyTheme, toggleTheme } from "./prefs.mjs";
+import { mountProgressButtons } from "./progress-file.mjs";
 
 const NAV = [["index.html", "Выпуски", "eps"], ["practice.html", "Самопроверка", "practice"], ["exam.html", "Экзамен", "exam"],
   ["errors.html", "Ошибки", "errors"], ["about.html", "О данных", "about"]];
@@ -17,6 +18,7 @@ export function header(active) {
   document.body.prepend(h);
   h.querySelectorAll("#langseg button").forEach(b => b.onclick = () => { setLang(b.dataset.l); syncLang(); });
   $("#themebtn", h).onclick = toggleTheme;
+  mountProgressButtons($(".tools", h));
   syncLang();
   const z = document.createElement("div");
   z.className = "zoom"; z.id = "zoom"; z.innerHTML = "<img alt=''>";

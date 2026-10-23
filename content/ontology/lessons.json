@@ -96,5 +96,59 @@
    "A1:1.прим.а",
    "A1:5.прим3"
   ]
+ },
+ {
+  "id": "ep05",
+  "introduces": [
+   "road-user",
+   "driver",
+   "driver-equivalents",
+   "pedestrian",
+   "passenger",
+   "passenger-boarding",
+   "traffic-controller",
+   "walked-vehicle-side",
+   "rollers-no-threat"
+  ],
+  "relies_on": [
+   "road",
+   "carriageway",
+   "sidewalk",
+   "shoulder",
+   "pedestrians-on-shoulder",
+   "settlement"
+  ],
+  "assumes": [
+   "vehicle"
+  ]
+ },
+ {
+  "id": "ep06",
+  "introduces": [
+   "vehicle",
+   "mechanical-vehicle",
+   "design-speed",
+   "automobile",
+   "bicycle",
+   "e-scooter",
+   "moped",
+   "motorcycle",
+   "slow-vehicle",
+   "trailer",
+   "route-electric-transport",
+   "vehicle-masses",
+   "rider-age",
+   "wheels-on-road",
+   "tram-priority",
+   "light-off-unregulated"
+  ],
+  "relies_on": [
+   "driver",
+   "road-user",
+   "intersection",
+   "right-hand-rule",
+   "main-road"
+  ],
+  "assumes": []
  }
 ]

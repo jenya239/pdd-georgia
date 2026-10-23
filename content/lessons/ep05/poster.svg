@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Выпуск 5: участники дорожного движения">
+<rect width="640" height="360" fill="#16324f"/>
+<rect y="230" width="640" height="70" fill="#4a515b"/><rect y="210" width="640" height="20" fill="#b9a27a"/>
+<g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><circle cx="400" cy="160" r="9" fill="#fff"/><path d="M400 170 L400 198 M400 178 L388 192 M400 178 L412 192 M400 198 L390 222 M400 198 L410 222"/></g>
+<g fill="none" stroke="#ffe08a" stroke-width="4"><circle cx="440" cy="262" r="16"/><circle cx="486" cy="262" r="16"/><path d="M440 262 L460 242 L478 242 L486 262 M478 242 L476 232"/></g>
+<g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><circle cx="420" cy="222" r="8" fill="#fff"/><path d="M420 230 L420 256 M420 238 L446 246"/></g>
+<rect x="510" y="236" width="100" height="40" rx="8" fill="#9cc2ff"/><rect x="530" y="218" width="56" height="22" rx="6" fill="#9cc2ff"/>
+<text x="32" y="64" fill="#9cc2ff" font-family="system-ui,sans-serif" font-size="22" font-weight="600">Выпуск 5 · текстовый урок</text>
+<text x="32" y="108" fill="#fff" font-family="system-ui,sans-serif" font-size="30" font-weight="700">Участники движения:</text>
+<text x="32" y="146" fill="#fff" font-family="system-ui,sans-serif" font-size="30" font-weight="700">кто водитель, кто пешеход</text>
+<text x="32" y="340" fill="#c9ced6" font-family="system-ui,sans-serif" font-size="16">ст. 5, пп. 61, 49, 87, 34, 32</text>
+</svg>

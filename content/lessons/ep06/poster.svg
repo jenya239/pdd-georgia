@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Выпуск 6: транспортные средства">
+<rect width="640" height="360" fill="#16324f"/>
+<rect y="236" width="640" height="64" fill="#4a515b"/>
+<g stroke="#c9ced6" stroke-width="4"><line x1="0" y1="256" x2="640" y2="256"/><line x1="0" y1="280" x2="640" y2="280"/></g>
+<rect x="380" y="196" width="170" height="56" rx="8" fill="#ffe08a"/><g fill="#16324f"><rect x="394" y="206" width="30" height="22"/><rect x="432" y="206" width="30" height="22"/><rect x="470" y="206" width="30" height="22"/><rect x="508" y="206" width="30" height="22"/></g>
+<line x1="465" y1="196" x2="485" y2="168" stroke="#c9ced6" stroke-width="3"/>
+<g fill="none" stroke="#9cc2ff" stroke-width="4"><circle cx="300" cy="300" r="14"/><circle cx="344" cy="300" r="14"/><path d="M300 300 L318 280 L338 280 L344 300 M338 280 L334 270"/></g>
+<text x="32" y="64" fill="#9cc2ff" font-family="system-ui,sans-serif" font-size="22" font-weight="600">Выпуск 6 · текстовый урок</text>
+<text x="32" y="108" fill="#fff" font-family="system-ui,sans-serif" font-size="30" font-weight="700">Транспортные средства:</text>
+<text x="32" y="146" fill="#fff" font-family="system-ui,sans-serif" font-size="30" font-weight="700">мопед, мотоцикл, трамвай</text>
+<text x="32" y="340" fill="#c9ced6" font-family="system-ui,sans-serif" font-size="16">ст. 5, пп. 73, 35, 42, 44; ст. 36, п. 4 «в»</text>
+</svg>

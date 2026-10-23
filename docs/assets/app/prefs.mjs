@@ -1,5 +1,5 @@
 /** Interface language and colour theme (browser preferences in localStorage). */
-const KEYS = { lang: "pddge.lang", theme: "pddge.theme" };
+import { KEYS } from "../domain/registry.mjs";
 export const LANGS = { ru: "RU", ka: "KA", en: "EN" };
 
 export const getLang = () => localStorage.getItem(KEYS.lang) || "ru";

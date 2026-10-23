@@ -50,3 +50,13 @@ test("labels are escaped and unknown kinds fail loudly", () => {
   assert.doesNotMatch(figureSvg({ kind: "section", strips: [{ k: "lane", label: "<b>" }] }), /<b>/);
   assert.throws(() => figureSvg({ kind: "nope" }));
 });
+
+test("crossing: a rail vehicle is drawn as a tram, not as a car", () => {
+  const svg = figureSvg({ kind: "crossing", arms: ["n", "e", "s", "w"],
+    cars: [{ id: "Т", from: "n", to: "s", rail: true }, { id: "А", from: "s", to: "n" }] });
+  assert.equal(count(svg, /class="car tram"/g), 1);
+  assert.equal(count(svg, /class="car"/g), 1);
+  assert.match(svg, /class="rail"/);
+  assert.match(svg, />Т</);
+  assert.doesNotMatch(svg, /\sid="/);
+});

@@ -3,14 +3,10 @@
  * in the browser, memoryBackend() in tests). All domain rules live in the pure modules.
  */
 import { applyAnswer, migrateProgress } from "./progress.mjs";
-import { makeBundle, parseBundle, mergeState } from "./bundle.mjs";
+import { makeBundle, parseBundle, applyImport, previewImport, cleanState } from "./bundle.mjs";
+import { STORAGE, KEYS, APP_VERSION } from "./registry.mjs";
 
-export const KEYS = {
-  progress: "pddge.progress.v1", // per-ticket records (legacy key, records extended additively)
-  runs: "pddge.runs.v1",         // finished cumulative checks
-  active: "pddge.cumrun.v1",     // unfinished cumulative checks by lesson
-  settings: "pddge.settings.v1",
-};
+export { KEYS };
 const DEFAULT_SETTINGS = { order: "new-first", own: true };
 
 export function memoryBackend(init = {}) {
@@ -29,7 +25,25 @@ export function createStore(backend) {
   const runs = () => { const r = read(KEYS.runs, []); return Array.isArray(r) ? r : []; };
   const actives = () => obj(read(KEYS.active, {}));
   const settings = () => ({ ...DEFAULT_SETTINGS, ...obj(read(KEYS.settings, {})) });
-  const state = () => ({ progress: progress(), runs: runs(), active: actives(), settings: obj(read(KEYS.settings, {})) });
+  const exams = () => { const r = read(KEYS.exams, []); return Array.isArray(r) ? r : []; };
+  /** Raw snapshot of every registered key (json parsed, text as is); absent keys are omitted. */
+  const snapshot = () => {
+    const out = {};
+    for (const s of STORAGE) {
+      const raw = backend.getItem(s.key);
+      if (raw === null || raw === undefined) continue;
+      if (s.kind === "text") { out[s.id] = raw; continue; }
+      try { out[s.id] = JSON.parse(raw); } catch (e) { /* broken value: not exported */ }
+    }
+    return cleanState(out);
+  };
+  const restore = st => {
+    for (const s of STORAGE) {
+      const v = st[s.id];
+      if (v === undefined || v === null) backend.removeItem(s.key);
+      else backend.setItem(s.key, s.kind === "text" ? String(v) : JSON.stringify(v));
+    }
+  };
 
   return {
     progress,
@@ -49,15 +63,23 @@ export function createStore(backend) {
       write(KEYS.runs, [...runs(), result]);
     },
     saveSettings(s) { write(KEYS.settings, { ...obj(read(KEYS.settings, {})), ...s }); },
-    exportText: now => JSON.stringify(makeBundle(state(), now), null, 1),
-    importText(text) {
-      const merged = mergeState(state(), parseBundle(text));
-      write(KEYS.progress, merged.progress);
-      write(KEYS.runs, merged.runs);
-      write(KEYS.active, merged.active);
-      write(KEYS.settings, merged.settings);
-      return { tickets: Object.keys(merged.progress).length, runs: merged.runs.length };
+    exams,
+    addExam(e, keep = 50) { write(KEYS.exams, [...exams(), e].slice(-keep)); },
+    snapshot,
+    /** The whole browser state as the progress file text. */
+    exportText: (now, app = APP_VERSION) => JSON.stringify(makeBundle(snapshot(), now, app), null, 1),
+    /** Parses a file and describes what loading it would do (nothing is written). Throws on a bad file. */
+    previewText(text, mode = "merge") {
+      const f = parseBundle(text);
+      return { ...f, ...previewImport(snapshot(), f.state, mode) };
     },
-    resetAll() { Object.values(KEYS).forEach(k => backend.removeItem(k)); },
+    /** Loads a file: mode "merge" (combine with this browser) or "replace" (this browser becomes the file). */
+    importText(text, mode = "merge") {
+      const f = parseBundle(text);
+      const next = applyImport(snapshot(), f.state, mode);
+      restore(next);
+      return previewImport(next, {}, "merge").before;
+    },
+    resetAll() { STORAGE.forEach(s => backend.removeItem(s.key)); },
   };
 }

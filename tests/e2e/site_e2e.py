@@ -149,7 +149,7 @@ def main():
             q.locator(".ans").nth((c + 1) % na).click()
             page.wait_for_timeout(100)
             rec = page.evaluate("JSON.parse(localStorage.getItem('pddge.progress.v1'))")[str(tid)]
-            check(before is None and rec["w"] == 1 and rec["k"] == 0 and rec["p"] == {str((c + 1) % na): 1}, f"{r['id']}: wrong pick recorded {rec}")
+            check((before is None or str(tid) not in json.loads(before)) and rec["w"] == 1 and rec["k"] == 0 and rec["p"] == {str((c + 1) % na): 1}, f"{r['id']}: wrong pick recorded {rec}")
             shot(page, f"{r['id']}_desktop_full.png", full_page=True)
 
         # own check items on every lesson page
@@ -324,21 +324,50 @@ def main():
             page.wait_for_selector(".q, .result")
         check(steps == need and "Готово" in page.locator(".result").inner_text(), f"drill done after {steps} answers (need {need})")
 
-        # export / import
+        # global save / load of all progress (header buttons on every page)
+        for pg in ["index.html", "practice.html", "exam.html", "errors.html", "about.html", "check.html?ep=ep04", "episode.html?id=ep05"]:
+            page.goto(base + pg)
+            page.wait_for_selector("header.top [data-act=export]")
+            check(page.locator("header.top [data-act=export]").inner_text().strip().endswith("Сохранить прогресс")
+                  and page.locator("header.top label:has([data-act=import])").inner_text().strip().endswith("Загрузить прогресс"),
+                  f"{pg}: header has Сохранить / Загрузить прогресс")
         page.goto(base + "errors.html")
-        page.wait_for_selector("#file button")
+        page.wait_for_selector("header.top [data-act=export]")
+        page.evaluate("""() => { localStorage.setItem('pddge.exams.v1', JSON.stringify([{d: 5, ok: 27, pass: true, s: 1000}]));
+            localStorage.setItem('pddge.lang', 'ka'); localStorage.setItem('pddge.theme', 'light'); localStorage.setItem('pddge.settings.v1', JSON.stringify({order: 'mixed', own: true})); }""")
+        keys = page.evaluate("import('./assets/domain/registry.mjs').then(m => m.STORAGE.map(s => s.key))")
+        snap = page.evaluate("ks => Object.fromEntries(ks.map(k => [k, localStorage.getItem(k)]))", keys)
         with page.expect_download() as dl:
-            page.click("[data-act=export]")
+            page.click("header.top [data-act=export]")
         tmp = Path(tempfile.mkdtemp()) / "progress.json"
         dl.value.save_as(tmp)
-        check(json.loads(tmp.read_text())["format"] == "pddge-progress", "export bundle written")
-        snap = page.evaluate("localStorage.getItem('pddge.progress.v1')")
+        bundle = json.loads(tmp.read_text())
+        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 2 and bundle["app"] and bundle["exportedAt"]
+              and {"progress", "runs", "exams", "lang", "theme", "settings"} <= set(bundle["data"]), f"export bundle: schema 2, sections {sorted(bundle['data'])}")
         page.evaluate("localStorage.clear()")
         page.reload()
-        page.wait_for_selector("#file input", state="attached")
-        page.set_input_files("[data-act=import]", str(tmp))
-        page.wait_for_function("document.querySelector('[data-msg]').textContent.startsWith('Загружено')")
-        check(json.loads(page.evaluate("localStorage.getItem('pddge.progress.v1')")) == json.loads(snap), "import restores progress")
+        page.wait_for_selector("header.top [data-act=import]", state="attached")
+        page.set_input_files("header.top [data-act=import]", str(tmp))
+        page.wait_for_selector("#pfdlg[open] [data-preview]")
+        prev = page.inner_text("#pfdlg [data-preview] tr[data-k=tickets]")
+        check(prev.split("\t")[1].strip() == "0" and int(prev.split("\t")[2]) > 0, f"import preview before applying: {prev!r}")
+        check(page.evaluate("localStorage.getItem('pddge.progress.v1')") is None, "preview writes nothing")
+        shot(page, "progress_import_preview.png")
+        page.check("#pfdlg input[value=replace]")
+        page.wait_for_selector("#pfdlg input[value=replace]:checked")
+        with page.expect_navigation():
+            page.click("#pfdlg [data-act=apply]")
+        page.wait_for_selector("header.top [data-act=export]")
+        after = page.evaluate("ks => Object.fromEntries(ks.map(k => [k, localStorage.getItem(k)]))", keys)
+        same = all((json.loads(after[k]) if after[k] and after[k][:1] in "[{" else after[k]) == (json.loads(snap[k]) if snap[k] and snap[k][:1] in "[{" else snap[k]) for k in keys)
+        check(same, "import (replace) restores every registered key")
+        newer = Path(tempfile.mkdtemp()) / "newer.json"
+        newer.write_text(json.dumps({"format": "pddge-progress", "schema": 99, "data": {}}))
+        page.set_input_files("header.top [data-act=import]", str(newer))
+        page.wait_for_selector("#pfdlg[open] [data-err]")
+        check("более новой версией" in page.inner_text("#pfdlg [data-err]") and page.evaluate("localStorage.getItem('pddge.progress.v1')") == snap[keys[0]],
+              "newer-schema file rejected, data untouched")
+        page.click("#pfdlg [data-act=close]")
 
         # about
         page.goto(base + "about.html")
@@ -353,6 +382,9 @@ def main():
         mp.wait_for_selector("#tk .q")
         sw = mp.evaluate("document.documentElement.scrollWidth")
         check(sw <= 390, f"mobile: no horizontal overflow ({sw})")
+        bx = mp.evaluate("""[...document.querySelectorAll('header.top .pfbtns .iconbtn')].map(b => { const r = b.getBoundingClientRect(); return [r.left, r.right, r.height]; })""")
+        check(len(bx) == 2 and all(l >= 0 and r <= 390 and h >= 28 for l, r, h in bx), f"mobile: save/load progress buttons visible in the header {bx}")
+        shot(mp, "mobile_header_progress.png")
         # wide lesson figures on a phone: hint + fullscreen view (text lessons only)
         for r in [x for x in E["released"] if x.get("format") == "text" or x.get("kind") == "text"]:
             mp.goto(base + f"episode.html?id={r['id']}")

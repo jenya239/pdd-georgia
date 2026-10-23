@@ -2,15 +2,15 @@
 import { loadTickets } from "../app/data.mjs";
 import { $, plural } from "../app/dom.mjs";
 import { header } from "../app/layout.mjs";
-import { record } from "../app/progress.mjs";
+import { record, store } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { shuffle } from "../domain/scope.mjs";
 (async () => {
   header("exam");
   const D = await loadTickets();
-  const N = 30, LIMIT = 30 * 60, MAXERR = 5, HKEY = "pddge.exams.v1";
+  const N = 30, LIMIT = 30 * 60, MAXERR = 5;
   let qs = [], ans = [], i = 0, t0 = 0, timer = null, done = false;
-  const hist = () => { try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch (e) { return []; } };
+  const hist = () => store.exams();
   function drawHist() {
     const h = hist().slice(-10).reverse();
     $("#hist").innerHTML = h.length ? `<h2>Последние попытки</h2><div class="card" style="padding:6px 10px"><table class="topics">${h.map(x => `<tr><td>${new Date(x.d).toLocaleString("ru-RU")}</td><td>${x.ok}/30</td><td>${x.pass ? "<span style='color:var(--ok)'>сдан</span>" : "<span style='color:var(--bad)'>не сдан</span>"}</td><td>${Math.floor(x.s / 60)} мин ${x.s % 60} с</td></tr>`).join("")}</table></div>` : "";
@@ -58,7 +58,7 @@ import { shuffle } from "../domain/scope.mjs";
     const res = qs.map((t, k) => ({ t, a: ans[k], ok: ans[k] === t.c }));
     const ok = res.filter(r => r.ok).length, err = N - ok;
     res.forEach(r => { if (r.a != null) record(r.t.id, r.ok, r.a); });
-    const h = hist(); h.push({ d: Date.now(), ok, pass: err <= MAXERR, s: secs }); localStorage.setItem(HKEY, JSON.stringify(h.slice(-50)));
+    store.addExam({ d: Date.now(), ok, pass: err <= MAXERR, s: secs });
     $("#run").style.display = "none"; const R = $("#res"); R.style.display = "";
     const unans = ans.filter(a => a == null).length;
     R.innerHTML = `<div class="card"><div class="result ${err <= MAXERR ? "ok" : "bad"}">${err <= MAXERR ? "Экзамен сдан" : "Экзамен не сдан"}: ${ok} из ${N} верно, ${err} ${plural(err, ["ошибка", "ошибки", "ошибок"])}</div>

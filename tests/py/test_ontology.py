@@ -85,9 +85,9 @@ def test_derived_assignment_respects_concepts(world):
     # ep04 states note «а» to section 1 of annex 1 (150–300 / 50–100 m), so these stay in ep04
     assert all(derived["assigned"].get(t) == "ep04" for t in (611, 670, 671))
     # tickets once removed by hand are blocked by an untaught concept, not by a list
-    for tid in (47, 53, 69, 75, 21, 59, 256, 605, 614, 618, 794):
+    for tid in (21, 59, 256, 605, 614, 618, 794):
         assert tid in derived["blocked"], tid
-    assert set(order) == {"ep01", "ep02", "ep03", "ep04"}
+    assert set(order) == {"ep01", "ep02", "ep03", "ep04", "ep05", "ep06"}
 
 
 # --- verdicts for tickets the old heuristic put into lessons ----------------------

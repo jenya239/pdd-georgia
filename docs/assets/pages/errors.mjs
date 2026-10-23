@@ -7,7 +7,6 @@ import { renderQuestion } from "../app/question.mjs";
 import { errorStats, groupStats, drillQueue } from "../domain/errors.mjs";
 import { MASTERY_STREAK } from "../domain/progress.mjs";
 import { idLabel, parseId, misconceptionFor } from "../domain/items.mjs";
-import { mountProgressFile } from "../app/progress-file.mjs";
 
 header("errors");
 const [D, E, st] = await Promise.all([loadTickets(), loadEpisodes(), store]);
@@ -108,6 +107,5 @@ function drill() {
   step();
 }
 
-mountProgressFile($("#file"), st, { onImport: () => { if (!q.get("drill")) list(); } });
 q.get("drill") ? drill() : list();
 document.addEventListener("pdd:lang", () => { if (!q.get("drill")) list(); });

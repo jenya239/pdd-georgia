@@ -17,7 +17,9 @@ def norm(s):
 
 @pytest.fixture(scope="module")
 def law_text():
-    return norm(paths.LAW_RU.read_text(encoding="utf-8")) + " " + norm(paths.ANNEX_RU.read_text(encoding="utf-8"))
+    # the PDF page footer ("http://www.matsne.gov.ge <doc id>") can fall inside a sentence: drop it
+    footer = re.compile(r"\s*http://www\.matsne\.gov\.ge\s+\d+\s*")
+    return " ".join(footer.sub(" ", norm(paths.LAW_RU.read_text(encoding="utf-8"))).split()) + " " + norm(paths.ANNEX_RU.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(scope="module", params=LESSONS)
