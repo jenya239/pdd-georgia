@@ -1,0 +1,52 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "PDD Georgia course ontology (concepts.json + misconceptions.json + lessons.json + tickets.json)",
+ "type": "object",
+ "required": ["concepts", "misconceptions", "lessons", "tickets"],
+ "additionalProperties": false,
+ "$defs": {
+  "id": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+  "norm": {"type": "string", "description": "norm spec: '37.6', '37.6.а.а', 'A1:5.19.1', 'A1:1.прим.а' (a group stands for its sub-norms)",
+           "pattern": "^(\\d+[¹²³]?(\\.\\d+)?(\\.[а-я]+)*|A[1-5]:\\d+(\\.\\d+)*(\\.прим\\d*)?(\\.[а-я])*)$"},
+  "norms": {"type": "array", "items": {"$ref": "#/$defs/norm"}, "uniqueItems": true},
+  "ids": {"type": "array", "items": {"$ref": "#/$defs/id"}, "uniqueItems": true}
+ },
+ "properties": {
+  "concepts": {"type": "array", "items": {
+   "type": "object", "required": ["id", "label", "norms"], "additionalProperties": false,
+   "properties": {
+    "id": {"$ref": "#/$defs/id"},
+    "label": {"type": "string", "minLength": 3},
+    "norms": {"$ref": "#/$defs/norms", "description": "where the law states it; tickets checking these norms use the concept"},
+    "part_of": {"$ref": "#/$defs/norms", "description": "related norms, not used for matching"},
+    "gap": {"type": "string"},
+    "source": {"type": "string", "description": "non-law source"}
+   }}},
+  "misconceptions": {"type": "array", "items": {
+   "type": "object", "required": ["id", "belief", "truth", "norms", "concepts"], "additionalProperties": false,
+   "properties": {
+    "id": {"type": "string", "pattern": "^mc-[a-z0-9-]+$"},
+    "belief": {"type": "string"}, "truth": {"type": "string"},
+    "norms": {"$ref": "#/$defs/norms"}, "concepts": {"$ref": "#/$defs/ids"}
+   }}},
+  "lessons": {"type": "array", "items": {
+   "type": "object", "required": ["id", "introduces"], "additionalProperties": false,
+   "properties": {
+    "id": {"type": "string", "pattern": "^ep\\d\\d$"},
+    "introduces": {"$ref": "#/$defs/ids"},
+    "relies_on": {"$ref": "#/$defs/ids"},
+    "assumes": {"$ref": "#/$defs/ids", "description": "general terms used without being taught"},
+    "states": {"$ref": "#/$defs/norms", "description": "norms the lesson text states (cited) beyond teaches/quote_refs"}
+   }}},
+  "tickets": {"type": "object", "propertyNames": {"pattern": "^[1-9]\\d*$"},
+   "additionalProperties": {
+    "type": "object", "additionalProperties": false,
+    "properties": {
+     "concepts": {"$ref": "#/$defs/ids"},
+     "norms": {"$ref": "#/$defs/norms"},
+     "distractors": {"type": "object", "propertyNames": {"pattern": "^\\d$"},
+                     "additionalProperties": {"oneOf": [{"type": "string", "pattern": "^mc-"}, {"type": "null"}]}},
+     "note": {"type": "string"}
+    }}}
+ }
+}

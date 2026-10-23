@@ -1,0 +1,369 @@
+{
+ "265": {
+  "distractors": {
+   "0": "mc-shoulder-driving"
+  }
+ },
+ "351": {
+  "distractors": {
+   "0": "mc-oncoming-side"
+  }
+ },
+ "386": {
+  "distractors": {
+   "1": "mc-oncoming-side",
+   "2": "mc-oncoming-side"
+  }
+ },
+ "390": {
+  "distractors": {
+   "1": "mc-carriageways-by-lanes",
+   "2": "mc-carriageways-by-lanes",
+   "3": "mc-carriageways-by-lanes"
+  }
+ },
+ "391": {
+  "distractors": {
+   "0": "mc-carriageways-by-lanes",
+   "2": "mc-carriageways-by-lanes"
+  }
+ },
+ "884": {
+  "distractors": {
+   "0": "mc-road-elements",
+   "1": "mc-road-elements"
+  }
+ },
+ "902": {
+  "distractors": {
+   "0": "mc-road-elements",
+   "1": "mc-road-elements"
+  }
+ },
+ "948": {
+  "distractors": {
+   "1": "mc-lanes-need-marking",
+   "2": "mc-lanes-need-marking"
+  }
+ },
+ "949": {
+  "distractors": {
+   "1": "mc-oncoming-side",
+   "2": "mc-oncoming-side"
+  }
+ },
+ "1": {
+  "distractors": {
+   "0": "mc-right-rule"
+  }
+ },
+ "2": {
+  "distractors": {
+   "1": "mc-yard-exit-priority"
+  }
+ },
+ "54": {
+  "distractors": {
+   "0": "mc-unpaved-equal",
+   "2": "mc-unpaved-equal"
+  }
+ },
+ "81": {
+  "distractors": {
+   "0": "mc-unknown-surface-main"
+  }
+ },
+ "99": {
+  "distractors": {
+   "1": "mc-yard-exit-priority"
+  }
+ },
+ "121": {
+  "distractors": {
+   "0": "mc-right-rule"
+  }
+ },
+ "503": {
+  "distractors": {
+   "0": "mc-yard-exit-priority",
+   "1": "mc-yard-exit-priority",
+   "2": "mc-yard-exit-priority"
+  }
+ },
+ "653": {
+  "distractors": {
+   "1": "mc-main-road-sign",
+   "2": "mc-main-road-sign",
+   "3": "mc-main-road-sign"
+  }
+ },
+ "654": {
+  "distractors": {
+   "1": "mc-main-road-sign",
+   "2": "mc-main-road-sign"
+  }
+ },
+ "888": {
+  "distractors": {
+   "1": "mc-adjacent-is-intersection",
+   "2": "mc-different-levels"
+  }
+ },
+ "900": {
+  "distractors": {
+   "1": "mc-road-elements",
+   "2": "mc-adjacent-is-intersection"
+  }
+ },
+ "961": {
+  "distractors": {
+   "1": "mc-unknown-surface-main",
+   "2": "mc-unknown-surface-main"
+  }
+ },
+ "1262": {
+  "distractors": {
+   "1": "mc-sign-zone"
+  }
+ },
+ "1275": {
+  "distractors": {
+   "0": "mc-right-rule"
+  }
+ },
+ "20": {
+  "distractors": {
+   "0": "mc-crossing-driver-priority",
+   "1": "mc-crossing-driver-priority",
+   "2": "mc-crossing-driver-priority"
+  }
+ },
+ "150": {
+  "distractors": {
+   "1": "mc-crossing-driver-priority"
+  }
+ },
+ "171": {
+  "distractors": {
+   "1": "mc-crossing-driver-priority"
+  }
+ },
+ "224": {
+  "distractors": {
+   "0": "mc-min-speed-ignored",
+   "1": "mc-settlement-speed",
+   "3": null
+  }
+ },
+ "274": {
+  "distractors": {
+   "0": "mc-railway-overtake"
+  }
+ },
+ "280": {
+  "distractors": {
+   "1": "mc-crossing-driver-priority"
+  }
+ },
+ "288": {
+  "distractors": {
+   "1": "mc-overtake-crossing"
+  }
+ },
+ "289": {
+  "distractors": {
+   "1": "mc-overtake-crossing"
+  }
+ },
+ "296": {
+  "distractors": {
+   "1": "mc-overtake-crossing",
+   "2": "mc-overtake-crossing"
+  }
+ },
+ "314": {
+  "distractors": {
+   "0": "mc-stop-near-crossing",
+   "2": "mc-stop-near-crossing",
+   "3": null
+  },
+  "note": "ответ 3 («ни один») — незнание исключения для маршрутных ТС (ст. 41, п. 3), в уроках не разобрано"
+ },
+ "415": {
+  "distractors": {
+   "1": "mc-barrier",
+   "2": "mc-barrier",
+   "3": "mc-barrier"
+  }
+ },
+ "418": {
+  "distractors": {
+   "1": "mc-railway-bypass"
+  }
+ },
+ "422": {
+  "distractors": {
+   "0": "mc-railway-stop-order",
+   "1": "mc-railway-stop-order"
+  }
+ },
+ "425": {
+  "distractors": {
+   "0": null,
+   "1": null,
+   "3": null
+  },
+  "note": "решается по знакам 1.4.x и их сторонам (примечание «е») — в уроке не разобрано"
+ },
+ "434": {
+  "distractors": {
+   "0": null
+  },
+  "note": "решается по знакам 1.4.x (примечания «а», «е») — в уроке не разобрано"
+ },
+ "435": {
+  "distractors": {
+   "1": "mc-railway-bypass"
+  }
+ },
+ "436": {
+  "distractors": {
+   "1": null
+  },
+  "note": "решается по знакам 1.4.x (примечания «б», «е») — в уроке не разобрано"
+ },
+ "440": {
+  "distractors": {
+   "1": "mc-enter-when-blocked"
+  }
+ },
+ "441": {
+  "distractors": {
+   "1": "mc-railway-speed"
+  }
+ },
+ "515": {
+  "distractors": {
+   "1": "mc-settlement-speed",
+   "2": "mc-settlement-speed"
+  }
+ },
+ "601": {
+  "distractors": {
+   "0": "mc-railway-signs",
+   "2": "mc-railway-signs",
+   "3": "mc-railway-signs"
+  }
+ },
+ "607": {
+  "distractors": {
+   "0": "mc-railway-signs",
+   "1": "mc-railway-signs",
+   "3": "mc-railway-signs"
+  }
+ },
+ "611": {
+  "distractors": {
+   "0": "mc-sign-distance",
+   "1": "mc-sign-distance"
+  }
+ },
+ "670": {
+  "distractors": {
+   "0": "mc-sign-distance",
+   "1": "mc-sign-distance",
+   "3": "mc-sign-distance"
+  }
+ },
+ "671": {
+  "distractors": {
+   "1": "mc-sign-distance",
+   "2": "mc-sign-distance"
+  }
+ },
+ "874": {
+  "distractors": {
+   "1": "mc-crossing-driver-priority",
+   "2": "mc-crossing-driver-priority"
+  }
+ },
+ "875": {
+  "distractors": {
+   "0": "mc-crossing-stop-place",
+   "2": "mc-crossing-stop-place"
+  }
+ },
+ "876": {
+  "distractors": {
+   "0": "mc-crossing-driver-priority",
+   "1": "mc-crossing-driver-priority"
+  }
+ },
+ "878": {
+  "distractors": {
+   "0": null,
+   "1": null
+  }
+ },
+ "891": {
+  "distractors": {
+   "0": "mc-houses-settlement",
+   "1": "mc-houses-settlement"
+  }
+ },
+ "908": {
+  "distractors": {
+   "0": null,
+   "2": "mc-different-levels"
+  }
+ },
+ "47": {
+  "concepts": [
+   "tram-priority"
+  ],
+  "note": "исключён из ep03 вручную: трамваи"
+ },
+ "53": {
+  "concepts": [
+   "tram-priority"
+  ],
+  "note": "исключён из ep03 вручную: трамваи"
+ },
+ "69": {
+  "concepts": [
+   "tram-priority"
+  ],
+  "note": "исключён из ep03 вручную: трамваи"
+ },
+ "75": {
+  "concepts": [
+   "tram-priority"
+  ],
+  "note": "исключён из ep03 вручную: трамваи, отключённый светофор"
+ },
+ "21": {
+  "note": "исключён из ep04 вручную"
+ },
+ "59": {
+  "note": "исключён из ep04 вручную"
+ },
+ "256": {
+  "norms": [
+   "A1:1.4.1",
+   "A1:1.4.6"
+  ],
+  "note": "исключён из ep04 вручную; в данных билета «1.41», «1.46» вместо 1.4.1, 1.4.6"
+ },
+ "605": {
+  "note": "исключён из ep04 вручную"
+ },
+ "614": {
+  "note": "исключён из ep04 вручную"
+ },
+ "618": {
+  "note": "исключён из ep04 вручную"
+ },
+ "794": {
+  "note": "исключён из ep04 вручную"
+ }
+}

@@ -19,6 +19,7 @@ from pdd import paths
 from pdd.assign import assign_lessons, primary_ref, rule_key, rule_label, pitfall_for
 from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
 from pdd.lawparse import parse_law, parse_annex
+from pdd import norms as norms_mod, ontology
 from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
@@ -131,6 +132,15 @@ def generate():
     return files, copies, report
 
 
+def generated_sources() -> dict:
+    """Generated files kept in the repository (content/ontology/generated): {Path: text}."""
+    norms = norms_mod.generate_norms()
+    world = ontology.World(ontology.load_doc(), norms,
+                           json.loads(paths.TICKETS_JSON.read_text(encoding="utf-8"))["questions"],
+                           json.loads(paths.EPISODES_JSON.read_text(encoding="utf-8")))
+    return {norms_mod.NORMS_JSON: norms_mod.dump(norms), ontology.REPORT_JSON: ontology.dump(world.report())}
+
+
 def expected_tree(files, copies) -> dict:
     tree = {rel: ("text", text) for rel, text in files.items()}
     for rel, src in copies.items():
@@ -177,12 +187,18 @@ def main(argv=None):
         print("missing source files:", report["missing_files"], file=sys.stderr)
         return 2
     tree = expected_tree(files, copies)
+    sources = generated_sources()
     if check:
-        problems = diff_tree(out, tree)
+        problems = [f"{p.relative_to(paths.REPO)}: out of date" for p, text in sources.items()
+                    if not p.exists() or p.read_text(encoding="utf-8") != text]
+        problems += diff_tree(out, tree)
         for p in problems[:50]:
             print(p)
         print(f"{out}: {'OUT OF DATE (' + str(len(problems)) + ' differences)' if problems else 'up to date'}")
         return 1 if problems else 0
+    for p, text in sources.items():
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
     write_tree(out, tree)
     print(json.dumps(report, ensure_ascii=False, indent=1))
     return 0

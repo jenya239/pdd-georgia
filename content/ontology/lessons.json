@@ -1,0 +1,100 @@
+[
+ {
+  "id": "ep01",
+  "introduces": [
+   "law-scope",
+   "annexes",
+   "liability",
+   "licence-exam",
+   "exam-admission",
+   "theory-exam-format"
+  ]
+ },
+ {
+  "id": "ep02",
+  "introduces": [
+   "road",
+   "carriageway",
+   "dividing-strip",
+   "sidewalk",
+   "lane",
+   "shoulder",
+   "lane-count",
+   "oncoming-side",
+   "keep-right",
+   "no-driving-off-carriageway",
+   "edge-marking",
+   "pedestrians-on-shoulder"
+  ],
+  "relies_on": [
+   "annexes"
+  ],
+  "assumes": [
+   "vehicle",
+   "mechanical-vehicle",
+   "driver",
+   "pedestrian"
+  ]
+ },
+ {
+  "id": "ep03",
+  "introduces": [
+   "intersection",
+   "adjacent-territory",
+   "main-road",
+   "main-road-sign",
+   "right-hand-rule",
+   "unpaved-exit",
+   "adjacent-exit-yield",
+   "unknown-surface",
+   "no-stop-near-intersection",
+   "no-parking-yard-exit"
+  ],
+  "relies_on": [
+   "road",
+   "carriageway",
+   "pedestrian"
+  ],
+  "assumes": [
+   "give-way",
+   "priority",
+   "stopping",
+   "parking"
+  ]
+ },
+ {
+  "id": "ep04",
+  "introduces": [
+   "pedestrian-crossing",
+   "crossing-give-way",
+   "crossing-no-blocking",
+   "overtaking-at-crossing",
+   "no-stop-at-crossing",
+   "railway-crossing",
+   "railway-warning-signs",
+   "warning-sign-distance",
+   "railway-crossing-rules",
+   "railway-no-oncoming-bypass",
+   "railway-stop-position",
+   "railway-no-overtaking",
+   "railway-no-parking",
+   "settlement",
+   "settlement-speed"
+  ],
+  "relies_on": [
+   "carriageway",
+   "lane",
+   "oncoming-side",
+   "intersection",
+   "stopping",
+   "parking"
+  ],
+  "assumes": [
+   "overtaking"
+  ],
+  "states": [
+   "A1:1.прим.а",
+   "A1:5.прим3"
+  ]
+ }
+]

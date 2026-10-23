@@ -1,0 +1,492 @@
+{
+ "_generated": "python3 tools/build.py (pdd.ontology); do not edit",
+ "stats": {
+  "norms": 1459,
+  "norms_by_kind": {
+   "annex": 327,
+   "annex note": 60,
+   "article": 69,
+   "law": 1003
+  },
+  "concepts": 60,
+  "introduced": {
+   "ep01": 6,
+   "ep02": 12,
+   "ep03": 10,
+   "ep04": 15
+  },
+  "assumed": 9,
+  "untaught": 8,
+  "misconceptions": 28,
+  "annotated_tickets": 65,
+  "distractors": 98,
+  "distractors_mapped": 88
+ },
+ "assignment": {
+  "live": {
+   "ep01": 0,
+   "ep02": 9,
+   "ep03": 14,
+   "ep04": 31
+  },
+  "derived": {
+   "ep01": 0,
+   "ep02": 9,
+   "ep03": 13,
+   "ep04": 26
+  },
+  "strict": {
+   "ep01": 0,
+   "ep02": 8,
+   "ep03": 15,
+   "ep04": 15
+  },
+  "blocked": 17,
+  "diff_live_vs_derived": [
+   {
+    "ticket": 224,
+    "live": "ep04",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep04",
+     "missing": [
+      "min-speed-sign"
+     ]
+    }
+   },
+   {
+    "ticket": 274,
+    "live": "ep04",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep04",
+     "missing": [
+      "warning-sign-repeat"
+     ]
+    }
+   },
+   {
+    "ticket": 425,
+    "live": "ep04",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep04",
+     "missing": [
+      "railway-approach-signs",
+      "warning-sign-repeat"
+     ]
+    }
+   },
+   {
+    "ticket": 434,
+    "live": "ep04",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep04",
+     "missing": [
+      "railway-approach-signs"
+     ]
+    }
+   },
+   {
+    "ticket": 436,
+    "live": "ep04",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep04",
+     "missing": [
+      "railway-approach-signs",
+      "warning-sign-repeat"
+     ]
+    }
+   },
+   {
+    "ticket": 515,
+    "live": "ep04",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep04",
+     "missing": [
+      "living-zone"
+     ]
+    }
+   },
+   {
+    "ticket": 794,
+    "live": null,
+    "derived": "ep04"
+   },
+   {
+    "ticket": 1262,
+    "live": "ep03",
+    "derived": null,
+    "blocked": {
+     "lesson": "ep03",
+     "missing": [
+      "sign-zone-of-action"
+     ]
+    }
+   }
+  ],
+  "diff_live_vs_strict": [
+   {
+    "ticket": 20,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 47,
+    "live": null,
+    "strict": "ep03"
+   },
+   {
+    "ticket": 53,
+    "live": null,
+    "strict": "ep03"
+   },
+   {
+    "ticket": 69,
+    "live": null,
+    "strict": "ep03"
+   },
+   {
+    "ticket": 75,
+    "live": null,
+    "strict": "ep03"
+   },
+   {
+    "ticket": 150,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 171,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 224,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 265,
+    "live": "ep02",
+    "strict": null
+   },
+   {
+    "ticket": 274,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 280,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 314,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 425,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 434,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 435,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 436,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 515,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 611,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 639,
+    "live": null,
+    "strict": "ep04"
+   },
+   {
+    "ticket": 653,
+    "live": "ep03",
+    "strict": null
+   },
+   {
+    "ticket": 654,
+    "live": "ep03",
+    "strict": null
+   },
+   {
+    "ticket": 670,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 671,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 794,
+    "live": null,
+    "strict": "ep04"
+   },
+   {
+    "ticket": 874,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 875,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 876,
+    "live": "ep04",
+    "strict": null
+   },
+   {
+    "ticket": 1262,
+    "live": "ep03",
+    "strict": null
+   }
+  ]
+ },
+ "gaps": {
+  "assumed_concepts": [
+   {
+    "id": "driver",
+    "label": "Водитель"
+   },
+   {
+    "id": "give-way",
+    "label": "Уступить дорогу (не создавать помех)"
+   },
+   {
+    "id": "mechanical-vehicle",
+    "label": "Механическое транспортное средство"
+   },
+   {
+    "id": "overtaking",
+    "label": "Обгон"
+   },
+   {
+    "id": "parking",
+    "label": "Стоянка (дольше 5 минут)"
+   },
+   {
+    "id": "pedestrian",
+    "label": "Пешеход"
+   },
+   {
+    "id": "priority",
+    "label": "Преимущество (приоритет)"
+   },
+   {
+    "id": "stopping",
+    "label": "Остановка (до 5 минут)"
+   },
+   {
+    "id": "vehicle",
+    "label": "Транспортное средство"
+   }
+  ],
+  "untaught_concepts": [
+   {
+    "id": "emergency-vehicles",
+    "label": "Пропустить оперативный транспорт с маячком и сиреной",
+    "blocks": [
+     21
+    ]
+   },
+   {
+    "id": "living-zone",
+    "label": "Жилая зона: определение, знаки 5.21/5.22, особые правила",
+    "blocks": [
+     515
+    ]
+   },
+   {
+    "id": "min-speed-sign",
+    "label": "Знак 4.6 «Ограничение минимальной скорости»",
+    "blocks": [
+     224
+    ]
+   },
+   {
+    "id": "railway-approach-signs",
+    "label": "Знаки 1.4.1–1.4.6 «Приближение к железнодорожному переезду» и их стороны",
+    "blocks": [
+     256,
+     425,
+     434,
+     436,
+     618
+    ]
+   },
+   {
+    "id": "sign-zone-of-action",
+    "label": "Зона действия запрещающих знаков (до ближайшего перекрёстка)",
+    "blocks": [
+     1262
+    ]
+   },
+   {
+    "id": "trajectory-right-rule",
+    "label": "Траектории пересекаются, очерёдность не определена — уступить справа",
+    "blocks": [
+     59
+    ]
+   },
+   {
+    "id": "tram-priority",
+    "label": "Трамвай на равнозначном перекрёстке (вторая фраза ст. 36, п. 4 «в»)",
+    "blocks": [
+     47,
+     53,
+     69,
+     75
+    ]
+   },
+   {
+    "id": "warning-sign-repeat",
+    "label": "Повторные предупреждающие знаки (не ближе 50 м до опасного участка)",
+    "blocks": [
+     274,
+     425,
+     436,
+     605,
+     614,
+     618
+    ]
+   }
+  ],
+  "concept_notes": [
+   {
+    "id": "theory-exam-format",
+    "gap": "не из закона: источник — сайт Агентства сервисов (sa.gov.ge); в онтологии нет нормы закона"
+   },
+   {
+    "id": "shoulder",
+    "gap": "в ст. 5 нет определения обочины; урок объясняет её через ст. 24.5, 31.18 и разметку 1.2.1"
+   }
+  ],
+  "unmapped_distractors": [
+   "224:3",
+   "314:3",
+   "425:0",
+   "425:1",
+   "425:3",
+   "434:0",
+   "436:1",
+   "878:0",
+   "878:1",
+   "908:0"
+  ],
+  "unused_misconceptions": [],
+  "unresolved_ticket_refs": {
+   "256": [
+    "A1:1.41",
+    "A1:1.46"
+   ],
+   "639": [
+    "A1:1.14.1",
+    "A1:1.14.3"
+   ],
+   "657": [
+    "A1:1.7",
+    "A1:1.7.2",
+    "A1:1.7.4",
+    "A1:1.7.7"
+   ],
+   "658": [
+    "A1:1.7",
+    "A1:1.7.2",
+    "A1:1.7.4",
+    "A1:1.7.7"
+   ],
+   "659": [
+    "A1:1.7",
+    "A1:1.7.2",
+    "A1:1.7.4",
+    "A1:1.7.7"
+   ],
+   "668": [
+    "A1:1.7",
+    "A1:1.7.2",
+    "A1:1.7.4",
+    "A1:1.7.7"
+   ],
+   "785": [
+    "A1:5.13"
+   ],
+   "1196": [
+    "A1:8.1"
+   ],
+   "1211": [
+    "A1:8.5",
+    "A1:8.5.2"
+   ],
+   "1213": [
+    "A1:8.5",
+    "A1:8.5.2",
+    "A1:8.5.3"
+   ],
+   "1253": [
+    "A2:3.27"
+   ],
+   "1263": [
+    "A2:3.27"
+   ]
+  }
+ },
+ "misconception_use": {
+  "mc-adjacent-is-intersection": 2,
+  "mc-barrier": 3,
+  "mc-carriageways-by-lanes": 5,
+  "mc-crossing-driver-priority": 10,
+  "mc-crossing-stop-place": 2,
+  "mc-different-levels": 2,
+  "mc-enter-when-blocked": 1,
+  "mc-houses-settlement": 2,
+  "mc-lanes-need-marking": 2,
+  "mc-main-road-sign": 5,
+  "mc-min-speed-ignored": 1,
+  "mc-oncoming-side": 5,
+  "mc-overtake-crossing": 4,
+  "mc-railway-bypass": 2,
+  "mc-railway-overtake": 1,
+  "mc-railway-signs": 6,
+  "mc-railway-speed": 1,
+  "mc-railway-stop-order": 2,
+  "mc-right-rule": 3,
+  "mc-road-elements": 5,
+  "mc-settlement-speed": 3,
+  "mc-shoulder-driving": 1,
+  "mc-sign-distance": 7,
+  "mc-sign-zone": 1,
+  "mc-stop-near-crossing": 2,
+  "mc-unknown-surface-main": 3,
+  "mc-unpaved-equal": 2,
+  "mc-yard-exit-priority": 5
+ }
+}
