@@ -23,9 +23,11 @@ export function itemAsTicket(it) {
 }
 
 /** Question text to show: Russian (+ the Georgian original for the «оригинал (KA)» toggle);
- *  tickets untranslated in the source base (nu ∋ "ru") are shown in Georgian; own items are Russian only. */
+ *  tickets untranslated in the source base (nu ∋ "ru") are shown in our machine translation (t.mt) if there is one,
+ *  else in Georgian; own items are Russian only. */
 export function questionText(t) {
   if (t.own) return { q: t.q.ru, a: t.a.ru, lang: "ru", untranslated: false, ka: null };
+  if ((t.nu || []).includes("ru") && t.mt) return { q: t.mt.q, a: t.mt.a, lang: "ru", untranslated: true, mt: true, ka: { q: t.q.ka, a: t.a.ka } };
   if ((t.nu || []).includes("ru")) return { q: t.q.ka || t.q.ru, a: t.a.ka || t.a.ru, lang: "ka", untranslated: true, ka: null };
   return { q: t.q.ru, a: t.a.ru, lang: "ru", untranslated: false, ka: t.q.ka && t.a.ka ? { q: t.q.ka, a: t.a.ka } : null };
 }

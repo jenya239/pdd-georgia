@@ -103,6 +103,9 @@ details.law summary{cursor:pointer;font-weight:600;font-size:14px}
 .verdict{font-weight:700;margin-bottom:6px}
 .verdict.ok{color:var(--ok)}.verdict.bad{color:var(--bad)}
 .expl{font-size:15px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.expl .exru{margin-top:2px}
+.expl details.exka{margin-top:6px}
+.expl details.exka > summary{cursor:pointer;font-size:13px;color:var(--mut)}
 .expl .ka{font-family:"Noto Sans Georgian","Sylfaen",var(--font)}
 .qnav{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap}
 .kbd{font-size:12px;color:var(--mut)}

@@ -69,6 +69,9 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
     for x, t in zip(raw, tickets):
         bank = world.bank_norms(x["id"])
         L.ka_field("tickets_ka", t["id"], t, "ex", bank["norms"], strict=bool(bank["unresolved"]))
+        if t.get("ex_ru") and not t.pop("ex_ru_nl", False):
+            L.ru_fields("tickets_mt", t["id"], t, ["ex_ru"])
+            _trust_mt_letters(t)
         if t.get("why"):
             L.ru_fields("typical_errors", t["id"], t, ["why"], scopes=[ep_scope.get(t.get("lesson"), [])])
         if t.get("br"):
@@ -83,6 +86,18 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
     for mid, m in items_export["misconceptions"].items():
         L.ru_fields("misconceptions", mid, m, ["belief", "truth"])
     return L
+
+
+def _trust_mt_letters(t: dict) -> None:
+    """Subparagraph letters in machine-translated text are only trusted where the Georgian original links them:
+    MT may keep a Georgian letter's look (გ → «г») though it is the Russian «в»; such links are dropped."""
+    r = t.get("_r") or {}
+    ka = {sp[2] for sp in r.get("ex", [])}
+    keep = [sp for sp in r.get("ex_ru", []) if sp[2] in ka or not re.match(r"st\d+(_\d+)?-p\d+-", sp[2])]
+    if keep:
+        r["ex_ru"] = keep
+    else:
+        r.pop("ex_ru", None)
 
 
 def _link_breakdown(L, norms: dict, t: dict):

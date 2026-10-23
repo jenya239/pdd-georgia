@@ -7,6 +7,7 @@ import { figureSvg } from "../domain/figure.mjs";
 import { misconceptionFor, questionText } from "../domain/items.mjs";
 import { lk, lawDetails } from "../domain/normlinks.mjs";
 import { breakdownHtml } from "../domain/breakdown.mjs";
+import { baseExplanationHtml } from "../domain/explanation.mjs";
 
 function lawBlock(t) {
   if (!t.law || !t.law.length) return "";
@@ -28,8 +29,7 @@ function mcNote(t, choice) {
 
 function explanation(t) {
   if (t.own) return ownExplanation(t);
-  return (t.ex ? `<div class="expl"><div class="small mut">Пояснение из базы (только на грузинском):</div><div class="ka" lang="ka">${lk(t, "ex")}</div></div>`
-    : `<div class="expl small mut">Пояснения в исходной базе нет.</div>`) + lawBlock(t)
+  return baseExplanationHtml(t) + lawBlock(t)
     + (t.br ? breakdownHtml(t.br, loadedTickets().mc) : "");
 }
 
@@ -41,7 +41,8 @@ function head(t, opts, tx, toggle) {
   const topic = loadedTickets().meta.topics[t.t] || "";
   return `${opts.index != null ? `<b>${opts.index + 1}${opts.total ? " / " + opts.total : ""}</b>` : ""}
       <span>Билет № ${t.id}</span><span class="badge grey">${esc(topic)}</span>
-      ${tx.untranslated ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён">нет перевода на русский — текст на грузинском</span>` : ""}
+      ${tx.mt ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён; русский текст — автоматический перевод с грузинского, оригинал — кнопка «оригинал (KA)»">машинный перевод</span>`
+        : tx.untranslated ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён">нет перевода на русский — текст на грузинском</span>` : ""}
       ${toggle ? `<button type="button" class="katoggle" aria-pressed="false" title="Показать грузинский текст вопроса и ответов">оригинал (KA)</button>` : ""}
       ${opts.mode !== "exam" ? `<a class="small" href="${esc(t.src)}" target="_blank" rel="noopener">источник</a>` : ""}`;
 }

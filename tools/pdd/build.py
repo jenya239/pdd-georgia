@@ -15,7 +15,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from pdd import paths
+from pdd import mt, paths
 from pdd.assign import primary_ref, rule_key, rule_label, pitfall_for
 from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids
 from pdd.lawparse import parse_law, parse_annex
@@ -55,6 +55,25 @@ def lesson_asset_refs(html: str, prefix: str) -> list:
     return sorted(set(re.findall(r'(?:src|href)="' + re.escape(prefix) + r'([^"/]+)"', html)))
 
 
+def attach_machine_translations(Q: list, by_id: dict) -> None:
+    """Russian machine translations of the Georgian-only text (cache: content/translations, tools/translate_ka.py)."""
+    jobs, cache = mt.jobs(Q), mt.load_cache()
+    errors = mt.cache_errors(jobs, cache)
+    if errors:
+        raise ValueError(f"{len(errors)} machine translations are missing or stale:\n" + "\n".join(errors[:20]))
+    for key in jobs:
+        tid, f = key.split(":")
+        t, ru = by_id[int(tid)], cache[key]["ru"]
+        if f == "ex":
+            t["ex_ru"] = ru
+            if cache[key].get("masked") is False:   # citations translated by MT, not restored: not auto-linked
+                t["ex_ru_nl"] = True
+        elif f == "q":
+            t.setdefault("mt", {"q": "", "a": []})["q"] = ru
+        else:
+            t.setdefault("mt", {"q": "", "a": []})["a"].append(ru)   # jobs list answers in order
+
+
 def generate():
     """Returns (generated text files {relpath: str}, copies {relpath: source Path}, report)."""
     idx = load_law_index()
@@ -89,6 +108,7 @@ def generate():
     by_id = {t["id"]: t for t in tickets}
     for b in brs:
         by_id[b["ticket"]]["br"] = breakdowns.export(b, world)
+    attach_machine_translations(Q, by_id)
 
     items = checkitems.load_items()
     errors = checkitems.validate(items, world)

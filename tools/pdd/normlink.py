@@ -86,7 +86,7 @@ class Linker:
             if spans:
                 ann[f] = spans
         if ann:
-            obj["_r"] = ann
+            obj.setdefault("_r", {}).update(ann)
 
     def ru_spans(self, ctype, key, text, scopes=(), own_article=None, self_id=None) -> list:
         """[start, end, slug] (Python indices) for one string, for server-side rendering."""

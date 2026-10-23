@@ -197,6 +197,27 @@ def breakdowns(br, base):
     page.close()
 
 
+def machine_translation(br, base):
+    """Georgian-only bank explanation: Russian machine translation first (with norm links), original collapsed."""
+    page = br.new_page(viewport={"width": 1280, "height": 1000})
+    watch(page)
+    page.goto(base + "practice.html?ids=1")
+    page.wait_for_selector("#set option[value=ids]", state="attached")
+    page.click("#go")
+    page.wait_for_selector('.q[data-id="1"] .ans')
+    answer_current(page)
+    e = page.locator(".q .expl")
+    check("машинный перевод" in e.locator(".small").first.inner_text() and e.locator(".exru a.nref").count() >= 1,
+          "ticket 1: explanation in Russian machine translation with norm links")
+    d = e.locator("details.exka")
+    check(d.get_attribute("open") is None and d.locator(".ka").is_hidden(), "Georgian original collapsed by default")
+    d.locator("summary").click()
+    check(d.locator(".ka").is_visible() and d.locator(".ka a.nref").count() >= 1, "original (KA) opens with its links")
+    e.evaluate("e => e.scrollIntoView({block: 'end'})")
+    shot(page, "explanation_mt.png")
+    page.close()
+
+
 def header_layout(br, base):
     """Compact one-line header on every page at desktop, tablet and phone widths; menu and icon buttons."""
     for w in [1280, 1024, 768, 390, 320]:
@@ -454,8 +475,8 @@ def main():
         page.uncheck("#nountr")
         page.click("#go")
         page.wait_for_selector("#qbox .badge.warn")
-        check("нет перевода" in page.inner_text("#qbox .badge.warn") and page.locator("#qbox .katoggle").count() == 0
-              and page.get_attribute("#qbox .qtext", "lang") == "ka", "practice: untranslated eco question in Georgian with the badge, no toggle")
+        check("машинный перевод" in page.inner_text("#qbox .badge.warn") and page.locator("#qbox .katoggle").count() == 1
+              and page.get_attribute("#qbox .qtext", "lang") == "ru", "practice: untranslated eco question in machine translation with the badge and the KA toggle")
         page.goto(base + "practice.html")
         page.wait_for_selector("#set option", state="attached")
         page.click("#go")
@@ -678,6 +699,7 @@ def main():
         norms(br, base)
         header_layout(br, base)
         breakdowns(br, base)
+        machine_translation(br, base)
         br.close()
     stop()
     legacy_root()
