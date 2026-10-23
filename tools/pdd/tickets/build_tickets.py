@@ -157,4 +157,5 @@ for r in records:
     bs = {EP[i]["block"] for i in range(len(EP)) if set(EP[i]["episodes"]) & set(r["episodes"])}
     for b in bs: blk[b] += 1
 print(sorted(blk.items(), key=lambda x: int(x[0])))
+blk = dict(sorted(blk.items(), key=lambda x: int(x[0])))  # set iteration order depends on the hash seed
 json.dump({"by_block": blk, "by_method": c}, open(f"{OUT}/stats.json","w"), ensure_ascii=False, indent=1)
