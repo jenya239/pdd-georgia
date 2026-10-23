@@ -208,6 +208,10 @@ fieldset.order{border:0;padding:0;margin:0;display:grid;gap:6px}
 /* own check items («наш вопрос») */
 .badge.own{background:#efe6fb;color:#5b2ca0;font-weight:600}
 :root[data-theme=dark] .badge.own{background:#2c2140;color:#c9a7ff}
+details.br{margin-top:10px;border:1px solid var(--acc);border-radius:8px;padding:8px 12px;font-size:15px}
+details.br > summary{cursor:pointer;font-weight:600;color:var(--acc)}
+details.br .steps,details.br .whynot{margin:6px 0;padding-left:20px}
+details.br .note{margin:6px 0}
 .note.mc{border-color:var(--bad);background:var(--badbg);margin-top:8px}
 blockquote.lawquote{margin:10px 0 0;padding:8px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:6px;font-size:14px}
 .ownopt{display:block;margin-top:10px;font-size:14px}

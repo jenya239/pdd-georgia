@@ -71,6 +71,8 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
         L.ka_field("tickets_ka", t["id"], t, "ex", bank["norms"], strict=bool(bank["unresolved"]))
         if t.get("why"):
             L.ru_fields("typical_errors", t["id"], t, ["why"], scopes=[ep_scope.get(t.get("lesson"), [])])
+        if t.get("br"):
+            _link_breakdown(L, norms, t)
     for it in items_export["items"]:
         qn = quote_norm(it["quote"]["ref"], ids)
         if qn:
@@ -81,6 +83,17 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
     for mid, m in items_export["misconceptions"].items():
         L.ru_fields("misconceptions", mid, m, ["belief", "truth"])
     return L
+
+
+def _link_breakdown(L, norms: dict, t: dict):
+    br = t["br"]
+    scope = L.cites([q["ref"] for q in br["quotes"]])
+    for q in br["quotes"]:
+        nid = q.pop("norm")
+        q["n"] = slug(nid)
+        L.ru_fields("breakdowns", t["id"], q, ["text"], own_article=norms[nid].get("article"), self_id=nid)
+    for part in [*br["steps"], *br["why_not"], *([br["trap"]] if br.get("trap") else [])]:
+        L.ru_fields("breakdowns", t["id"], part, ["t"], scopes=[scope])
 
 
 # ---------------- pages ----------------

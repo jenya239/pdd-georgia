@@ -169,6 +169,34 @@ HEADER_ITEMS = """[...document.querySelectorAll('header.top .brand, header.top .
   .map(e => { const r = e.getBoundingClientRect(); return [e.className || e.tagName, Math.round(r.top), Math.round(r.bottom), Math.round(r.left), Math.round(r.right)]; })"""
 
 
+def breakdowns(br, base):
+    """Pilot «Разбор»: a closed block under the answered ticket; tickets without one are unchanged."""
+    page = br.new_page(viewport={"width": 1280, "height": 1000})
+    watch(page)
+    page.goto(base + "practice.html?ids=54")
+    page.wait_for_selector("#set option[value=ids]", state="attached")
+    page.click("#go")
+    page.wait_for_selector('.q[data-id="54"] .ans')
+    check(page.locator("details.br").count() == 0, "breakdown hidden before answering")
+    answer_current(page, correct=False)
+    d = page.locator(".q details.br")
+    check(d.count() == 1 and d.locator("summary").inner_text() == "Разбор" and d.get_attribute("open") is None,
+          "answered ticket 54: closed «Разбор» block")
+    d.locator("summary").click()
+    check(d.locator("blockquote.lawquote a.nref[href='norm/st5-p37.html']").count() == 1, "breakdown quote links its norm")
+    check(d.locator(".whynot li").count() == 2 and d.locator("a[href='episode.html?id=ep03']").count() == 1,
+          "breakdown: one line per wrong option + lesson link")
+    d.evaluate("e => e.scrollIntoView({block: 'end'})")
+    shot(page, "breakdown_open.png")
+    page.goto(base + "practice.html?ids=1")
+    page.wait_for_selector("#set option[value=ids]", state="attached")
+    page.click("#go")
+    page.wait_for_selector('.q[data-id="1"] .ans')
+    answer_current(page)
+    check(page.locator(".q .fb .verdict").count() == 1 and page.locator("details.br").count() == 0, "ticket without breakdown unchanged")
+    page.close()
+
+
 def header_layout(br, base):
     """Compact one-line header on every page at desktop, tablet and phone widths; menu and icon buttons."""
     for w in [1280, 1024, 768, 390, 320]:
@@ -649,6 +677,7 @@ def main():
         shot(mp, f"{last['id']}_mobile_dark.png")
         norms(br, base)
         header_layout(br, base)
+        breakdowns(br, base)
         br.close()
     stop()
     legacy_root()

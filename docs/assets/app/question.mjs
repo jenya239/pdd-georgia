@@ -6,6 +6,7 @@ import { zoom } from "./layout.mjs";
 import { figureSvg } from "../domain/figure.mjs";
 import { misconceptionFor, questionText } from "../domain/items.mjs";
 import { lk, lawDetails } from "../domain/normlinks.mjs";
+import { breakdownHtml } from "../domain/breakdown.mjs";
 
 function lawBlock(t) {
   if (!t.law || !t.law.length) return "";
@@ -28,7 +29,8 @@ function mcNote(t, choice) {
 function explanation(t) {
   if (t.own) return ownExplanation(t);
   return (t.ex ? `<div class="expl"><div class="small mut">Пояснение из базы (только на грузинском):</div><div class="ka" lang="ka">${lk(t, "ex")}</div></div>`
-    : `<div class="expl small mut">Пояснения в исходной базе нет.</div>`) + lawBlock(t);
+    : `<div class="expl small mut">Пояснения в исходной базе нет.</div>`) + lawBlock(t)
+    + (t.br ? breakdownHtml(t.br, loadedTickets().mc) : "");
 }
 
 function head(t, opts, tx, toggle) {

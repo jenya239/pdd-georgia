@@ -19,7 +19,7 @@ from pdd import paths
 from pdd.assign import primary_ref, rule_key, rule_label, pitfall_for
 from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids
 from pdd.lawparse import parse_law, parse_annex
-from pdd import checkitems, norms as norms_mod, normsite, ontology
+from pdd import breakdowns, checkitems, norms as norms_mod, normsite, ontology
 from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
@@ -81,6 +81,14 @@ def generate():
         why = pitfall_for(ref, pitfalls.get(t["lesson"], {})) if t["lesson"] else None
         if why:
             t["why"] = why
+
+    brs = breakdowns.load()
+    errors = breakdowns.validate(brs, world)
+    if errors:
+        raise ValueError("ticket breakdowns are invalid:\n" + "\n".join(errors))
+    by_id = {t["id"]: t for t in tickets}
+    for b in brs:
+        by_id[b["ticket"]]["br"] = breakdowns.export(b, world)
 
     items = checkitems.load_items()
     errors = checkitems.validate(items, world)
