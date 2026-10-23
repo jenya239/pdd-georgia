@@ -16,7 +16,7 @@ import { TYPE_LABEL } from "../domain/items.mjs";
   const idx = E.released.indexOf(r), prev = E.released[idx - 1], next = E.released[idx + 1];
   const core = r.tickets_core.map(i => D.byId[i]), linked = r.tickets_linked.map(i => D.byId[i]);
   const own = (r.own_items || []).map(i => D.byId[i]);
-  const { episodeKind, splitLesson, ownQuestionVerdict } = await import("../domain/episode.mjs");
+  const { episodeKind, splitLesson } = await import("../domain/episode.mjs");
   const isText = episodeKind(r) === "text";
   const lesson = isText ? splitLesson(await (await fetch(r.lesson)).text()) : null;
   const lawPart = `<h2>Главное</h2>
@@ -32,8 +32,8 @@ import { TYPE_LABEL } from "../domain/items.mjs";
    ${lawPart}
    <h2>Билеты к выпуску</h2>
    <div id="tk"></div>
-   <article class="lesson">${lesson.after}</article>
    <div id="own-items"></div>
+   <article class="lesson">${lesson.after}</article>
    <div id="cum"></div>${nav}`
     : `${kindLine}
    <h1>${esc(r.title)}</h1>
@@ -44,15 +44,8 @@ import { TYPE_LABEL } from "../domain/items.mjs";
    <div id="tk"></div>
    <div id="own-items"></div>
    <div id="cum"></div>${nav}`;
-  // свои вопросы урока: проверяются на месте, в прогресс не пишутся
-  m.querySelectorAll(".ownq").forEach(q => {
-    const bs = [...q.querySelectorAll(".ans")], fb = q.querySelector(".fb");
-    bs.forEach((b, i) => b.onclick = () => {
-      const v = ownQuestionVerdict(i, q.dataset.ok), okI = Number(q.dataset.ok);
-      bs.forEach((x, j) => { x.disabled = true; if (j === okI) x.classList.add("ok"); if (j === i && !v.ok) x.classList.add("bad"); });
-      fb.hidden = false; const vd = fb.querySelector(".verdict"); vd.className = "verdict " + (v.ok ? "ok" : "bad"); vd.textContent = `${v.label} Правильный ответ: ${okI + 1}.`;
-    });
-  });
+  const { enhanceFigures } = await import("../app/figzoom.mjs");
+  enhanceFigures(m);
   // накопительная проверка: этот урок + все предыдущие
   const { cumulativeScope, scopeStatus } = await import("../domain/scope.mjs");
   const st = await store, withOwn = st.settings().own !== false;

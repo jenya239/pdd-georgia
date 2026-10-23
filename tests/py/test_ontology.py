@@ -61,9 +61,12 @@ def test_integrity(world):
     assert world.integrity_errors() == []
 
 
-def test_every_live_lesson_ticket_is_annotated(world):
-    live = world.live_assignment
-    lesson_tickets = sorted(t for t, l in live.items())
+def test_no_live_hand_assignment(world):
+    assert not hasattr(world, "live_assignment")
+
+
+def test_every_lesson_ticket_is_annotated(world):
+    lesson_tickets = sorted(world.derive_assignment()["assigned"])
     missing = [t for t in lesson_tickets if "distractors" not in world.doc["tickets"].get(str(t), {})]
     assert missing == []
 
@@ -81,10 +84,64 @@ def test_derived_assignment_respects_concepts(world):
     assert derived["blocked"][1262]["missing"] == ["sign-zone-of-action"]
     # ep04 states note «а» to section 1 of annex 1 (150–300 / 50–100 m), so these stay in ep04
     assert all(derived["assigned"].get(t) == "ep04" for t in (611, 670, 671))
-    # the hand-made excludes of ep03/ep04 are explained by untaught concepts (794 is not: reported)
-    for tid in (47, 53, 69, 75, 21, 59, 256, 605, 614, 618):
+    # tickets once removed by hand are blocked by an untaught concept, not by a list
+    for tid in (47, 53, 69, 75, 21, 59, 256, 605, 614, 618, 794):
         assert tid in derived["blocked"], tid
     assert set(order) == {"ep01", "ep02", "ep03", "ep04"}
+
+
+# --- verdicts for tickets the old heuristic put into lessons ----------------------
+
+DROPPED = {224: ["min-speed-sign"], 274: ["warning-sign-repeat"], 425: ["railway-approach-signs", "warning-sign-repeat"],
+           434: ["railway-approach-signs"], 436: ["railway-approach-signs", "warning-sign-repeat"],
+           1262: ["sign-zone-of-action"], 794: ["settlement-sign-look"]}
+
+
+def test_dropped_tickets_are_blocked_with_a_recorded_reason(world):
+    blocked = world.derive_assignment()["blocked"]
+    for tid, missing in DROPPED.items():
+        assert blocked[tid]["missing"] == missing, (tid, blocked.get(tid))
+        assert len(world.annotation(tid).get("note", "")) > 20, tid
+
+
+def test_794_needs_the_look_of_settlement_signs(world):
+    c = world.concepts["settlement-sign-look"]
+    assert c["norms"] == [] and "settlement-sign-look" in world.untaught
+    assert "рисун" in c["gap"] and "5.26" in world.annotation(794)["note"]
+
+
+def test_515_living_zone_speed_is_taught_in_ep04(world):
+    # the question itself says «в жилой зоне»; ep04 quotes 33.6 «в жилых зонах – … не более 20 км/ч»
+    assert world.derive_assignment()["assigned"][515] == "ep04"
+    a = world.annotation(515)
+    assert a["context_norms"] == ["A1:5.21"] and a["note"]
+    tn = world.ticket_norms(515)
+    assert "A1:5.21" not in tn["norms"] and "33.6" in tn["norms"] and tn["context"] == ["A1:5.21"]
+    assert "living-zone" not in world.ticket_concepts(515)
+
+
+def test_context_norms_must_be_cited_by_the_bank_and_not_primary(world):
+    import copy
+    doc = copy.deepcopy(world.doc)
+    doc["tickets"]["515"]["context_norms"] = ["33.6", "5.58"]
+    w = O.World(doc, list(world.norms.values()), list(world.questions.values()), world.episodes)
+    errs = w.integrity_errors()
+    assert "ticket 515: context norm 33.6 is its primary norm" in errs
+    assert "ticket 515: context norm 5.58 is not cited by the bank" in errs
+
+
+def test_shoulder_is_a_concept_without_a_definition(world):
+    c = world.concepts["shoulder"]
+    assert c["norms"] == [] and c["gap"].startswith("Закон не определяет обочину")
+    for n in ("5.12", "5.15", "31.18", "24.5", "A2:1.2.1"):
+        assert n in c["part_of"], n
+    assert world.introduced_in.get("shoulder") == "ep02"
+
+
+def test_report_has_no_live_assignment(world):
+    rep = world.report()
+    assert set(rep["assignment"]) == {"derived", "strict", "blocked", "blocked_tickets", "diff_derived_vs_strict"}
+    assert rep["assignment"]["blocked_tickets"]["794"]["missing"] == ["settlement-sign-look"]
 
 
 def test_report_is_fresh(world):

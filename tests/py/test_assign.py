@@ -2,7 +2,7 @@
 import sys, pathlib
 
 
-from pdd.assign import Ref, parse_spec, subpoint_for, primary_ref, covers, assign_lessons, rule_key, rule_label
+from pdd.assign import Ref, parse_spec, subpoint_for, primary_ref, covers, rule_key, rule_label
 
 
 def ticket(tid, laws=(), annex=(), expl=""):
@@ -81,43 +81,10 @@ def test_law_spec_never_covers_annex_ref():
     assert not covers(parse_spec("5.19"), Ref("annex", "1", "5.19", None))
 
 
-LESSONS = [
-    {"id": "ep02", "num": 2, "teaches": ["5.12"]},
-    {"id": "ep03", "num": 3, "teaches": ["36.7", "37.6.а.в"]},
-    {"id": "ep04", "num": 4, "teaches": ["5.58", "36.7", "37.6.а.а"], "include": [99], "exclude": [11]},
-]
-
-
-def test_assign_earliest_lesson_teaching_primary_ref():
-    out = assign_lessons([ticket(10, laws=[("36", 7)])], LESSONS)
-    assert out == {10: "ep03"}
-
-
-def test_assign_uses_only_primary_ref():
-    # secondary ref 5.58 is taught in ep04 but the primary 33.2 is not taught
-    out = assign_lessons([ticket(12, laws=[("33", 2), ("5", 58)])], LESSONS)
-    assert out == {}
-
-
-def test_assign_respects_subpoints():
-    out = assign_lessons([ticket(13, laws=[("37", 6)], expl=EXPL_37)], LESSONS)
-    assert out == {13: "ep04"}
-
-
-def test_explicit_exclude_and_include():
-    out = assign_lessons([ticket(11, laws=[("5", 58)]), ticket(99, laws=[("1", 1)])], LESSONS)
-    assert out == {99: "ep04"}
-
-
-def test_include_wins_over_earlier_lesson():
-    lessons = LESSONS + [{"id": "ep05", "num": 5, "teaches": [], "include": [10]}]
-    out = assign_lessons([ticket(10, laws=[("36", 7)])], lessons)
-    assert out == {10: "ep05"}
-
-
-def test_lessons_are_ordered_by_num_not_list_order():
-    out = assign_lessons([ticket(10, laws=[("36", 7)])], list(reversed(LESSONS)))
-    assert out == {10: "ep03"}
+def test_no_hand_assignment_left():
+    """Lessons are assigned only by the ontology (World.derive_assignment); the heuristic is gone."""
+    import pdd.assign as A
+    assert not hasattr(A, "assign_lessons")
 
 
 def test_rule_key_and_label():

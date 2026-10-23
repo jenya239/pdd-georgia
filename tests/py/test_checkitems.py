@@ -77,3 +77,24 @@ def test_validate_reports_untaught_norm_and_future_concept(world, items):
     bad = dict(items[0], id="o-ep01-99", norms=["36.4.в"], concepts=["intersection"])
     errs = checkitems.validate([bad], world)
     assert any("36.4.в" in e for e in errs) and any("intersection" in e for e in errs)
+
+
+def test_ep04_lesson_questions_are_recorded_items(items):
+    """The former unrecorded Н1–Н3 of the ep04 text are ordinary items now (one each, no duplicates)."""
+    ep04 = [i for i in items if i["lesson"] == "ep04"]
+    by_quote = {i["quote"]["norm"]: i for i in ep04}
+    assert "5.58" in by_quote and "Мост" in by_quote["5.58"]["q"]          # Н2: a bridge is not a crossing
+    assert "A1:5.25" in by_quote and "60 км/ч" in by_quote["A1:5.25"]["q"]  # Н3: rules of settlements off
+    signs_stop = [i for i in ep04 if "5.19.1" in i["q"] and "остановиться" in i["q"]]
+    assert len(signs_stop) == 1                                               # Н1, merged with the width item
+    qs = [re.sub(r"\W+", " ", i["q"]).lower() for i in items]
+    assert len(qs) == len(set(qs))
+
+
+def test_items_are_hand_authored_source():
+    """content/checkitems/*.json is the source of truth (no generator); files are tidy, ids in order."""
+    for f in sorted(CHECKITEMS.glob("ep*.json")):
+        raw = f.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        assert raw == json.dumps(data, ensure_ascii=False, indent=1) + "\n", f.name
+        assert [i["id"] for i in data] == [f"o-{f.stem}-{n:02d}" for n in range(1, len(data) + 1)], f.name

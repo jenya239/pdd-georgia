@@ -46,6 +46,23 @@ def test_published_episode_data_has_no_source_only_keys(built):
         assert not {"include", "exclude", "ticket_refs", "teaches"} & set(r), r["id"]
 
 
+def test_site_lessons_are_the_ontology_derived_assignment(built):
+    """Single source of truth: a ticket's lesson on the site is World.derive_assignment(), nothing else."""
+    import json
+    from pdd.ontology import load_world
+    site = {t["id"]: t["lesson"] for t in json.loads(built[0]["data/tickets.json"])["tickets"] if t["lesson"]}
+    assert site == load_world().derive_assignment()["assigned"]
+    E = json.loads(built[0]["data/episodes.json"])
+    for r in E["released"]:
+        assert r["tickets_lesson"] == sorted(t for t, l in site.items() if l == r["id"]), r["id"]
+
+
+def test_episode_sources_have_no_hand_ticket_lists():
+    import json
+    for e in json.loads(paths.EPISODES_JSON.read_text(encoding="utf-8")):
+        assert not {"include", "exclude"} & set(e), e["id"]
+
+
 def test_own_items_are_published_and_listed_per_episode(built):
     import json
     data = json.loads(built[0]["data/items.json"])

@@ -16,16 +16,15 @@ import sys
 from pathlib import Path
 
 from pdd import paths
-from pdd.assign import assign_lessons, primary_ref, rule_key, rule_label, pitfall_for
-from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
+from pdd.assign import primary_ref, rule_key, rule_label, pitfall_for
+from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids
 from pdd.lawparse import parse_law, parse_annex
 from pdd import checkitems, norms as norms_mod, ontology
 from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
 META = "teoria.on.ge (кат. B/B1), выгрузка 20.10.2026; закон: Matsne, ред. 25.06.2026"
-EPISODE_SOURCE_KEYS = ("ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "include", "exclude",
-                       "pitfalls", "linked")
+EPISODE_SOURCE_KEYS = ("ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "pitfalls", "linked")
 
 
 def dumps_compact(obj):
@@ -71,7 +70,8 @@ def generate():
         p["n"] = cnt.get(p["e"], 0)
 
     eps = json.loads(paths.EPISODES_JSON.read_text(encoding="utf-8"))
-    assignment = assign_lessons(Q, lesson_specs(eps))
+    world = load_world()
+    assignment = world.derive_assignment()["assigned"]   # the only assignment (pdd.ontology)
     pitfalls = {e["id"]: e.get("pitfalls", {}) for e in eps}
     for x, t in zip(Q, tickets):
         ref = primary_ref(x)
@@ -82,7 +82,6 @@ def generate():
         if why:
             t["why"] = why
 
-    world = load_world()
     items = checkitems.load_items()
     errors = checkitems.validate(items, world)
     if errors:

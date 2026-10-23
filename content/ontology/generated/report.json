@@ -8,7 +8,7 @@
    "article": 69,
    "law": 1003
   },
-  "concepts": 60,
+  "concepts": 61,
   "introduced": {
    "ep01": 6,
    "ep02": 12,
@@ -16,19 +16,13 @@
    "ep04": 15
   },
   "assumed": 9,
-  "untaught": 8,
-  "misconceptions": 34,
+  "untaught": 9,
+  "misconceptions": 37,
   "annotated_tickets": 65,
   "distractors": 98,
-  "distractors_mapped": 88
+  "distractors_mapped": 93
  },
  "assignment": {
-  "live": {
-   "ep01": 0,
-   "ep02": 9,
-   "ep03": 14,
-   "ep04": 31
-  },
   "derived": {
    "ep01": 0,
    "ep02": 9,
@@ -42,231 +36,239 @@
    "ep04": 15
   },
   "blocked": 17,
-  "diff_live_vs_derived": [
-   {
-    "ticket": 224,
-    "live": "ep04",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep04",
-     "missing": [
-      "min-speed-sign"
-     ]
-    }
+  "blocked_tickets": {
+   "21": {
+    "lesson": "ep04",
+    "missing": [
+     "emergency-vehicles"
+    ],
+    "note": "исключён из ep04 вручную"
    },
-   {
-    "ticket": 274,
-    "live": "ep04",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep04",
-     "missing": [
-      "warning-sign-repeat"
-     ]
-    }
+   "47": {
+    "lesson": "ep03",
+    "missing": [
+     "tram-priority"
+    ],
+    "note": "исключён из ep03 вручную: трамваи"
    },
-   {
-    "ticket": 425,
-    "live": "ep04",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep04",
-     "missing": [
-      "railway-approach-signs",
-      "warning-sign-repeat"
-     ]
-    }
+   "53": {
+    "lesson": "ep03",
+    "missing": [
+     "tram-priority"
+    ],
+    "note": "исключён из ep03 вручную: трамваи"
    },
-   {
-    "ticket": 434,
-    "live": "ep04",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep04",
-     "missing": [
-      "railway-approach-signs"
-     ]
-    }
+   "59": {
+    "lesson": "ep04",
+    "missing": [
+     "trajectory-right-rule"
+    ],
+    "note": "исключён из ep04 вручную"
    },
-   {
-    "ticket": 436,
-    "live": "ep04",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep04",
-     "missing": [
-      "railway-approach-signs",
-      "warning-sign-repeat"
-     ]
-    }
+   "69": {
+    "lesson": "ep03",
+    "missing": [
+     "tram-priority"
+    ],
+    "note": "исключён из ep03 вручную: трамваи"
    },
-   {
-    "ticket": 515,
-    "live": "ep04",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep04",
-     "missing": [
-      "living-zone"
-     ]
-    }
+   "75": {
+    "lesson": "ep03",
+    "missing": [
+     "tram-priority"
+    ],
+    "note": "исключён из ep03 вручную: трамваи, отключённый светофор"
    },
-   {
-    "ticket": 794,
-    "live": null,
-    "derived": "ep04"
+   "224": {
+    "lesson": "ep04",
+    "missing": [
+     "min-speed-sign"
+    ],
+    "note": "вне урока 4: ответ требует знака 4.6 «Ограничение минимальной скорости» (прил. 1, п. 4.6); урок цитирует только ст. 33, п. 6 (60 км/ч). Вариант 4 (не менее 20, не более 40) читает 40 на знаке как максимум."
    },
-   {
-    "ticket": 1262,
-    "live": "ep03",
-    "derived": null,
-    "blocked": {
-     "lesson": "ep03",
-     "missing": [
-      "sign-zone-of-action"
-     ]
-    }
+   "256": {
+    "lesson": "ep04",
+    "missing": [
+     "railway-approach-signs"
+    ],
+    "note": "исключён из ep04 вручную; в данных билета «1.41», «1.46» вместо 1.4.1, 1.4.6"
+   },
+   "274": {
+    "lesson": "ep04",
+    "missing": [
+     "warning-sign-repeat"
+    ],
+    "note": "вне урока 4: обгон у повторного знака 1.1. Пояснение банка опирается на примечание «б» к разделу 1 прил. 1 (знак повторяется вне населённого пункта, второй — не менее чем за 50 м до опасного участка); урок его не разбирает, а по одному примечанию «а» (первый знак за 150–300 м) ответ не получить."
+   },
+   "425": {
+    "lesson": "ep04",
+    "missing": [
+     "railway-approach-signs",
+     "warning-sign-repeat"
+    ],
+    "note": "вне урока 4: решается по табличкам 1.4.x и повторным знакам (прил. 1, примечания «б», «е» к разделу 1: 1.4.3/1.4.6 ставят вместе с повторяющим знаком 1.1 или 1.2); урок лишь упоминает, что 1.4.1–1.4.6 ставят вне населённого пункта. Вариант 2 («ни одному») — обгон у переезда считают разрешённым."
+   },
+   "434": {
+    "lesson": "ep04",
+    "missing": [
+     "railway-approach-signs"
+    ],
+    "note": "вне урока 4: нужно узнать основной знак по табличке 1.4.1 (примечание «е»: её ставят с основным знаком 1.1 или 1.2; на рисунке — три полосы) и связать его с 150–300 м (примечание «а»); таблички 1.4.x урок не разбирает. Вариант «запрещается» — путают расстояние у основного знака (150–300 м больше 100 м из ст. 34, п. 9 «б»)."
+   },
+   "436": {
+    "lesson": "ep04",
+    "missing": [
+     "railway-approach-signs",
+     "warning-sign-repeat"
+    ],
+    "note": "вне урока 4: как № 274 — обгон у повторного знака с табличкой 1.4.3 (примечание «е»: её ставят с повторяющим знаком; на рисунке — одна полоса); повторные знаки и таблички 1.4.x (прил. 1, примечания «б», «е» к разделу 1) урок не разбирает."
+   },
+   "605": {
+    "lesson": "ep04",
+    "missing": [
+     "warning-sign-repeat"
+    ],
+    "note": "исключён из ep04 вручную"
+   },
+   "614": {
+    "lesson": "ep04",
+    "missing": [
+     "warning-sign-repeat"
+    ],
+    "note": "исключён из ep04 вручную"
+   },
+   "618": {
+    "lesson": "ep04",
+    "missing": [
+     "railway-approach-signs",
+     "warning-sign-repeat"
+    ],
+    "note": "исключён из ep04 вручную"
+   },
+   "794": {
+    "lesson": "ep04",
+    "missing": [
+     "settlement-sign-look"
+    ],
+    "note": "вне урока 4 (решено при разборе): нужно по виду выбрать знак 5.26 (белая надпись на синем фоне, III) среди 5.24.1 (чёрное на белом, I) и 5.24.2 (силуэт, II). Урок называет 5.26 концом пункта со знаком 5.25 и цитирует п. 5.25/5.26, но рисунков 5.23.1/5.25/5.26 не показывает и о цвете не говорит; текст норм цвета тоже не называет. Без этого остаётся угадывать между I и III. Вернуть в урок можно, только показав рисунки приложения."
+   },
+   "1262": {
+    "lesson": "ep03",
+    "missing": [
+     "sign-zone-of-action"
+    ],
+    "note": "вне урока 3: ответ — зона действия знака 3.27 не прерывается выездом с полевой дороги (прил. 1, примечание «д» к разделу 3); урок 3 объясняет, что выезд с прилегающей территории — не перекрёсток, но не разбирает зону действия запрещающих знаков."
    }
-  ],
-  "diff_live_vs_strict": [
+  },
+  "diff_derived_vs_strict": [
    {
     "ticket": 20,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 47,
-    "live": null,
+    "derived": null,
     "strict": "ep03"
    },
    {
     "ticket": 53,
-    "live": null,
+    "derived": null,
     "strict": "ep03"
    },
    {
     "ticket": 69,
-    "live": null,
+    "derived": null,
     "strict": "ep03"
    },
    {
     "ticket": 75,
-    "live": null,
+    "derived": null,
     "strict": "ep03"
    },
    {
     "ticket": 150,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 171,
-    "live": "ep04",
-    "strict": null
-   },
-   {
-    "ticket": 224,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 265,
-    "live": "ep02",
-    "strict": null
-   },
-   {
-    "ticket": 274,
-    "live": "ep04",
+    "derived": "ep02",
     "strict": null
    },
    {
     "ticket": 280,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 314,
-    "live": "ep04",
-    "strict": null
-   },
-   {
-    "ticket": 425,
-    "live": "ep04",
-    "strict": null
-   },
-   {
-    "ticket": 434,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 435,
-    "live": "ep04",
-    "strict": null
-   },
-   {
-    "ticket": 436,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 515,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 611,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 639,
-    "live": null,
+    "derived": null,
     "strict": "ep04"
    },
    {
     "ticket": 653,
-    "live": "ep03",
+    "derived": "ep03",
     "strict": null
    },
    {
     "ticket": 654,
-    "live": "ep03",
+    "derived": "ep03",
     "strict": null
    },
    {
     "ticket": 670,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 671,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 794,
-    "live": null,
+    "derived": null,
     "strict": "ep04"
    },
    {
     "ticket": 874,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 875,
-    "live": "ep04",
+    "derived": "ep04",
     "strict": null
    },
    {
     "ticket": 876,
-    "live": "ep04",
-    "strict": null
-   },
-   {
-    "ticket": 1262,
-    "live": "ep03",
+    "derived": "ep04",
     "strict": null
    }
   ]
@@ -321,9 +323,7 @@
    {
     "id": "living-zone",
     "label": "Жилая зона: определение, знаки 5.21/5.22, особые правила",
-    "blocks": [
-     515
-    ]
+    "blocks": []
    },
    {
     "id": "min-speed-sign",
@@ -341,6 +341,13 @@
      434,
      436,
      618
+    ]
+   },
+   {
+    "id": "settlement-sign-look",
+    "label": "Как выглядят знаки 5.23.1/5.24.1 и 5.25/5.26 (по рисунку)",
+    "blocks": [
+     794
     ]
    },
    {
@@ -387,20 +394,19 @@
    },
    {
     "id": "shoulder",
-    "gap": "в ст. 5 нет определения обочины; урок объясняет её через ст. 24.5, 31.18 и разметку 1.2.1"
+    "gap": "Закон не определяет обочину: в ст. 5 такого термина нет, и урок своего определения не даёт. Её смысл виден только из употребления: дорога может включать обочины (ст. 5, п. 12), проезжая часть — без обочин (п. 15); движение механических ТС по обочинам запрещено, кроме случаев ст. 37, п. 1 и ст. 43, п. 2 (ст. 31, п. 18); вне населённых пунктов пешеходы идут по обочине навстречу движению (ст. 24, п. 5); разворот возможен «с правой обочины» (ст. 32, п. 10); линию 1.2.1 на автомагистрали можно пересечь для остановки на обочине (прил. 2, п. 1.2.1)."
+   },
+   {
+    "id": "settlement-sign-look",
+    "gap": "текст приложения 1 цвет знаков не называет: отличие видно только на рисунках (у 5.25/5.26 в билете № 794 — синий фон); урок 4 рисунков 5.23.1, 5.25 и 5.26 не показывает"
    }
   ],
   "unmapped_distractors": [
-   "224:3",
    "314:3",
    "425:0",
-   "425:1",
    "425:3",
-   "434:0",
-   "436:1",
    "878:0",
-   "878:1",
-   "908:0"
+   "878:1"
   ],
   "unused_misconceptions": [],
   "unresolved_ticket_refs": {
@@ -460,12 +466,12 @@
   }
  },
  "own_items": {
-  "total": 34,
+  "total": 36,
   "by_lesson": {
    "ep01": 5,
    "ep02": 8,
    "ep03": 9,
-   "ep04": 12
+   "ep04": 14
   },
   "by_type": {
    "cloze": 5,
@@ -473,30 +479,33 @@
    "flashcard": 7,
    "max-error": 5,
    "priority": 6,
-   "ticket": 6
+   "ticket": 8
   }
  },
  "misconception_use": {
+  "mc-525-is-settlement": 1,
   "mc-adjacent-is-intersection": 5,
   "mc-age-without-school": 2,
   "mc-annex-optional": 2,
+  "mc-any-track-is-crossing": 1,
   "mc-barrier": 5,
   "mc-carriageways-by-lanes": 7,
   "mc-crossing-blocking": 2,
   "mc-crossing-driver-priority": 12,
+  "mc-crossing-needs-marking": 1,
   "mc-crossing-stop-place": 2,
-  "mc-different-levels": 2,
+  "mc-different-levels": 3,
   "mc-enter-when-blocked": 1,
   "mc-houses-settlement": 2,
   "mc-lanes-need-marking": 3,
   "mc-law-citizens-only": 2,
   "mc-main-road-sign": 6,
-  "mc-min-speed-ignored": 1,
+  "mc-min-speed-ignored": 2,
   "mc-oncoming-side": 7,
   "mc-overtake-crossing": 4,
   "mc-pedestrian-side": 2,
   "mc-railway-bypass": 3,
-  "mc-railway-overtake": 1,
+  "mc-railway-overtake": 3,
   "mc-railway-signs": 6,
   "mc-railway-speed": 1,
   "mc-railway-stop-order": 9,
@@ -505,9 +514,9 @@
   "mc-road-elements": 9,
   "mc-settlement-speed": 4,
   "mc-shoulder-driving": 6,
-  "mc-sign-distance": 10,
+  "mc-sign-distance": 11,
   "mc-sign-zone": 1,
-  "mc-stop-near-crossing": 4,
+  "mc-stop-near-crossing": 5,
   "mc-unknown-surface-main": 5,
   "mc-unpaved-equal": 4,
   "mc-yard-exit-priority": 6

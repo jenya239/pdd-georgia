@@ -3,7 +3,7 @@ import sys, pathlib
 import pytest
 
 
-from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids, lesson_specs
+from pdd.episodes import core_ticket_ids, linked_ticket_ids, episode_kind, lesson_ticket_ids
 
 Q = [
     {"id": 1, "law_refs": [{"article": "5", "paragraph": 86}], "episodes": ["E005"]},
@@ -47,15 +47,6 @@ def test_kind_rejects_unknown_format():
 
 def test_lesson_ticket_ids_sorted():
     assert lesson_ticket_ids("ep04", {9: "ep04", 2: "ep03", 5: "ep04"}) == [5, 9]
-
-
-def test_lesson_specs_pick_assignment_fields():
-    eps = [{"id": "ep02", "num": 2, "teaches": ["5.12"], "title": "x"},
-           {"id": "ep01", "num": 1}]
-    assert lesson_specs(eps) == [
-        {"id": "ep02", "num": 2, "teaches": ["5.12"], "include": [], "exclude": []},
-        {"id": "ep01", "num": 1, "teaches": [], "include": [], "exclude": []},
-    ]
 
 
 def test_linked_can_come_from_lesson_assignment():

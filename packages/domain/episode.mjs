@@ -8,8 +8,3 @@ export function splitLesson(html) {
   const i = html.indexOf(LESSON_MARKER);
   return i < 0 ? { before: html, after: "" } : { before: html.slice(0, i), after: html.slice(i + LESSON_MARKER.length) };
 }
-
-export function ownQuestionVerdict(choice, okAttr) {
-  const ok = choice === Number(okAttr);
-  return { ok, label: ok ? "Верно." : "Неверно." };
-}

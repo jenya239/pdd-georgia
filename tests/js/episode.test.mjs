@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { episodeKind, splitLesson, LESSON_MARKER, ownQuestionVerdict } from "../../packages/domain/episode.mjs";
+import * as Episode from "../../packages/domain/episode.mjs";
+const { episodeKind, splitLesson, LESSON_MARKER } = Episode;
 
 test("episodes are video unless declared text", () => {
   assert.equal(episodeKind({ kind: "text" }), "text");
@@ -13,7 +14,6 @@ test("lesson body is split at the tickets marker", () => {
   assert.deepEqual(splitLesson("<p>only</p>"), { before: "<p>only</p>", after: "" });
 });
 
-test("own question verdict compares with the 0-based correct index", () => {
-  assert.deepEqual(ownQuestionVerdict(1, "1"), { ok: true, label: "Верно." });
-  assert.deepEqual(ownQuestionVerdict(0, "1"), { ok: false, label: "Неверно." });
+test("lessons carry no ad-hoc question widget (own questions are recorded items)", () => {
+  assert.equal(Episode.ownQuestionVerdict, undefined);
 });

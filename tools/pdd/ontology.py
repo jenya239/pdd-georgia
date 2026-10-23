@@ -5,18 +5,21 @@ Entities
   concept        an idea a learner must hold; `norms` = specs where the law states it (auto-matched
                  against the norms a ticket checks), `part_of` = related norms that are *not* matched
   lesson         `introduces` concepts, `relies_on` earlier concepts, `assumes` general terms never taught
-  ticket         annotation for a bank ticket: extra `concepts`, extra `norms`, distractor -> misconception
+  ticket         annotation for a bank ticket: extra `concepts`, extra `norms`, `context_norms` (cited by the
+                 bank but not needed for the answer, e.g. a sign that is only scenery), distractor ->
+                 misconception, `note` (why the ticket is or is not in a lesson)
   misconception  a wrong belief behind a distractor; `norms`/`concepts` that correct it
 
 Which norms a ticket checks: every law reference (sub-point from the Georgian citation), every annex
-item, every cited annex note (parsed from the Georgian explanation) and annotated extra norms.
+item, every cited annex note (parsed from the Georgian explanation) and annotated extra norms,
+minus annotated context norms.
 Its concepts: all concepts whose `norms` cover one of those norms, plus annotated ones.
 
 Derived assignment: the earliest lesson whose `teaches` covers the ticket's primary norm, provided every
 concept of the ticket is available there (introduced in that or an earlier lesson, or assumed).
-Otherwise the ticket is blocked (reported with the missing concepts). `strict`: the earliest lesson by
-which *every* checked norm is taught. Both are compared with the live assignment (episodes.json teaches +
-manual include/exclude) in generated/report.json; the site keeps using the live one."""
+Otherwise the ticket is blocked (reported with the missing concepts). This is the only assignment: the
+site build uses it as is (no hand lists). `strict` (the earliest lesson by which *every* checked norm is
+taught) is reported next to it in generated/report.json for review."""
 from __future__ import annotations
 
 import collections
@@ -25,8 +28,7 @@ import re
 from functools import cached_property
 
 from pdd import paths
-from pdd.assign import KA_TO_RU, _number, primary_ref, subpoint_for, assign_lessons
-from pdd.episodes import lesson_specs
+from pdd.assign import KA_TO_RU, _number, primary_ref, subpoint_for
 from pdd.norms import NORMS_JSON, resolve
 
 ONTOLOGY = paths.ONTOLOGY
@@ -144,7 +146,6 @@ class World:
         self.misconceptions = {m["id"]: m for m in doc["misconceptions"]}
         self.lessons = {l["id"]: l for l in doc["lessons"]}
         self.lesson_order = [e["id"] for e in self.episodes]
-        self.live_assignment = assign_lessons(questions, lesson_specs(self.episodes))
 
     # -- lessons ---------------------------------------------------------------
     def _ep(self, lesson):
@@ -192,8 +193,17 @@ class World:
     def annotation(self, tid):
         return self.doc["tickets"].get(str(tid), {})
 
-    def ticket_norms(self, tid):
+    def bank_norms(self, tid):
+        """Norms as cited by the bank (plus annotated extra norms), before context norms are removed."""
         return ticket_norms(self.questions[tid], self.norm_ids, self.norm_text, self.annotation(tid).get("norms", []))
+
+    def ticket_norms(self, tid):
+        tn = self.bank_norms(tid)
+        ctx = self.annotation(tid).get("context_norms", [])
+        if not ctx:
+            return tn
+        drop = [n for n in tn["norms"] if any(covers_id(c, n) for c in ctx)]
+        return {**tn, "norms": [n for n in tn["norms"] if n not in drop], "context": sorted(drop)}
 
     def concepts_for_norms(self, norm_ids):
         return sorted(c for c, d in self.concepts.items()
@@ -291,6 +301,13 @@ class World:
             for s in a.get("norms", []):
                 if not self._spec_ok(s):
                     err.append(f"ticket {key}: unknown norm {s}")
+            if a.get("context_norms"):
+                bank = self.bank_norms(tid)
+                for s in a["context_norms"]:
+                    if bank["primary"] is not None and covers_id(s, bank["primary"]):
+                        err.append(f"ticket {key}: context norm {s} is its primary norm")
+                    elif not any(covers_id(s, n) for n in bank["norms"]):
+                        err.append(f"ticket {key}: context norm {s} is not cited by the bank")
             correct = q["correct"] - 1
             dist = a.get("distractors")
             if dist is not None:
@@ -309,24 +326,15 @@ class World:
     # -- report ----------------------------------------------------------------
     def report(self, items=()):
         """`items`: own check items (pdd.checkitems) — counted, and their distractors count as misconception use."""
-        live = self.live_assignment
         der = self.derive_assignment()
         strict = self.strict_assignment()
         kinds = {}
         for n in self.norms.values():
             k = "annex note" if ".прим" in n["id"] else n["kind"]
             kinds[k] = kinds.get(k, 0) + 1
-        diffs = []
-        for tid in sorted(set(live) | set(der["assigned"]) | set(der["blocked"])):
-            a, b = live.get(tid), der["assigned"].get(tid)
-            if a != b:
-                row = {"ticket": tid, "live": a, "derived": b}
-                if tid in der["blocked"]:
-                    row["blocked"] = der["blocked"][tid]
-                diffs.append(row)
-        strict_diffs = [{"ticket": t, "live": live.get(t), "strict": strict.get(t)}
-                        for t in sorted(set(live) | set(strict)) if live.get(t) != strict.get(t)
-                        and (live.get(t) or strict.get(t))]
+        assigned = der["assigned"]
+        strict_diffs = [{"ticket": t, "derived": assigned.get(t), "strict": strict.get(t)}
+                        for t in sorted(set(assigned) | set(strict)) if assigned.get(t) != strict.get(t)]
         annotated = self.doc["tickets"]
         dist = [m for a in annotated.values() for m in (a.get("distractors") or {}).values()]
         by_lesson = lambda asg: {l: sum(1 for v in asg.values() if v == l) for l in self.lesson_order}
@@ -351,9 +359,11 @@ class World:
                 "distractors": len(dist), "distractors_mapped": sum(1 for m in dist if m),
             },
             "assignment": {
-                "live": by_lesson(live), "derived": by_lesson(der["assigned"]),
-                "strict": by_lesson(strict), "blocked": len(der["blocked"]),
-                "diff_live_vs_derived": diffs, "diff_live_vs_strict": strict_diffs,
+                "derived": by_lesson(assigned), "strict": by_lesson(strict), "blocked": len(der["blocked"]),
+                "blocked_tickets": {str(t): {**b, **({"note": self.annotation(t)["note"]}
+                                                     if self.annotation(t).get("note") else {})}
+                                    for t, b in sorted(der["blocked"].items())},
+                "diff_derived_vs_strict": strict_diffs,
             },
             "gaps": {
                 "assumed_concepts": [{"id": c, "label": self.concepts[c]["label"]} for c in self.assumed],

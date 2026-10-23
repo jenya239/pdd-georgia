@@ -39,9 +39,3 @@ def episode_kind(ep: dict) -> str:
 
 def lesson_ticket_ids(lesson_id: str, assignment: dict) -> list:
     return sorted(tid for tid, lid in assignment.items() if lid == lesson_id)
-
-
-def lesson_specs(episodes: list) -> list:
-    return [{"id": e["id"], "num": e["num"], "teaches": list(e.get("teaches", [])),
-             "include": list(e.get("include", [])), "exclude": list(e.get("exclude", []))}
-            for e in episodes]

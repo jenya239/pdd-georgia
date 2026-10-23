@@ -44,6 +44,7 @@
     "properties": {
      "concepts": {"$ref": "#/$defs/ids"},
      "norms": {"$ref": "#/$defs/norms"},
+     "context_norms": {"$ref": "#/$defs/norms", "description": "cited by the bank but not needed for the answer; not used for concepts or assignment"},
      "distractors": {"type": "object", "propertyNames": {"pattern": "^\\d$"},
                      "additionalProperties": {"oneOf": [{"type": "string", "pattern": "^mc-"}, {"type": "null"}]}},
      "note": {"type": "string"}

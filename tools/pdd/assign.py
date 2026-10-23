@@ -1,14 +1,12 @@
-"""Ticket -> primary lesson assignment. Pure functions, no I/O.
+"""Primary rule of a ticket and spec matching. Pure functions, no I/O.
 
-Rule (documented in README):
+The lesson of a ticket is derived by the ontology (pdd.ontology.World.derive_assignment);
+this module only provides the primitives it uses:
   * The *primary rule* of a ticket is its first law reference (article, paragraph and,
     when the Georgian explanation names it, the sub-point); tickets without law
     references fall back to their first annex item (sign / marking).
   * A lesson declares what it teaches as specs: "5.86", "37.6.а.а", "A1:5.19.1".
-  * The ticket's lesson is the earliest released lesson (by number) whose specs cover
-    the primary rule. Explicit "include"/"exclude" ticket ids of a lesson override it
-    (used only after checking the ticket against the lesson text).
-  * Otherwise the ticket stays unassigned (its topic is not taught yet).
+  * `covers(spec, ref)` tells whether a spec covers a reference.
 """
 from __future__ import annotations
 
@@ -82,28 +80,6 @@ def covers(spec: Ref, ref: Ref) -> bool:
     if spec.minor != ref.minor:
         return False
     return spec.sub is None or _nested(spec.sub, ref.sub)
-
-
-def assign_lessons(tickets: list, lessons: list) -> dict:
-    ordered = sorted(lessons, key=lambda l: l["num"])
-    specs = [(l, [parse_spec(s) for s in l.get("teaches", [])]) for l in ordered]
-    out = {}
-    for t in tickets:
-        tid = t["id"]
-        explicit = [l["id"] for l in ordered if tid in l.get("include", [])]
-        if explicit:
-            out[tid] = explicit[0]
-            continue
-        ref = primary_ref(t)
-        if ref is None:
-            continue
-        for lesson, lesson_specs in specs:
-            if tid in lesson.get("exclude", []):
-                continue
-            if any(covers(s, ref) for s in lesson_specs):
-                out[tid] = lesson["id"]
-                break
-    return out
 
 
 def rule_key(ref: Ref) -> str:

@@ -139,9 +139,6 @@ footer{max-width:1040px;margin:0 auto;padding:20px 16px 40px;color:var(--mut);fo
 .sg{display:flex;flex-direction:column;align-items:center;gap:2px;width:120px;text-align:center;font-size:13px}
 .sgimg{background:#fff;border-radius:8px;padding:6px;display:block;border:1px solid var(--line)}
 .sgimg img{width:64px;height:64px;object-fit:contain;display:block}
-.ownq{margin:12px 0}
-.ownq .fb{margin-top:10px}
-.ownq .fb[hidden]{display:none}
 .fig{margin:16px 0;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:8px;overflow-x:auto}
 .fig svg{display:block;width:100%;height:auto;min-width:520px}
 .fig figcaption{font-size:13px;color:var(--mut);margin-top:6px}
@@ -213,3 +210,13 @@ svg.fig .barrier{stroke:#c62828;stroke-width:6;stroke-dasharray:10 8}
 svg.fig .rail{stroke:#444;stroke-width:4}
 svg.fig .light rect{fill:#1b1f24}
 svg.fig .mark line{stroke:#ffd54f;stroke-width:3}
+/* wide lesson figures on small screens: scroll hint + fullscreen view */
+.fighint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--mut);margin:6px 0 0}
+.fighint[hidden]{display:none}
+.fighint button{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--acc);background:var(--acc2);color:var(--fg);cursor:pointer}
+.figmodal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.figmodal .figbar{display:flex;justify-content:flex-end;width:100%;height:48px;align-items:flex-start}
+.figmodal .figbar button{font:inherit;padding:6px 14px;border-radius:999px;border:0;background:var(--bg);color:var(--fg);cursor:pointer}
+.figmodal .fig{margin:0;overflow:hidden;padding:0}
+.figmodal .fig svg{min-width:0;width:100%;height:100%}
+body.figopen{overflow:hidden}

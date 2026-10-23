@@ -51,3 +51,8 @@ def test_svg_ids_unique_and_refs_resolve(lesson):
         assert refs <= local, refs - local
     defs = [i for i in ids if re.search(r"<(marker|pattern|linearGradient|clipPath)[^>]*id=\"" + re.escape(i), html)]
     assert all(i.startswith(name + "-") for i in defs), defs
+
+
+def test_no_unrecorded_questions_in_lesson_text(lesson):
+    """Own questions live in content/checkitems (recorded, validated), not as ad-hoc blocks in the text."""
+    assert 'class="q card ownq"' not in lesson[1] and 'id="own"' not in lesson[1]
