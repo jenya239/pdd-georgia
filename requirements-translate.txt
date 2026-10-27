@@ -1,0 +1,3 @@
+# machine translation ka → ru of Georgian-only ticket texts (tools/translate_ka.py, tools/translate_ka_loop.sh)
+# free web endpoint, no API key, no LLM; used only to refresh content/translations/explanations_ru.json
+translators>=6.0

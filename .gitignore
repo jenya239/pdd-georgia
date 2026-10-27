@@ -17,3 +17,7 @@ video/episodes/*/music.wav
 video/episodes/*/*.mp4
 # e2e screenshots
 tests/e2e/shots/
+
+# local virtualenvs
+.venv/
+__pycache__/

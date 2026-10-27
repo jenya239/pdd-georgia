@@ -1,0 +1,7 @@
+# video pipeline (python video/render.py epNN …) — separate venv recommended; also needs ffmpeg in PATH
+# and the fonts in /usr/share/fonts/truetype/sand-box/google/ (tests/video skip without them)
+numpy>=2.0
+pillow>=10
+matplotlib>=3.8
+edge-tts>=6.1
+pytest>=8
