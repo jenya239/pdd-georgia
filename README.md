@@ -48,7 +48,7 @@ python3 tools/build.py --out=DIR # собрать в другую папку
 ```
 Сборка генерирует `docs/data/tickets.json`, `docs/data/items.json` (наши вопросы и заблуждения), `docs/data/episodes.json`, HTML текстовых уроков, копирует страницы, `web/assets`, `packages/domain` (→ `docs/assets/domain/`), картинки билетов (→ `docs/img/`), видео и знаки, пишет `.nojekyll`.
 
-Локальный просмотр: `cd docs && python3 -m http.server 8000` → http://localhost:8000/ (с `file://` не работает — данные грузятся через `fetch`).
+Локальный просмотр: `nvm use && npm run dev` → http://127.0.0.1:8000/pdd-georgia/ (с `file://` не работает — данные грузятся через `fetch`). Нужен Node.js 24.22+, Active LTS.
 
 ## Публикация (GitHub Pages)
 
