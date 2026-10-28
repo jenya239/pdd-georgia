@@ -12,6 +12,7 @@ import importlib.util
 import json
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -230,11 +231,22 @@ def load_world():
     return _WORLD[0]
 
 
+def ontology_report_text() -> str:
+    """Text of content/ontology/generated/report.json, from the Node ontology."""
+    completed = subprocess.run(
+        ["node", "tools/ontology-report.mjs"],
+        cwd=paths.REPO, capture_output=True, text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or "node tools/ontology-report.mjs failed")
+    return completed.stdout
+
+
 def generated_sources() -> dict:
     """Generated files kept in the repository (content/ontology/generated): {Path: text}."""
     world = load_world()
     return {norms_mod.NORMS_JSON: norms_mod.dump(list(world.norms.values())),
-            ontology.REPORT_JSON: ontology.dump(world.report(checkitems.load_items())),
+            ontology.REPORT_JSON: ontology_report_text(),
             LINKS_JSON: links_report()}
 
 

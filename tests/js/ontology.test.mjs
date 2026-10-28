@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { coversId } from "../../packages/domain/ontology.mjs";
-import { loadItems, loadWorld } from "../../tools/load-ontology.mjs";
+import { loadItems, loadWorld, reportText } from "../../tools/load-ontology.mjs";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const world = loadWorld(repo);
@@ -60,7 +60,8 @@ test("context norms are cited scenery, not the primary rule", () => {
 });
 
 test("the report matches the committed ontology report, including our check items", () => {
-  const fresh = world.report(loadItems(repo));
-  const committed = JSON.parse(readFileSync(path.join(repo, "content/ontology/generated/report.json"), "utf8"));
-  assert.deepEqual(fresh, committed);
+  const committedPath = path.join(repo, "content/ontology/generated/report.json");
+  const committedText = readFileSync(committedPath, "utf8");
+  assert.equal(reportText(repo), committedText);
+  assert.deepEqual(world.report(loadItems(repo)), JSON.parse(committedText));
 });

@@ -4,8 +4,8 @@
 #   PYTHON     interpreter with pytest            (default: python3)
 #   E2E_PYTHON interpreter with playwright        (default: $PYTHON; set E2E=0 to skip)
 #   VIDEO_PYTHON interpreter of the video venv    (video still tests skip without it)
-# Python still builds the site, the ontology and the browser test. New code is Node;
-# that pipeline is what moves next. Do not add Python.
+# Python still builds the site and the browser test. The ontology report is written
+# by Node (tools/ontology-report.mjs). New code is Node; do not add Python.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=${PYTHON:-python3}

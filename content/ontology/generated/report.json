@@ -1,5 +1,5 @@
 {
- "_generated": "python3 tools/build.py (pdd.ontology); do not edit",
+ "_generated": "node tools/ontology-report.mjs; do not edit",
  "stats": {
   "norms": 1459,
   "norms_by_kind": {

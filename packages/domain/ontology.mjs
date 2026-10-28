@@ -455,7 +455,7 @@ export class World {
     const byType = {};
     for (const item of items) byType[item.type] = (byType[item.type] || 0) + 1;
     return {
-      _generated: "python3 tools/build.py (pdd.ontology); do not edit",
+      _generated: "node tools/ontology-report.mjs; do not edit",
       stats: {
         norms: this.norms.size,
         norms_by_kind: sortedObject(Object.entries(kinds)),

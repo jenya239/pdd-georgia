@@ -351,7 +351,7 @@ class World:
                 if m:
                     mis_use[m] = mis_use.get(m, 0) + 1
         return {
-            "_generated": "python3 tools/build.py (pdd.ontology); do not edit",
+            "_generated": "node tools/ontology-report.mjs; do not edit",
             "stats": {
                 "norms": len(self.norms), "norms_by_kind": dict(sorted(kinds.items())),
                 "concepts": len(self.concepts),

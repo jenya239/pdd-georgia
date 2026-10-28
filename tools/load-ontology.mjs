@@ -27,3 +27,7 @@ export function loadWorld(repo) {
     readJson(path.join(repo, "content/episodes.json")),
   );
 }
+
+export function reportText(repo) {
+  return `${JSON.stringify(loadWorld(repo).report(loadItems(repo)), null, 1)}\n`;
+}
