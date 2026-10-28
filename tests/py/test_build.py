@@ -47,10 +47,12 @@ def test_published_episode_data_has_no_source_only_keys(built):
 
 
 def test_site_lessons_are_the_ontology_derived_assignment(built):
-    """Single source of truth: a ticket's lesson on the site is World.derive_assignment(), nothing else."""
+    """A ticket's lesson on the site is the Node ontology assignment."""
     import json
+    from pdd.build import ontology_assignment
     from pdd.ontology import load_world
     site = {t["id"]: t["lesson"] for t in json.loads(built[0]["data/tickets.json"])["tickets"] if t["lesson"]}
+    assert site == ontology_assignment()
     assert site == load_world().derive_assignment()["assigned"]
     E = json.loads(built[0]["data/episodes.json"])
     for r in E["released"]:

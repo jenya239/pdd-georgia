@@ -126,7 +126,7 @@ def generate():
 
     eps = json.loads(paths.EPISODES_JSON.read_text(encoding="utf-8"))
     world = load_world()
-    assignment = world.derive_assignment()["assigned"]   # the only assignment (pdd.ontology)
+    assignment = ontology_assignment()
     pitfalls = {e["id"]: e.get("pitfalls", {}) for e in eps}
     for x, t in zip(Q, tickets):
         ref = primary_ref(x)
@@ -231,15 +231,24 @@ def load_world():
     return _WORLD[0]
 
 
-def ontology_report_text() -> str:
-    """Text of content/ontology/generated/report.json, from the Node ontology."""
+def node_ontology(*args: str) -> str:
     completed = subprocess.run(
-        ["node", "tools/ontology-report.mjs"],
+        ["node", "tools/ontology-report.mjs", *args],
         cwd=paths.REPO, capture_output=True, text=True,
     )
     if completed.returncode != 0:
         raise RuntimeError(completed.stderr.strip() or "node tools/ontology-report.mjs failed")
     return completed.stdout
+
+
+def ontology_report_text() -> str:
+    """Text of content/ontology/generated/report.json, from the Node ontology."""
+    return node_ontology()
+
+
+def ontology_assignment() -> dict:
+    """ticket id → lesson id, from the Node ontology."""
+    return {int(ticket): lesson for ticket, lesson in json.loads(node_ontology("--assignment")).items()}
 
 
 def generated_sources() -> dict:

@@ -1,6 +1,7 @@
-import { reportText } from "./load-ontology.mjs";
+import { assignmentText, reportText } from "./load-ontology.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-process.stdout.write(reportText(repo));
+const text = process.argv[2] === "--assignment" ? assignmentText(repo) : reportText(repo);
+process.stdout.write(text);

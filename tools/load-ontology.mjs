@@ -31,3 +31,9 @@ export function loadWorld(repo) {
 export function reportText(repo) {
   return `${JSON.stringify(loadWorld(repo).report(loadItems(repo)), null, 1)}\n`;
 }
+
+export function assignmentText(repo) {
+  const { assigned } = loadWorld(repo).deriveAssignment();
+  const ordered = Object.fromEntries(Object.entries(assigned).sort((a, b) => Number(a[0]) - Number(b[0])));
+  return `${JSON.stringify(ordered)}\n`;
+}

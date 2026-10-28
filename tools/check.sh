@@ -4,8 +4,9 @@
 #   PYTHON     interpreter with pytest            (default: python3)
 #   E2E_PYTHON interpreter with playwright        (default: $PYTHON; set E2E=0 to skip)
 #   VIDEO_PYTHON interpreter of the video venv    (video still tests skip without it)
-# Python still builds the site and the browser test. The ontology report is written
-# by Node (tools/ontology-report.mjs). New code is Node; do not add Python.
+# Python still builds the pages and the browser test. The ontology report and the
+# ticket-to-lesson assignment come from Node (tools/ontology-report.mjs).
+# New code is Node; do not add Python.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=${PYTHON:-python3}

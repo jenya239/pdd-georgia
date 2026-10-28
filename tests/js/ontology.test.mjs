@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { coversId } from "../../packages/domain/ontology.mjs";
-import { loadItems, loadWorld, reportText } from "../../tools/load-ontology.mjs";
+import { assignmentText, loadItems, loadWorld, reportText } from "../../tools/load-ontology.mjs";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const world = loadWorld(repo);
@@ -57,6 +57,15 @@ test("context norms are cited scenery, not the primary rule", () => {
   const errors = broken.integrityErrors();
   assert.ok(errors.includes("ticket 515: context norm 33.6 is its primary norm"));
   assert.ok(errors.includes("ticket 515: context norm 5.58 is not cited by the bank"));
+});
+
+test("the published assignment is the map whose counts the report lists", () => {
+  const assigned = JSON.parse(assignmentText(repo));
+  const report = JSON.parse(reportText(repo));
+  for (const [lesson, count] of Object.entries(report.assignment.derived)) {
+    assert.equal(Object.values(assigned).filter((value) => value === lesson).length, count);
+  }
+  assert.equal(Object.keys(assigned).length, Object.values(report.assignment.derived).reduce((sum, n) => sum + n, 0));
 });
 
 test("the report matches the committed ontology report, including our check items", () => {
