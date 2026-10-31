@@ -3,13 +3,13 @@
 <title>ПДД Грузии</title>
 <meta name="robots" content="noindex">
 <!-- Old links (…/pdd-georgia/episode.html?id=ep01) keep working while Pages serves the branch root:
-     forward them to the same page inside docs/. -->
+     forward them to the same page inside site/. -->
 <script>
 (function () {
   var p = location.pathname, base = "/pdd-georgia/";
   var i = p.indexOf(base);
   var rest = i >= 0 ? p.slice(i + base.length) : p.replace(/^\//, "");
-  if (rest.indexOf("docs/") !== 0) location.replace((i >= 0 ? p.slice(0, i) + base : "/") + "docs/" + rest + location.search + location.hash);
+  if (rest.indexOf("site/") !== 0) location.replace((i >= 0 ? p.slice(0, i) + base : "/") + "site/" + rest + location.search + location.hash);
 })();
 </script>
-</head><body><p>Страница не найдена. <a href="docs/">На главную</a></p></body></html>
+</head><body><p>Страница не найдена. <a href="site/">На главную</a></p></body></html>

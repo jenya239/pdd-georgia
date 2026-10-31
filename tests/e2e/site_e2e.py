@@ -1,7 +1,7 @@
-"""Headless browser test of the published site (docs/ as GitHub Pages serves it).
+"""Headless browser test of the published site (site/ as it is served).
 
-Run:  /workspace/.pwvenv/bin/python tests/e2e/site_e2e.py [--root=docs] [--shots=DIR]
-Exit code 0 = all checks passed. Screenshots go to --shots (default: none), never into docs/.
+Run:  /workspace/.pwvenv/bin/python tests/e2e/site_e2e.py [--root=site] [--shots=DIR]
+Exit code 0 = all checks passed. Screenshots go to --shots (default: none), never into site/.
 """
 import json, os, re, sys, tempfile
 from pathlib import Path
@@ -12,7 +12,7 @@ from serve import serve  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 ARGS = dict(a[2:].split("=", 1) for a in sys.argv[1:] if a.startswith("--") and "=" in a)
-ROOT = Path(ARGS.get("root", REPO / "docs"))
+ROOT = Path(ARGS.get("root", REPO / "site"))
 SHOTS = Path(ARGS["shots"]) if "shots" in ARGS else None
 LOAD_T = "import('./assets/app/data.mjs').then(m => m.loadTickets())"
 LOAD_E = "import('./assets/app/data.mjs').then(m => m.loadEpisodes())"
@@ -63,17 +63,17 @@ def answer_current(page, correct=True):
 
 
 def legacy_root():
-    """While Pages still serves the branch root, the root index.html / 404.html forward into docs/."""
+    """While Pages still serves the branch root, the root index.html / 404.html forward into site/."""
     base, stop = serve(REPO)
     with sync_playwright() as p:
         br = launch(p)
         page = br.new_page()
         page.goto(base)
-        page.wait_for_url("**/docs/**")
-        check(page.url == base + "docs/", f"root redirects to docs/ ({page.url})")
+        page.wait_for_url("**/site/**")
+        check(page.url == base + "site/", f"root redirects to site/ ({page.url})")
         page.goto(base + "episode.html?id=ep01#tk")
-        page.wait_for_url("**/docs/**")
-        check(page.url == base + "docs/episode.html?id=ep01#tk", f"old deep link forwarded ({page.url})")
+        page.wait_for_url("**/site/**")
+        check(page.url == base + "site/episode.html?id=ep01#tk", f"old deep link forwarded ({page.url})")
         page.wait_for_selector(".points li")
         check(page.locator(".points li").count() > 0, "forwarded episode page renders")
         br.close()
@@ -187,10 +187,10 @@ def breakdowns(br, base):
           "breakdown: one line per wrong option + lesson link")
     d.evaluate("e => e.scrollIntoView({block: 'end'})")
     shot(page, "breakdown_open.png")
-    page.goto(base + "practice.html?ids=1")
+    page.goto(base + "practice.html?ids=4")
     page.wait_for_selector("#set option[value=ids]", state="attached")
     page.click("#go")
-    page.wait_for_selector('.q[data-id="1"] .ans')
+    page.wait_for_selector('.q[data-id="4"] .ans')
     answer_current(page)
     check(page.locator(".q .fb .verdict").count() == 1 and page.locator('.tdet [data-tab="br"], .br').count() == 0, "ticket without breakdown: no «Разбор» tab")
     page.close()

@@ -65,7 +65,7 @@ function list() {
     : stats.map(item).join("");
   L.querySelectorAll("details.err").forEach(d => d.addEventListener("toggle", () => {
     const w = d.querySelector(".qwrap");
-    if (d.open && !w.firstChild) { const s = stats.find(x => x.id == d.dataset.id); renderQuestion(w, D.byId[s.id], { mode: "instant", reveal: true, selected: s.lastChoice }); }
+    if (d.open && !w.firstChild) { const s = stats.find(x => x.id == d.dataset.id); renderQuestion(w, D.byId[s.id], { mode: "instant", reveal: true, selected: s.lastChoice, onUndo: () => list() }); }
   }));
 }
 
@@ -92,6 +92,11 @@ function drill() {
       n.className = "small"; n.textContent = ok ? `Серия верных: ${r.k} из ${MASTERY_STREAK}.` : "Ошибка: серия сброшена, билет вернётся позже.";
       fb.prepend(n);
       $("#next").disabled = false; $("#next").focus();
+    }, onUndo: () => {
+      $("#next").disabled = true;
+      const left = drillQueue(st.progress(), pool), k = (st.progress()[id] || {}).k || 0;
+      const line = m.querySelector("p.small");
+      if (line) line.textContent = `Осталось ${left.length}. Билет уходит из разбора после ${MASTERY_STREAK} верных ответов подряд; у этого сейчас ${k} из ${MASTERY_STREAK}.`;
     } });
     $("#next").onclick = step;
   }

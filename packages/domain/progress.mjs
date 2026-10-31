@@ -61,6 +61,58 @@ export function applyAnswer(rec, { ok, choice, now, where }) {
   return next;
 }
 
+function replay(attempts) {
+  let r = null;
+  for (const a of attempts) r = applyAnswer(r, { ok: !!a.ok, choice: a.c, now: a.t, where: a.w });
+  return r;
+}
+
+/**
+ * Drop the latest attempt.
+ * Returns null when that attempt is not in `h` (a record from schema ≤ 2, or history that does not end at `t`).
+ * `record` is null when the dropped attempt was the only one.
+ * `k` matches a full replay, except when the streak continues into attempts that fell out of the cap
+ * and those unseen attempts are not all correct: then `k` is the trailing correct run still in `h`.
+ */
+export function undoLast(rec) {
+  const cur = normalizeRecord(rec);
+  if (!cur?.h?.length) return null;
+  const last = cur.h[cur.h.length - 1];
+  if (last.t !== cur.t || last.ok !== cur.l) return null;
+  const rest = cur.h.slice(0, -1);
+  if (cur.h.length === cur.s) return { record: replay(rest), undone: last };
+  if (!rest.length) return null;
+  const prev = rest[rest.length - 1];
+  const next = { s: cur.s - 1, c: cur.c - last.ok, w: cur.w - (1 - last.ok), l: prev.ok, t: prev.t, h: rest };
+  if (last.ok) next.k = Math.max(0, (cur.k || 0) - 1);
+  else {
+    let trail = 0;
+    for (let i = rest.length - 1; i >= 0 && rest[i].ok; i--) trail++;
+    const earlierS = cur.s - cur.h.length;
+    const earlierW = next.w - rest.filter(a => !a.ok).length;
+    next.k = trail + (trail === rest.length && earlierW <= 0 ? earlierS : 0);
+  }
+  if (last.ok) {
+    if (cur.p) next.p = { ...cur.p };
+    if (typeof cur.lw === "number") next.lw = cur.lw;
+    if (isCount(cur.lc)) next.lc = cur.lc;
+  } else {
+    if (cur.p && last.c != null && cur.p[last.c]) {
+      const p = { ...cur.p };
+      if (p[last.c] > 1) p[last.c] -= 1;
+      else delete p[last.c];
+      if (Object.keys(p).length) next.p = p;
+    } else if (cur.p) next.p = { ...cur.p };
+    const prevWrong = [...rest].reverse().find(a => !a.ok);
+    if (prevWrong) {
+      next.lw = prevWrong.t;
+      if (prevWrong.c != null) next.lc = prevWrong.c;
+    }
+  }
+  const record = normalizeRecord(next);
+  return record ? { record, undone: last } : null;
+}
+
 export const isMastered = (rec, streak = MASTERY_STREAK) => !!rec && (rec.k || 0) >= streak;
 
 export function migrateProgress(raw) {

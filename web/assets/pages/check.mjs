@@ -67,6 +67,14 @@ function play(run) {
     st.saveActiveRun(run);
     await record(id, ok, choice, "check");
     $("#next").disabled = false; $("#next").focus();
+  }, onUndo: () => {
+    if (run.answers[id] == null && run.answers[String(id)] == null) return;
+    const answers = { ...run.answers };
+    delete answers[id];
+    delete answers[String(id)];
+    run = { ...run, answers };
+    st.saveActiveRun(run);
+    $("#next").disabled = true;
   } });
   $("#next").onclick = () => play(run);
 }

@@ -1,8 +1,11 @@
 /** Renders one exam question (a bank ticket or an own check item) with instant or exam-mode answering.
- *  After an answer the verdict is followed by the one post-answer panel (./details.mjs); nothing during a running exam. */
+ *  After an answer the verdict is followed by the one post-answer panel (./details.mjs).
+ *  During a running exam the panel stays hidden. Undo there only clears this question's current choice:
+ *  the attempt is written to progress when the exam finishes, so the button must not touch the store. */
 import { esc } from "./dom.mjs";
 import { loadedTickets } from "./data.mjs";
 import { record, store } from "./progress.mjs";
+import { undoLast } from "../domain/progress.mjs";
 import { zoom } from "./layout.mjs";
 import { renderDetails } from "./details.mjs";
 import { figureSvg } from "../domain/figure.mjs";
@@ -59,9 +62,41 @@ export function renderQuestion(el, t, opts = {}) {
     return ok;
   }
   const details = choice => renderDetails(el.querySelector(".fb"), t, choice);
+  function placeUndo() {
+    el.querySelector("[data-undo]")?.remove();
+    const runningExam = opts.mode === "exam";
+    if (runningExam ? state.choice == null : !undoLast(store.progress()[t.id])) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn ghost undo";
+    b.dataset.undo = "";
+    b.textContent = "Отменить последний ответ";
+    b.onclick = () => {
+      if (runningExam) {
+        renderQuestion(el, t, { ...opts, reveal: false, selected: null });
+        opts.onUndo && opts.onUndo(null, { session: true });
+        return;
+      }
+      const res = store.undoAnswer(t.id);
+      if (!res) return;
+      const session = state.answered;
+      renderQuestion(el, t, { ...opts, reveal: false, selected: null });
+      opts.onUndo && opts.onUndo(res.undone, { session });
+    };
+    const fb = el.querySelector(".fb");
+    const verdict = fb.querySelector(".verdict");
+    if (verdict) verdict.insertAdjacentElement("afterend", b);
+    else fb.append(b);
+  }
   if (opts.mode === "exam") {
     if (state.choice != null) btns[state.choice].classList.add("sel");
-    btns.forEach((b, i) => b.onclick = () => { btns.forEach(x => x.classList.remove("sel")); b.classList.add("sel"); state.choice = i; opts.onAnswer && opts.onAnswer(i, i === t.c); });
+    btns.forEach((b, i) => b.onclick = () => {
+      btns.forEach(x => x.classList.remove("sel"));
+      b.classList.add("sel");
+      state.choice = i;
+      opts.onAnswer && opts.onAnswer(i, i === t.c);
+      placeUndo();
+    });
   } else if (opts.reveal) {
     reveal(opts.selected ?? null);
     details(opts.selected ?? null);
@@ -72,8 +107,10 @@ export function renderQuestion(el, t, opts = {}) {
       if (!opts.noRecord) record(t.id, ok, i, opts.where || "practice");
       opts.onAnswer && opts.onAnswer(i, ok);   // callers with noRecord record synchronously here, before the panel reads history
       details(i);
+      placeUndo();
     });
   }
+  placeUndo();
   el._pick = i => { if (i < btns.length && !btns[i].disabled) btns[i].click(); };
   el._state = state;
   return el;

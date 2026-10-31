@@ -1,4 +1,4 @@
-"""Permanent norm ids: one stable, human-readable slug per norm (docs/norm/<slug>.html)."""
+"""Permanent norm ids: one stable, human-readable slug per norm (site/norm/<slug>.html)."""
 import json
 
 import pytest

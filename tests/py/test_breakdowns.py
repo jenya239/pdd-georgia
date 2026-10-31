@@ -75,9 +75,14 @@ def test_ticket_must_be_assigned(world):
 
 def test_repository_breakdowns_are_valid_and_varied(world):
     items = breakdowns.load()
-    assert len(items) == 10 and breakdowns.validate(items, world) == []
-    lessons = {world.derive_assignment()["assigned"][b["ticket"]] for b in items}
-    assert lessons == {"ep02", "ep03", "ep04", "ep05", "ep06"}
+    assert breakdowns.validate(items, world) == []
+    assigned = world.derive_assignment()["assigned"]
+    lessons = {assigned[b["ticket"]] for b in items}
+    assert {"ep02", "ep03", "ep04", "ep05", "ep06"} <= lessons
+    got = {b["ticket"] for b in items}
+    for lesson in ("ep02", "ep03", "ep04", "ep05", "ep06"):
+        ids = {tid for tid, les in assigned.items() if les == lesson}
+        assert ids <= got, f"{lesson} missing {sorted(ids - got)}"
 
 
 def test_built_tickets_carry_linked_breakdowns():
@@ -87,6 +92,6 @@ def test_built_tickets_carry_linked_breakdowns():
     for t in with_br:
         br = t["br"]
         assert br["lesson"]["id"] == t["lesson"] and br["lesson"]["title"]
-        assert all(q["n"] and q["ref"].startswith(("ст.", "Прил")) for q in br["quotes"])
+        assert all(q["n"] and q["ref"].startswith(("ст.", "прил.", "Прил")) for q in br["quotes"])
         assert {w["i"] for w in br["why_not"]} == set(range(len(t["a"]["ru"]))) - {t["c"]}
         assert br["concepts"] and all(isinstance(c, str) for c in br["concepts"])

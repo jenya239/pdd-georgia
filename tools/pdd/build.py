@@ -1,7 +1,7 @@
-"""Site build: assembles the published directory (docs/) from web/, packages/domain, content/ and data/.
+"""Site build: assembles the published directory (site/) from web/, packages/domain, content/ and data/.
 
-    python3 tools/build.py            # rebuild docs/
-    python3 tools/build.py --check    # fail if docs/ is not what the sources produce
+    python3 tools/build.py            # rebuild site/
+    python3 tools/build.py --check    # fail if site/ is not what the sources produce
 
 Generated files (data/*.json, lessons/*.html) are produced in memory; static files are copied.
 Nothing outside the repository is read."""
@@ -50,6 +50,22 @@ def load_lesson(lesson_dir: Path):
         for name in [n for n, m in sys.modules.items() if getattr(m, "__file__", None) and
                      Path(m.__file__).parent == lesson_dir]:
             del sys.modules[name]
+
+
+def render_plain_lesson(lesson_id: str) -> str | None:
+    """HTML of content/lessons/<id>/plain.mjs, or None when that edition does not exist.
+
+    Figures are the lesson's existing figs.py. The statute quotes stay inside the module.
+    """
+    if not (paths.LESSONS / lesson_id / "plain.mjs").is_file():
+        return None
+    completed = subprocess.run(
+        ["node", "tools/render-plain-lesson.mjs", lesson_id],
+        cwd=paths.REPO, capture_output=True, text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or f"plain lesson {lesson_id} failed")
+    return completed.stdout
 
 
 def lesson_asset_refs(html: str, prefix: str) -> list:
@@ -151,7 +167,7 @@ def generate():
     if errors:
         raise ValueError("own check items are invalid:\n" + "\n".join(errors))
 
-    files, copies, lessons = {}, {}, {}
+    files, copies, lessons, plains = {}, {}, {}, {}
     for ep in eps:
         ep["kind"] = episode_kind(ep)
         own = [i["id"] for i in items if i["lesson"] == ep["id"]]
@@ -167,12 +183,28 @@ def generate():
             assert q["text"], q
         for k in EPISODE_SOURCE_KEYS:
             ep.pop(k, None)
+        plain = render_plain_lesson(ep["id"])
+        if plain and ep["kind"] != "text":
+            plains[ep["id"]] = plain
+            ep["editions"] = [
+                {"id": "dialogue", "label": "Ролик", "href": ep["video"]},
+                {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
+            ]
         if ep["kind"] == "text":
             lesson_dir = paths.LESSONS / ep["id"]
             html = load_lesson(lesson_dir).render()
             lessons[ep["id"]] = html
+            if plain:
+                plains[ep["id"]] = plain
+                ep["editions"] = [
+                    {"id": "dialogue", "label": "С диалогом", "href": ep["lesson"]},
+                    {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
+                ]
             prefix = f"lessons/{ep['id']}/"
-            for name in lesson_asset_refs(html, prefix):
+            names = set(lesson_asset_refs(html, prefix))
+            if plain:
+                names |= set(lesson_asset_refs(plain, prefix))
+            for name in sorted(names):
                 src = lesson_dir / name
                 copies[prefix + name] = src if src.exists() else paths.SIGNS / name
         for key in ("poster", "video"):
@@ -183,10 +215,12 @@ def generate():
                 copies[rel] = paths.MEDIA / rel[len("media/"):]
 
     items_export = checkitems.export(items, world)
-    linker = normsite.link_content(world.norms, world, eps, lessons, tickets, Q, idx.quotes, items_export)
+    linker = normsite.link_content(world.norms, world, eps, lessons, tickets, Q, idx.quotes, items_export, plains)
     for ep in eps:
         if ep["id"] in lessons:
             files[ep["lesson"]] = lessons[ep["id"]]
+        if ep["id"] in plains:
+            files[f"lessons/{ep['id']}-plain.html"] = plains[ep["id"]]
     norm_pages, norm_copies, _ = normsite.norm_files(world.norms, world, linker, eps, tickets, items_export)
     files.update(norm_pages)
     copies.update(norm_copies)

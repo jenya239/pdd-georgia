@@ -1,6 +1,6 @@
 """Permanent ids of norms: ontology id ⇄ URL slug, citation label, lazy-chunk name.
 
-Scheme (docs/norm/<slug>.html; README "Постоянные ссылки на нормы"):
+Scheme (site/norm/<slug>.html; README "Постоянные ссылки на нормы"):
   article            5 → st5,        11¹ → st11_1
   paragraph          5.13 → st5-p13, 21.3¹ → st21-p3_1, 21.15^2 → st21-p15_2
   sub-point          37.6.а.а → st37-p6-a-a   (Russian letters transliterated)

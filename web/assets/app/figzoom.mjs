@@ -30,6 +30,7 @@ function openFull(fig, opener) {
 }
 
 export function enhanceFigures(root) {
+  root.querySelectorAll(":scope > .fighint, .fighint").forEach(n => n.remove());
   const figs = [...root.querySelectorAll("figure.fig")].filter(f => f.querySelector("svg"));
   const hints = figs.map(fig => {
     const hint = document.createElement("p");
@@ -42,6 +43,10 @@ export function enhanceFigures(root) {
     return [fig, hint];
   });
   const update = () => hints.forEach(([fig, hint]) => { hint.hidden = !overflowsX(fig.scrollWidth, fig.clientWidth); });
+  root._figUpdate = update;
+  if (!root._figListen) {
+    root._figListen = () => root._figUpdate?.();
+    addEventListener("resize", root._figListen);
+  }
   update();
-  addEventListener("resize", update);
 }

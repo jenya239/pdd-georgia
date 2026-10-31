@@ -58,3 +58,34 @@ def test_svg_ids_unique_and_refs_resolve(lesson):
 def test_no_unrecorded_questions_in_lesson_text(lesson):
     """Own questions live in content/checkitems (recorded, validated), not as ad-hoc blocks in the text."""
     assert 'class="q card ownq"' not in lesson[1] and 'id="own"' not in lesson[1]
+
+
+PLAIN = ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06"]
+
+
+@pytest.fixture(scope="module")
+def plain_lessons():
+    from pdd.build import render_plain_lesson
+    return [(lid, render_plain_lesson(lid)) for lid in PLAIN]
+
+
+def test_plain_editions_keep_the_statute_and_drop_the_characters(plain_lessons, law_text):
+    for name, html in plain_lessons:
+        assert html
+        bq = re.findall(r'<blockquote class="lq"[^>]*><p>(.*?)</p>', html, re.S)
+        assert len(bq) >= 6
+        bad = [p[:90] for q in bq for p in re.split(r"\s*…\s*", norm(re.sub(r"<[^>]+>", "", q)).strip("«»"))
+               if p and p.rstrip(";.") not in law_text]
+        assert bad == []
+        text = norm(re.sub(r"<[^>]+>", "", html))
+        inl = [m.group(1) for m in re.finditer(r"«([^«»]{25,})»[^«»]{0,40}?\((?:ст\.|прил\.)", text)]
+        miss = [q[:80] for q in inl if any(p.strip().rstrip(";.,") not in law_text for p in q.split("…") if p.strip())]
+        assert miss == []
+        assert "Аня" not in html and "Макс" not in html and "Сергей" not in html
+        assert 'class="chat"' not in html and 'class="say ' not in html
+        assert html.count('class="ask"') >= 4
+        assert "<!--AFTER-TICKETS-->" in html
+        ids = re.findall(r'\sid="([^"]+)"', html)
+        assert len(ids) == len(set(ids))
+        defs = [i for i in ids if re.search(r"<(marker|pattern|linearGradient|clipPath)[^>]*id=\"" + re.escape(i), html)]
+        assert defs and all(i.startswith(name + "-") for i in defs), defs

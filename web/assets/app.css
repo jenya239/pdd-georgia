@@ -102,6 +102,7 @@ details.law summary{cursor:pointer;font-weight:600;font-size:14px}
 .fb{margin-top:12px}
 .verdict{font-weight:700;margin-bottom:6px}
 .verdict.ok{color:var(--ok)}.verdict.bad{color:var(--bad)}
+.q .undo{margin:8px 0}
 .expl{font-size:15px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
 .expl .exru{margin-top:2px}
 .expl details.exka{margin-top:6px}
@@ -155,6 +156,11 @@ footer{max-width:1040px;margin:0 auto;padding:20px 16px 40px;color:var(--mut);fo
 .bub{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
 .say.t .bub{background:var(--acc2);border-color:transparent}
 .who{display:block;font-size:12px;color:var(--mut);margin-bottom:2px}
+.editions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.editions button{font:inherit;border:1px solid var(--line);background:transparent;color:inherit;border-radius:8px;padding:6px 12px;cursor:pointer}
+.editions button[aria-pressed="true"]{border-color:var(--acc);background:var(--acc);color:#fff}
+.ask{margin:16px 0;padding:10px 14px;border-left:3px solid var(--warn);background:var(--warnbg);border-radius:0 8px 8px 0}
+.ask p{margin:0}
 .lq{margin:14px 0;padding:10px 14px;border-left:3px solid var(--acc);background:var(--bg2);border-radius:0 8px 8px 0}
 .lq p{margin:0}
 .lq cite{display:block;font-size:12px;color:var(--mut);font-style:normal;margin-top:4px}

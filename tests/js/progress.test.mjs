@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { applyAnswer, normalizeRecord, migrateProgress, mergeProgress, isMastered, MASTERY_STREAK, HISTORY_CAP, WHERE } from "../../packages/domain/progress.mjs";
+import { applyAnswer, undoLast, normalizeRecord, migrateProgress, mergeProgress, isMastered, MASTERY_STREAK, HISTORY_CAP, WHERE } from "../../packages/domain/progress.mjs";
 
 test("first correct answer creates a record with streak 1", () => {
   assert.deepEqual(applyAnswer(undefined, { ok: true, choice: 2, now: 1000 }),
@@ -77,6 +77,51 @@ test("every answer is kept in the per-ticket history with the place it was given
   assert.equal(r.h[HISTORY_CAP - 1].t, 10 + HISTORY_CAP + 4);
   assert.equal(r.s, HISTORY_CAP + 7, "counters still count every answer");
   assert.ok(Object.keys(WHERE).includes("drill") && WHERE.check);
+});
+
+test("undoLast restores the previous record, and a sole answer clears the ticket", () => {
+  const first = applyAnswer(undefined, { ok: false, choice: 1, now: 1, where: "lesson" });
+  const second = applyAnswer(first, { ok: true, choice: 0, now: 2, where: "practice" });
+  assert.deepEqual(undoLast(second), { record: first, undone: { t: 2, c: 0, ok: 1, w: "practice" } });
+  assert.deepEqual(undoLast(first), { record: null, undone: { t: 1, c: 1, ok: 0, w: "lesson" } });
+  assert.equal(undoLast(null), null);
+  assert.equal(undoLast({ s: 2, c: 1, w: 1, l: 1, t: 9, k: 1 }), null);
+});
+
+test("undoLast past the history cap keeps the counters and the previous streak", () => {
+  let prev = null, cur = null;
+  for (let i = 0; i < HISTORY_CAP + 5; i++) {
+    prev = cur;
+    cur = applyAnswer(cur, { ok: true, choice: 1, now: i + 1, where: "practice" });
+  }
+  const frozen = JSON.parse(JSON.stringify(cur));
+  const next = undoLast(cur).record;
+  assert.equal(next.s, prev.s);
+  assert.equal(next.k, prev.k);
+  assert.equal(next.t, prev.t);
+  assert.equal(next.l, prev.l);
+  assert.equal(next.h[0].t, cur.h[0].t, "an attempt that already fell out of the cap stays out");
+  assert.deepEqual(cur, frozen);
+  prev = cur;
+  cur = applyAnswer(cur, { ok: false, choice: 2, now: 999, where: "check" });
+  const back = undoLast(cur).record;
+  assert.equal(back.s, prev.s);
+  assert.equal(back.k, prev.k);
+  assert.equal(back.w, 0);
+  assert.equal(back.l, 1);
+});
+
+test("when unseen attempts before the cap are mixed, the restored streak is the run still in history", () => {
+  let cur = null;
+  for (let i = 0; i < 5; i++) cur = applyAnswer(cur, { ok: false, choice: 1, now: i + 1 });
+  for (let i = 0; i < HISTORY_CAP; i++) cur = applyAnswer(cur, { ok: true, choice: 0, now: 100 + i });
+  cur = applyAnswer(cur, { ok: false, choice: 2, now: 1000, where: "lesson" });
+  const next = undoLast(cur).record;
+  assert.equal(next.s, 5 + HISTORY_CAP);
+  assert.equal(next.w, 5);
+  assert.equal(next.k, HISTORY_CAP - 1);
+  assert.equal(isMastered(next), true);
+  assert.deepEqual(next.p, { 1: 5 });
 });
 
 test("schema-2 records (aggregate counters only) migrate without history; bad history entries are dropped", () => {

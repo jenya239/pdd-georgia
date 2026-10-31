@@ -2,7 +2,8 @@
  * Storage adapter. `backend` is anything with getItem/setItem/removeItem (window.localStorage
  * in the browser, memoryBackend() in tests). All domain rules live in the pure modules.
  */
-import { applyAnswer, migrateProgress } from "./progress.mjs";
+import { applyAnswer, migrateProgress, undoLast } from "./progress.mjs";
+import { forgetLesson } from "./forget.mjs";
 import { makeBundle, parseBundle, applyImport, previewImport, cleanState, cleanNotes } from "./bundle.mjs";
 import { STORAGE, KEYS, RETIRED, APP_VERSION } from "./registry.mjs";
 
@@ -57,6 +58,31 @@ export function createStore(backend) {
       write(KEYS.progress, p);
       return p[id];
     },
+    /** Drops the latest attempt. A paused check loses this ticket only when that attempt was given there and matches. */
+    undoAnswer(id) {
+      const p = progress();
+      const res = undoLast(p[id]);
+      if (!res) return null;
+      if (res.record) p[id] = res.record;
+      else delete p[id];
+      write(KEYS.progress, p);
+      if (res.undone.w === "check") {
+        const a = actives();
+        let changed = false;
+        for (const [lesson, run] of Object.entries(a)) {
+          if (!run?.answers) continue;
+          const key = Object.keys(run.answers).find(k => k === String(id));
+          const ans = key ? run.answers[key] : null;
+          if (!ans || ans.choice !== res.undone.c || !!ans.ok !== !!res.undone.ok) continue;
+          const answers = { ...run.answers };
+          delete answers[key];
+          a[lesson] = { ...run, answers };
+          changed = true;
+        }
+        if (changed) write(KEYS.active, a);
+      }
+      return res;
+    },
     activeRun: lesson => actives()[lesson] ?? null,
     saveActiveRun(run) { write(KEYS.active, { ...actives(), [run.lesson]: run }); },
     clearActiveRun(lesson) { const a = actives(); delete a[lesson]; write(KEYS.active, a); },
@@ -91,5 +117,13 @@ export function createStore(backend) {
       return previewImport(next, {}, "merge").before;
     },
     resetAll() { STORAGE.forEach(s => backend.removeItem(s.key)); },
+    /** Drops answers and cumulative-check history of one lesson. Notes, exams and settings stay. */
+    resetLesson(lessonId, ids) {
+      const next = forgetLesson({ progress: progress(), runs: runs(), active: actives() }, lessonId, ids);
+      write(KEYS.progress, next.progress);
+      write(KEYS.runs, next.runs);
+      write(KEYS.active, next.active);
+      return next;
+    },
   };
 }

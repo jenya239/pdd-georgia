@@ -1,5 +1,5 @@
 """Own check items («наш вопрос») for the released lessons: loading, validation against the law and the
-ontology, and export to docs/data/items.json.
+ontology, and export to site/data/items.json.
 
 An item never states a rule of its own: its answer is backed by a verbatim quote of a norm that the lesson
 (or an earlier one) teaches, and it may only use concepts introduced (or assumed) by then.

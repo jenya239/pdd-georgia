@@ -1,4 +1,4 @@
-"""The published tree (docs/) is a pure function of the repository; it must be committed fresh."""
+"""The published tree (site/) is a pure function of the repository; it must be committed fresh."""
 import re
 from pathlib import Path
 

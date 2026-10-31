@@ -2,7 +2,7 @@
  * Hover panel for norm links (a.nref): the referenced text beside the line, with the permanent link.
  * Desktop: opens after a short hover delay (or on keyboard focus) in the margin next to the text column and stays
  * open while the pointer is over it. Touch / narrow screens: a tap opens a bottom sheet. Esc closes.
- * Texts are fetched lazily, one small JSON chunk per article / annex section (docs/norm/chunks/*.json).
+ * Texts are fetched lazily, one small JSON chunk per article / annex section (site/norm/chunks/*.json).
  */
 import { esc, toast } from "./dom.mjs";
 import { chunkOf, clip, placePanel } from "../domain/normlinks.mjs";

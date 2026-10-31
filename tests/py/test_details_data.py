@@ -1,5 +1,5 @@
 """Data behind the post-answer «Нормы» tab: per ticket / own item the checked and context norms
-(slug + citation), the course concepts, and the lesson names (docs/data/*.json)."""
+(slug + citation), the course concepts, and the lesson names (site/data/*.json)."""
 import json
 
 from pdd import paths

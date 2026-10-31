@@ -32,7 +32,11 @@ import { shuffle } from "../domain/scope.mjs";
   }
   function go(k) {
     i = Math.max(0, Math.min(N - 1, k));
-    renderQuestion($("#qbox"), qs[i], { mode: "exam", index: i, total: N, selected: ans[i], onAnswer: a => { ans[i] = a; grid(); } });
+    renderQuestion($("#qbox"), qs[i], {
+      mode: "exam", index: i, total: N, selected: ans[i],
+      onAnswer: a => { ans[i] = a; grid(); },
+      onUndo: () => { ans[i] = null; grid(); },
+    });
     grid(); $("#prev").disabled = i === 0; $("#next").textContent = i < N - 1 ? "Дальше →" : "К первому без ответа";
   }
   function grid() {
@@ -45,7 +49,7 @@ import { shuffle } from "../domain/scope.mjs";
   $("#finish").onclick = () => { const left = ans.filter(a => a == null).length; if (!left || confirm(`Без ответа ${left} — завершить экзамен?`)) finish(false); };
   $("#start").onclick = start;
   document.addEventListener("keydown", e => {
-    if ($("#run").style.display === "none" || e.target.closest("select,input")) return;
+    if ($("#run").style.display === "none" || e.target.closest("select,input,textarea,[data-undo]")) return;
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= 4) { $("#qbox")._pick(n - 1); e.preventDefault(); }
     else if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); $("#next").click(); }

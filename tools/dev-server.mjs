@@ -97,7 +97,7 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPat
 if (isMain) {
   const host = option("host", "127.0.0.1");
   const port = Number(option("port", "8000"));
-  const root = path.resolve(repoRoot, option("root", "docs"));
+  const root = path.resolve(repoRoot, option("root", "site"));
   startPagesServer({ root, host, port }).then(({ url }) => {
     console.log(url);
   });

@@ -8,7 +8,7 @@ CONTENT = REPO / "content"
 DATA = REPO / "data"
 SOURCES = DATA / "sources"
 TICKETS = DATA / "tickets"
-DOCS = REPO / "docs"
+DOCS = REPO / "site"
 
 LAW_RU = SOURCES / "law_ru_matsne_pub36_2026-06-25.txt"
 LAW_KA = SOURCES / "law_ka_matsne_pub36_2026-06-25.txt"

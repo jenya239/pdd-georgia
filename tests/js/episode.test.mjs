@@ -17,3 +17,21 @@ test("lesson body is split at the tickets marker", () => {
 test("lessons carry no ad-hoc question widget (own questions are recorded items)", () => {
   assert.equal(Episode.ownQuestionVerdict, undefined);
 });
+
+test("a lesson lists only editions that can be opened", () => {
+  assert.deepEqual(Episode.lessonEditions({}), []);
+  assert.deepEqual(Episode.lessonEditions({
+    editions: [{ id: "dialogue", href: "lessons/ep04.html" }, { id: "", href: "x" }, { label: "нет" }, null],
+  }), [{ id: "dialogue", href: "lessons/ep04.html" }]);
+});
+
+test("the saved edition is used when the lesson has it, otherwise the first", () => {
+  const editions = [
+    { id: "dialogue", href: "lessons/ep04.html", label: "С диалогом" },
+    { id: "plain", href: "lessons/ep04-plain.html", label: "Без персонажей" },
+  ];
+  assert.equal(Episode.pickEdition(editions, "plain").id, "plain");
+  assert.equal(Episode.pickEdition(editions, "missing").id, "dialogue");
+  assert.equal(Episode.pickEdition(editions, undefined).id, "dialogue");
+  assert.equal(Episode.pickEdition([], "plain"), null);
+});

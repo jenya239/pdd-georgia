@@ -70,6 +70,40 @@ test("notes: one free-text note per ticket, empty text deletes it, they travel w
   assert.equal(phone.previewText(phone.exportText(21)).file.notes, 1);
 });
 
+test("resetLesson forgets one lesson and leaves notes and other answers", () => {
+  const st = createStore(memoryBackend());
+  st.recordAnswer(20, { ok: true, choice: 0, now: 1, where: "lesson" });
+  st.recordAnswer(54, { ok: false, choice: 1, now: 2, where: "practice" });
+  st.saveNote(20, "зебра", 3);
+  st.addExam({ d: 4, ok: 25, pass: true, s: 100 });
+  st.finishRun("ep03", { id: "old", lesson: "ep03", date: 1, total: 1, correct: 1, score: 100, wrong: [] });
+  st.finishRun("ep04", { id: "done", lesson: "ep04", date: 2, total: 1, correct: 0, score: 0, wrong: [20] });
+  st.saveActiveRun({ id: "r", lesson: "ep04", ids: [20], answers: { 20: { choice: 0, ok: true } } });
+  st.saveActiveRun({ id: "later", lesson: "ep05", ids: [20, 54], answers: { 20: { choice: 0, ok: true }, 54: { choice: 1, ok: false } } });
+  st.resetLesson("ep04", [20]);
+  assert.equal(st.progress()[20], undefined);
+  assert.equal(st.progress()[54].l, 0);
+  assert.equal(st.notes()[20].x, "зебра");
+  assert.equal(st.exams().length, 1);
+  assert.equal(st.activeRun("ep04"), null);
+  assert.deepEqual(st.activeRun("ep05").answers, { 54: { choice: 1, ok: false } });
+  assert.deepEqual(st.runs().map(r => r.lesson), ["ep03"]);
+});
+
+test("undoAnswer drops the latest attempt and a matching paused check", () => {
+  const st = createStore(memoryBackend());
+  st.recordAnswer(20, { ok: false, choice: 1, now: 1, where: "check" });
+  st.recordAnswer(20, { ok: true, choice: 0, now: 2, where: "practice" });
+  st.saveActiveRun({ id: "r", lesson: "ep04", ids: [20], answers: { 20: { choice: 1, ok: false } } });
+  st.undoAnswer(20);
+  assert.equal(st.progress()[20].s, 1);
+  assert.deepEqual(st.activeRun("ep04").answers, { 20: { choice: 1, ok: false } });
+  st.undoAnswer(20);
+  assert.equal(st.progress()[20], undefined);
+  assert.deepEqual(st.activeRun("ep04").answers, {});
+  assert.equal(st.undoAnswer(20), null);
+});
+
 test("answers remember where they were given", () => {
   const st = createStore(memoryBackend());
   st.recordAnswer(3, { ok: true, choice: 1, now: 1, where: "check" });

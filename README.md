@@ -22,7 +22,7 @@ web/                страницы сайта: *.html (без инлайн-с�
   assets/app/         общий слой страниц: dom, prefs (тема), data (загрузка JSON), progress, layout, question
   assets/pages/       по одному модулю на страницу (index, episode, check, errors, practice, exam, about)
 tools/              сборка и конвейеры данных (Python)
-  build.py            точка входа сборки → docs/
+  build.py            точка входа сборки → site/
   pdd/                чистые функции: assign (билет→урок), episodes, lawparse, plan, lessonkit; build = ввод-вывод
   pdd/tickets/        scrape → parse → fetch_images → build_tickets
   check.sh            все проверки разом
@@ -31,33 +31,36 @@ video/              видеоконвейер
   engine/             общий движок: core (кадры PIL → ffmpeg), lib (рисование), cast (персонажи, голоса), tts, assemble, subs, music, final.sh
   episodes/epNN/      только своё: scenes.py (сценарий), boards.py (доски), timeline.json
 tests/              js (node --test), py (pytest), video (кадры против эталонов), e2e (Playwright)
-docs/               СОБРАННЫЙ САЙТ (артефакт сборки, коммитится, его публикует Pages)
+site/               СОБРАННЫЙ САЙТ (артефакт сборки, коммитится)
+docs/               документация по разработке (не публикуемый сайт)
 ci/test.yml         шаблон workflow GitHub Actions (см. «CI»)
 ```
 
-Зависимости направлены в одну сторону: `content` + `data` → `tools` → `docs`; страницы (`web/assets/pages`) → `web/assets/app` → `packages/domain`. Доменные модули не знают про DOM и `localStorage`: хранилище подключается адаптером `createStore(backend)` (в браузере `localStorage`, в тестах `memoryBackend()`).
+Зависимости направлены в одну сторону: `content` + `data` → `tools` → `site`; страницы (`web/assets/pages`) → `web/assets/app` → `packages/domain`. Доменные модули не знают про DOM и `localStorage`: хранилище подключается адаптером `createStore(backend)` (в браузере `localStorage`, в тестах `memoryBackend()`).
 
 Сборка читает только файлы внутри репозитория (это проверяет `tests/py/test_build.py`).
 
 ## Сборка
 
 ```
-python3 tools/build.py           # пересобрать docs/
-python3 tools/build.py --check   # только проверить, что docs/ актуален (ничего не пишет)
+python3 tools/build.py           # пересобрать site/
+python3 tools/build.py --check   # только проверить, что site/ актуален (ничего не пишет)
 python3 tools/build.py --out=DIR # собрать в другую папку
 ```
-Сборка генерирует `docs/data/tickets.json`, `docs/data/items.json` (наши вопросы и заблуждения), `docs/data/episodes.json`, HTML текстовых уроков, копирует страницы, `web/assets`, `packages/domain` (→ `docs/assets/domain/`), картинки билетов (→ `docs/img/`), видео и знаки, пишет `.nojekyll`.
+Сборка генерирует `site/data/tickets.json`, `site/data/items.json` (наши вопросы и заблуждения), `site/data/episodes.json`, HTML текстовых уроков, копирует страницы, `web/assets`, `packages/domain` (→ `site/assets/domain/`), картинки билетов (→ `site/img/`), видео и знаки, пишет `.nojekyll`.
 
 Локальный просмотр: `nvm use && npm run dev` → http://127.0.0.1:8000/pdd-georgia/ (с `file://` не работает — данные грузятся через `fetch`). Нужен Node.js 24.22+, Active LTS.
 
 ## Публикация (GitHub Pages)
 
-Публикуется папка `docs/` ветки `main`. Workflow для деплоя не нужен (у токена нет scope `workflow`).
-Чтобы Pages брал сайт из `docs/`, один раз переключите источник:
-```
-gh api -X PUT repos/jenya239/pdd-georgia/pages -f "source[branch]=main" -f "source[path]=/docs"
-```
-(или Settings → Pages → Branch: main, folder: /docs). Пока Pages смотрит в корень ветки, корневые `index.html` и `404.html` перенаправляют в `docs/`, в том числе старые ссылки вида `…/pdd-georgia/episode.html?id=ep01`. После переключения корневые файлы просто не публикуются.
+Собранный сайт лежит в `site/`. GitHub Pages при публикации из ветки умеет брать только `/` (корень репозитория) или `/docs`. Папку `site/` так не отдать.
+
+Сейчас источник Pages — ветка `main`, папка `/docs`. Пока это не переключено, **пуш этого переноса заменит курс на содержимое `docs/`** (документацию). Пушить можно после одного из двух переключений:
+
+- Actions публикует `site/` (шаблон `ci/pages.yml`; включить его и в Settings → Pages выбрать GitHub Actions). У токена нет scope `workflow`, файл в `.github/workflows/` тем же токеном не запушить.
+- Либо вернуть публикацию из ветки, но тогда сайт снова должен лежать в `/` или `/docs`. Так делать не стоит: `docs/` занят документацией.
+
+Пока Pages смотрит в корень ветки, корневые `index.html` и `404.html` перенаправляют в `site/`. Когда источник — папка или Actions, эти файлы не публикуются: содержимое `site/` и есть корень сайта.
 
 ## Тесты
 
@@ -66,7 +69,7 @@ tools/check.sh                         # всё: node, pytest, build --check, e2
 node --test tests/js                   # доменные модули (Node 18+)
 python3 -m pytest -q tests/py          # сборка, назначение билетов, уроки (цитаты дословно из закона), онтология, билеты
 python3 -m pytest -q tests/video       # кадры видео пиксель-в-пиксель против tests/video/baseline (пропускается без видео-venv)
-python3 tests/e2e/site_e2e.py [--root=docs] [--shots=DIR]   # Playwright, сайт как на Pages (под /pdd-georgia/)
+python3 tests/e2e/site_e2e.py [--root=site] [--shots=DIR]   # Playwright, сайт как на Pages (под /pdd-georgia/)
 ```
 Переменные `check.sh`: `PYTHON` (с pytest), `E2E_PYTHON` (с playwright), `VIDEO_PYTHON`, `E2E=0` — пропустить браузер, `E2E_CHANNEL=chromium` — встроенный Chromium вместо Chrome.
 Зависимости: `pip install -r requirements-dev.txt`, затем `python -m playwright install chromium`.
@@ -77,7 +80,7 @@ python3 tests/e2e/site_e2e.py [--root=docs] [--shots=DIR]   # Playwright, сай
 ## Новый выпуск
 Выпуск бывает двух видов (`kind` вычисляет сборка):
 - **видео** — `content/media/epNN.mp4` и `epNN.jpg`; исходники видео — `video/episodes/epNN/`;
-- **текст** — генератор `content/lessons/epNN/lesson.py` с функцией `render()` → фрагмент HTML (маркер `<!--AFTER-TICKETS-->` делит теорию и заключение; между ними сайт показывает билеты и «наши вопросы» из `content/checkitems/`. Своих вопросов прямо в тексте урока нет — `tests/py/test_lessons.py`). id внутри SVG обязаны начинаться с `epNN-` (проверяет `tests/py/test_lessons.py`, там же — что все цитаты дословно есть в законе).
+- **текст** — генератор `content/lessons/epNN/lesson.py` с функцией `render()` → фрагмент HTML (маркер `<!--AFTER-TICKETS-->` делит теорию и заключение; между ними сайт показывает билеты и «наши вопросы» из `content/checkitems/`. Своих вопросов прямо в тексте урока нет — `tests/py/test_lessons.py`). id внутри SVG обязаны начинаться с `epNN-` (проверяет `tests/py/test_lessons.py`, там же — что все цитаты дословно есть в законе). Вторая редакция — `content/lessons/epNN/plain.mjs`: тот же закон, без персонажей. Сборка пишет её в `lessons/epNN-plain.html`. У текстового выпуска она выбирается рядом с диалогом, у видеовыпуска — рядом с роликом.
 
 Затем добавьте запись в `content/episodes.json` и запустите `python3 tools/build.py`.
 
@@ -112,7 +115,7 @@ python3 tests/e2e/site_e2e.py [--root=docs] [--shots=DIR]   # Playwright, сай
 ## Нормы: постоянные страницы и автоссылки
 
 **Страницы.** У каждой нормы онтологии (статья, пункт, подпункт закона; знак, разметка, примечание приложений — 1459 шт.)
-своя статическая страница `docs/norm/<id>.html` и общий указатель `docs/norm/index.html` (с поиском). Страница: цитата,
+своя статическая страница `site/norm/<id>.html` и общий указатель `site/norm/index.html` (с поиском). Страница: цитата,
 текст RU (дословно), KA, EN (перевод 2019 г., помечен), редакция и ссылка на Matsne, родитель/дети/соседи, картинка знака,
 «где это в курсе» (уроки, понятия, наши вопросы, билеты). Генератор — `tools/pdd/normsite.py`.
 
@@ -132,7 +135,7 @@ Id не меняются при пересборке: `tests/py/fixtures/norm_sl
 **Всплывающая панель** (`web/assets/app/normpop.mjs`, расчёт положения — `packages/domain/normlinks.mjs`): наведение
 (250 мс) открывает панель справа от колонки текста (слева / под строкой, если места нет), фокус с клавиатуры — тоже,
 Esc закрывает; на тач-экранах и ≤640 px тап открывает нижнюю шторку, второй тап — переход. Тексты грузятся лениво
-по статьям: `docs/norm/chunks/<статья>.json`.
+по статьям: `site/norm/chunks/<статья>.json`.
 
 ## Прогресс, накопительная проверка, ошибки
 Прогресс хранится только в браузере (`localStorage`). Все ключи перечислены в одном реестре `packages/domain/registry.mjs`; код пишет ключи только через `KEYS.<id>`, а `tests/js/registry.test.mjs` падает, если где-то в `web/` или `packages/` встретился незарегистрированный ключ или ключ написан строкой мимо реестра:

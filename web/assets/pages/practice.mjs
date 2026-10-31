@@ -44,7 +44,12 @@ import { parseId, compareIds } from "../domain/items.mjs";
   let list = [], i = 0, ok = 0, bad = 0, cur = null;
   function show() {
     const t = list[i]; cur = $("#qbox");
-    renderQuestion(cur, t, { mode: "instant", index: i, total: list.length, onAnswer: (_, good) => { good ? ok++ : bad++; stat(); $("#next").disabled = false; $("#next").focus(); } });
+    renderQuestion(cur, t, { mode: "instant", index: i, total: list.length, onAnswer: (_, good) => { good ? ok++ : bad++; stat(); $("#next").disabled = false; $("#next").focus(); },
+      onUndo: (undone, info) => {
+        if (info.session) { if (undone.ok) ok--; else bad--; }
+        stat();
+        $("#next").disabled = true;
+      } });
     $("#next").disabled = true; $("#next").textContent = i + 1 < list.length ? "Дальше →" : "Завершить";
     stat();
   }
@@ -64,7 +69,7 @@ import { parseId, compareIds } from "../domain/items.mjs";
   $("#next").onclick = () => { if (i + 1 < list.length) { i++; show(); scrollTo({ top: 0 }); } else finish(); };
   $("#stop").onclick = () => { $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
   document.addEventListener("keydown", e => {
-    if ($("#run").style.display === "none" || e.target.closest("select,input")) return;
+    if ($("#run").style.display === "none" || e.target.closest("button,select,input,textarea")) return;
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= 4 && cur && cur._pick) { cur._pick(n - 1); e.preventDefault(); }
     else if ((e.key === "Enter" || e.key === "ArrowRight") && !$("#next").disabled) { e.preventDefault(); $("#next").click(); }

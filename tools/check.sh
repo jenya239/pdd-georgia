@@ -28,8 +28,8 @@ fi
 
 echo "== node: domain modules";      node --test tests/js/*.test.mjs
 echo "== pytest: build, ontology, lessons, video"; "$PY" -m pytest -q tests/py tests/video
-echo "== build: docs/ is up to date"; "$PY" tools/build.py --check
+echo "== build: site/ is up to date"; "$PY" tools/build.py --check
 if [ "${E2E:-1}" != 0 ]; then
-  echo "== e2e: headless browser on docs/"; "${E2E_PYTHON:-$PY}" tests/e2e/site_e2e.py
+  echo "== e2e: headless browser on site/"; "${E2E_PYTHON:-$PY}" tests/e2e/site_e2e.py
 fi
 echo "ALL GREEN"

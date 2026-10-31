@@ -1,5 +1,5 @@
-"""Norm permalinks: static pages docs/norm/<slug>.html, the index docs/norm/index.html, lazy pop-up chunks
-docs/norm/chunks/<chunk>.json, and auto-linking of norm references in all site content.
+"""Norm permalinks: static pages site/norm/<slug>.html, the index site/norm/index.html, lazy pop-up chunks
+site/norm/chunks/<chunk>.json, and auto-linking of norm references in all site content.
 
     link_content(...)  annotates lessons / data in place, returns the Linker (stats, mentions)
     norm_files(...)    → {relpath: text}, {relpath: source image}"""
@@ -38,7 +38,8 @@ def quote_norm(ref: str, ids):
     return None
 
 
-def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, raw: list, laws: dict, items_export: dict) -> Linker:
+def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, raw: list, laws: dict, items_export: dict,
+                 plains: dict | None = None) -> Linker:
     """Annotate everything in place. lessons: {ep id: html} is replaced by the linked HTML."""
     L = Linker(norms)
     ids = L.ids
@@ -49,6 +50,8 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
         ep_cites = L.cites(texts)
         if ep["id"] in lessons:
             lessons[ep["id"]] = L.lesson_html("lessons", ep["id"], lessons[ep["id"]], scopes=[ep_cites])
+        if plains and ep["id"] in plains:
+            plains[ep["id"]] = L.lesson_html("lessons", f"{ep['id']}:plain", plains[ep["id"]], scopes=[ep_cites])
         lesson_cites = L.cites([re.sub(r"<[^>]+>", "\x00", lessons.get(ep["id"], ""))])
         ep_scope[ep["id"]] = ep_cites + lesson_cites
         L.ru_fields("episodes", ep["id"], ep, ["lead", "core_note", "linked_note"], scopes=[ep_cites, lesson_cites])
