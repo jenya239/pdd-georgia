@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { makeBundle, parseBundle, mergeState, applyImport, previewImport, summarize, FORMAT } from "../../packages/domain/bundle.mjs";
-import { SCHEMA_VERSION } from "../../packages/domain/registry.mjs";
+import { makeBundle, parseBundle, mergeState, applyImport, previewImport, summarize, FORMAT } from "../../packages/domain/bundle.ts";
+import { SCHEMA_VERSION } from "../../packages/domain/registry.ts";
 
 const STATE = {
   progress: { 5: { s: 1, c: 1, w: 0, l: 1, t: 1, k: 1 } },
@@ -53,7 +53,7 @@ test("invalid sections and values are dropped, not imported", () => {
   assert.deepEqual(p.state, { progress: {}, runs: [], exams: [{ d: 5, ok: 20, pass: false, s: 10 }] });
 });
 
-test("merge: progress summed, runs and exams united, local unfinished runs and preferences kept", () => {
+test("merge: journals united, runs and exams united, local unfinished runs and preferences kept", () => {
   const incoming = {
     progress: { 5: { s: 1, c: 0, w: 1, l: 0, t: 9, k: 0, lw: 9, lc: 2, p: { 2: 1 } } },
     runs: [STATE.runs[0], { id: "b", lesson: "ep03", date: 2, total: 1, correct: 1, score: 100, wrong: [] }],
@@ -65,7 +65,7 @@ test("merge: progress summed, runs and exams united, local unfinished runs and p
   };
   const m = mergeState(STATE, incoming);
   assert.deepEqual(m.notes, { 5: { x: "новее", t: 9 }, 6: { x: "с телефона", t: 1 } }, "notes: the newer text per ticket");
-  assert.deepEqual(m.progress[5], { s: 2, c: 1, w: 1, l: 0, t: 9, k: 0, lw: 9, lc: 2, p: { 2: 1 } });
+  assert.deepEqual(m.progress[5], { s: 1, c: 0, w: 1, l: 0, t: 9, k: 0, lw: 9, lc: 2, p: { 2: 1 } });
   assert.deepEqual(m.runs.map(r => r.id), ["a", "b"]);
   assert.equal(m.active.ep04.id, "r2");
   assert.equal(m.active.ep03.id, "r3");
@@ -107,8 +107,20 @@ test("retired «lang» (global question language, removed in 0.7): old exports s
   assert.equal("lang" in makeBundle({ ...STATE, lang: "ka" }, 1, "t").data, false);
 });
 
+test("schema 4: a schema-3 history becomes events, the unseen tail is one balance, and importing it twice does not double", () => {
+  assert.equal(SCHEMA_VERSION, 4);
+  const file = { format: FORMAT, schema: 3, app: "0.7", exportedAt: "x", data: { progress: {
+    5: { s: 3, c: 2, w: 1, l: 1, t: 9, k: 1, h: [{ t: 9, c: 0, ok: 1 }] } } } };
+  const once = parseBundle(JSON.stringify(file));
+  assert.equal(once.migratedFrom, 3);
+  assert.equal(once.state.progress[5].s, 3);
+  assert.equal(once.state.progress[5].events.length, 1);
+  assert.equal(once.state.progress[5].balance.s, 2);
+  const twice = mergeState(once.state, parseBundle(JSON.stringify(file)).state);
+  assert.equal(twice.progress[5].s, 3);
+});
+
 test("schema 3: per-attempt history and notes; schema-2 files are migrated (records keep their counters, no history)", () => {
-  assert.equal(SCHEMA_VERSION, 3);
   const v2 = { format: FORMAT, schema: 2, app: "0.7", exportedAt: "x", data: { progress: { 5: { s: 4, c: 3, w: 1, l: 1, t: 9, k: 2 } } } };
   const p = parseBundle(JSON.stringify(v2));
   assert.equal(p.migratedFrom, 2);

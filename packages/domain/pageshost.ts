@@ -7,7 +7,7 @@
  */
 export const PAGES_PREFIX = "/pdd-georgia";
 
-export function resolvePages(rawUrl, lookup) {
+export function resolvePages(rawUrl: string, lookup: { isFile(path: string): boolean; isDir(path: string): boolean }) {
   let url;
   try {
     url = new URL(rawUrl, "http://127.0.0.1");

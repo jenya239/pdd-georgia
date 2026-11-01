@@ -5,13 +5,14 @@ import { header } from "../app/layout.mjs";
 import { record, store } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { errorStats, groupStats, drillQueue, notedStats } from "../domain/errors.mjs";
-import { MASTERY_STREAK } from "../domain/progress.mjs";
+import { MASTERY_STREAK, streakOf } from "../domain/progress.mjs";
 import { idLabel, parseId, questionText } from "../domain/items.mjs";
 import { lk } from "../domain/normlinks.mjs";
 
 header("errors");
 const [D, E, st] = await Promise.all([loadTickets(), loadEpisodes(), store]);
 const m = $("#m");
+const hashOf = id => D.byId[id]?.hash;
 const q = new URLSearchParams(location.search);
 const lessonName = Object.fromEntries(E.released.map(r => [r.id, `Выпуск ${r.num}. ${r.title}`]));
 const fmt = ms => (ms ? new Date(ms).toLocaleDateString("ru-RU") : "—");
@@ -46,7 +47,7 @@ function list() {
   const errs = errorStats(st.progress(), ALL, notes);
   const stats = onlyNotes ? notedStats(st.progress(), ALL, notes) : errs;
   const by = GROUPS[q.get("by")] ? q.get("by") : "lesson";
-  const left = drillQueue(st.progress(), errs.map(s => s.id));
+  const left = drillQueue(st.progress(), errs.map(s => s.id), hashOf);
   const notesBtn = nNotes ? `<label class="small notesfilter"><input type="checkbox" id="onlynotes"${onlyNotes ? " checked" : ""}> только билеты с заметками (${nNotes})</label>` : "";
   m.innerHTML = `<h1>Типичные ошибки</h1>
    ${stats.length ? `<p>${onlyNotes ? `Билетов с вашими заметками: ${stats.length} (с ошибками и без).` : `Билетов с ошибками: ${stats.length}; ещё не исправлено (нужно ${MASTERY_STREAK} верных ответа подряд): ${left.length}.`}</p>
@@ -74,12 +75,12 @@ function drill() {
   const pool = only.length ? only : errorStats(st.progress(), ALL).map(s => s.id);
   let lastId = null, cur = null;
   function step() {
-    const left = drillQueue(st.progress(), pool);
+    const left = drillQueue(st.progress(), pool, hashOf);
     if (!left.length) {
       m.innerHTML = `<h1>Разбор ошибок</h1><div class="result ok">Готово: каждый билет решён верно ${MASTERY_STREAK} раза подряд.</div><div class="row" style="margin-top:12px"><a class="btn ghost" href="errors.html">К списку ошибок</a></div>`;
       return;
     }
-    const id = left.find(x => x !== lastId) ?? left[0], t = D.byId[id], k = (st.progress()[id] || {}).k || 0;
+    const id = left.find(x => x !== lastId) ?? left[0], t = D.byId[id], k = streakOf(st.progress()[id], t.hash);
     lastId = id;
     m.innerHTML = `<div class="small mut"><a href="errors.html">Типичные ошибки</a> · разбор</div><h1>Разбор ошибок</h1>
      <p class="small">Осталось ${left.length}. Билет уходит из разбора после ${MASTERY_STREAK} верных ответов подряд; у этого сейчас ${k} из ${MASTERY_STREAK}.</p>
@@ -87,14 +88,14 @@ function drill() {
      <div id="q"></div><div class="row" style="margin-top:12px"><button class="btn" id="next" disabled>Дальше</button></div>`;
     cur = $("#q");
     renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {
-      const r = await record(id, ok, choice, "drill");
+      const r = await record(id, ok, choice, "drill", t.hash);
       const fb = cur.querySelector(".fb"), n = document.createElement("p");
       n.className = "small"; n.textContent = ok ? `Серия верных: ${r.k} из ${MASTERY_STREAK}.` : "Ошибка: серия сброшена, билет вернётся позже.";
       fb.prepend(n);
       $("#next").disabled = false; $("#next").focus();
     }, onUndo: () => {
       $("#next").disabled = true;
-      const left = drillQueue(st.progress(), pool), k = (st.progress()[id] || {}).k || 0;
+      const left = drillQueue(st.progress(), pool, hashOf), k = streakOf(st.progress()[id], t.hash);
       const line = m.querySelector("p.small");
       if (line) line.textContent = `Осталось ${left.length}. Билет уходит из разбора после ${MASTERY_STREAK} верных ответов подряд; у этого сейчас ${k} из ${MASTERY_STREAK}.`;
     } });

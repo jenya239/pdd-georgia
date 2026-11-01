@@ -733,8 +733,8 @@ def main():
         tmp = Path(tempfile.mkdtemp()) / "progress.json"
         dl.value.save_as(tmp)
         bundle = json.loads(tmp.read_text())
-        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 3 and bundle["app"] and bundle["exportedAt"]
-              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 3, sections {sorted(bundle['data'])}")
+        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 4 and bundle["app"] and bundle["exportedAt"]
+              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 4, sections {sorted(bundle['data'])}")
         page.evaluate("localStorage.clear()")
         page.reload()
         page.wait_for_selector("header.top [data-act=import]", state="attached")

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { figureSvg } from "../../packages/domain/figure.mjs";
+import { figureSvg } from "../../packages/domain/figure.ts";
 
 const count = (s, re) => (s.match(re) || []).length;
 

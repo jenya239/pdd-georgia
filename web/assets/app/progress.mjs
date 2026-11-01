@@ -4,7 +4,7 @@ import { createStore, KEYS } from "../domain/store.mjs";
 export const store = createStore(localStorage);
 
 /** Records an answer (choice = 0-based option index, where = place, see domain WHERE); returns the new record. */
-export const record = (id, ok, choice, where) => store.recordAnswer(id, { ok: !!ok, choice, now: Date.now(), where });
+export const record = (id, ok, choice, where, hash) => store.recordAnswer(id, { ok: !!ok, choice, now: Date.now(), where, hash });
 
 export const progress = () => store.progress();
 

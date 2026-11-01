@@ -65,7 +65,7 @@ function play(run) {
   renderQuestion(cur, t, { mode: "instant", noRecord: true, onAnswer: async (choice, ok) => {
     run = answerRun(run, id, { choice, ok });
     st.saveActiveRun(run);
-    await record(id, ok, choice, "check");
+    await record(id, ok, choice, "check", t.hash);
     $("#next").disabled = false; $("#next").focus();
   }, onUndo: () => {
     if (run.answers[id] == null && run.answers[String(id)] == null) return;

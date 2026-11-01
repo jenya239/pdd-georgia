@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { coversId } from "../../packages/domain/ontology.mjs";
+import { coversId } from "../../packages/domain/ontology.ts";
 import { assignmentText, loadItems, loadWorld, reportText } from "../../tools/load-ontology.mjs";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");

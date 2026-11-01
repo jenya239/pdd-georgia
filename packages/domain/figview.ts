@@ -6,10 +6,10 @@ const BAR = 48;   // height of the close bar in the fullscreen view, px
 const MAX_SCALE = 2;
 
 /** True when content is wider than its box (1–2 px of rounding is ignored). */
-export const overflowsX = (scrollWidth, clientWidth) => scrollWidth - clientWidth > 1;
+export const overflowsX = (scrollWidth: number, clientWidth: number) => scrollWidth - clientWidth > 1;
 
 /** Size of a w×h figure fitted into a vw×vh screen, keeping the aspect ratio. */
-export function fitBox(w, h, vw, vh) {
+export function fitBox(w: number, h: number, vw: number, vh: number) {
   const scale = Math.min((vw - 2 * PAD) / w, (vh - 2 * PAD - BAR) / h, MAX_SCALE);
   return { width: Math.round(w * scale), height: Math.round(h * scale) };
 }

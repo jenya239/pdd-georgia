@@ -45,7 +45,7 @@ function showPreview(text) {
     d.innerHTML = `<h3>Загрузить прогресс</h3>
       <p class="small">Файл от ${esc(when)}${pv.app ? `, версия сайта ${esc(pv.app)}` : ""}, схема ${pv.schema}.
       ${pv.migratedFrom !== null ? "Файл старого формата — он будет преобразован." : ""}</p>
-      <div class="pfmode"><label><input type="radio" name="pfmode" value="merge" ${mode === "merge" ? "checked" : ""}> Объединить с этим браузером <span class="mut">(ответы суммируются, истории объединяются; незавершённые проверки, настройки и тема — как здесь)</span></label>
+      <div class="pfmode"><label><input type="radio" name="pfmode" value="merge" ${mode === "merge" ? "checked" : ""}> Объединить с этим браузером <span class="mut">(журнал попыток соединяется по событию, старые сводки без журнала не складываются; незавершённые проверки, настройки и тема — как здесь)</span></label>
       <label><input type="radio" name="pfmode" value="replace" ${mode === "replace" ? "checked" : ""}> Заменить <span class="mut">(всё в этом браузере станет как в файле; чего нет в файле — удалится)</span></label></div>
       <div class="pftable"><table class="topics" data-preview><tr><th></th><th>Сейчас</th><th>В файле</th><th>После</th></tr>
       ${ROWS.map(([k, t]) => `<tr data-k="${k}"><td>${t}</td><td>${cell(pv.before[k])}</td><td>${cell(pv.file[k])}</td><td><b>${cell(pv.after[k])}</b></td></tr>`).join("")}</table></div>

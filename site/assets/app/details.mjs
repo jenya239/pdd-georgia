@@ -1,4 +1,4 @@
-/** Wires the post-answer panel (packages/domain/details.mjs) under a ticket: tabs, the note, lazy norm texts. */
+/** Wires the post-answer panel (packages/domain/details.ts, emitted as details.mjs) under a ticket: tabs, the note, lazy norm texts. */
 import { loadedTickets } from "./data.mjs";
 import { store } from "./progress.mjs";
 import { normEntry } from "./normpop.mjs";

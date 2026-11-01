@@ -2,15 +2,17 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
-import { STORAGE, KEYS, RETIRED } from "../../packages/domain/registry.mjs";
-import { createStore, memoryBackend } from "../../packages/domain/store.mjs";
+import { STORAGE, KEYS, RETIRED } from "../../packages/domain/registry.ts";
+import { createStore, memoryBackend } from "../../packages/domain/store.ts";
 
 const ROOT = new URL("../../", import.meta.url).pathname;
 
 /** One realistic value per registered key; a new key without a sample fails the round-trip test. */
 const SAMPLES = {
-  progress: { 5: { s: 3, c: 1, w: 2, l: 0, t: 30, k: 0, lw: 30, lc: 2, p: { 2: 1, 3: 1 },
-    h: [{ t: 10, c: 1, ok: 1, w: "lesson" }, { t: 20, c: 2, ok: 0, w: "check" }, { t: 30, c: 3, ok: 0, w: "exam" }] }, 7: { s: 2, c: 2, w: 0, l: 1, t: 9, k: 2 },
+  progress: { 5: { s: 3, c: 1, w: 2, l: 0, t: 30, k: 0,
+    h: [{ t: 10, c: 1, ok: 1, w: "lesson" }, { t: 20, c: 2, ok: 0, w: "check" }, { t: 30, c: 3, ok: 0, w: "exam" }],
+    events: [{ id: "10:1:1", t: 10, c: 1, ok: 1, w: "lesson" }, { id: "20:2:0", t: 20, c: 2, ok: 0, w: "check" }, { id: "30:3:0", t: 30, c: 3, ok: 0, w: "exam" }],
+    p: { 2: 1, 3: 1 }, lw: 30, lc: 3 }, 7: { s: 2, c: 2, w: 0, l: 1, t: 9, k: 2 },
     "o-ep05-01": { s: 1, c: 1, w: 0, l: 1, t: 4, k: 1 } },
   runs: [{ id: "r1", lesson: "ep04", date: 11, total: 10, correct: 8, score: 80, wrong: [5, 6] }],
   active: { ep06: { id: "r2", lesson: "ep06", ids: [5, 7], answers: { 5: 1 } } },
@@ -23,7 +25,7 @@ const SAMPLES = {
 function files(dir, out = []) {
   for (const n of readdirSync(dir)) {
     const p = join(dir, n);
-    if (statSync(p).isDirectory()) files(p, out); else if (/\.(mjs|js|html)$/.test(n)) out.push(p);
+    if (statSync(p).isDirectory()) files(p, out); else if (/\.(mjs|js|ts|html)$/.test(n)) out.push(p);
   }
   return out;
 }
@@ -42,7 +44,7 @@ test("registry: code uses no storage key that is not registered, and spells keys
     const src = readFileSync(f, "utf8"), rel = relative(ROOT, f);
     for (const m of src.matchAll(/["'`](pddge\.[\w.-]+)["'`]/g)) {
       assert.ok(registered.has(m[1]), `${rel}: unregistered storage key ${m[1]}`);
-      assert.equal(rel, "packages/domain/registry.mjs", `${rel}: spell ${m[1]} via KEYS from the registry`);
+      assert.equal(rel, "packages/domain/registry.ts", `${rel}: spell ${m[1]} via KEYS from the registry`);
     }
     for (const m of src.matchAll(/(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)\(\s*([^,)]+)/g))
       assert.match(m[1].trim(), /^KEYS\.\w+$/, `${rel}: storage access must go through KEYS.<id>, got ${m[1]}`);

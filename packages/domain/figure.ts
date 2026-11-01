@@ -1,28 +1,29 @@
 /** Schematic SVG figures for own check items (pure: spec → SVG string). Not to scale. */
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" } as const;
+const esc = (s: unknown) => String(s).replace(/[&<>"']/g, c => ESC[c as keyof typeof ESC]);
 
-const svg = (w, h, title, body) =>
+const svg = (w: number, h: number, title: string, body: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" class="fig" role="img" aria-label="${esc(title)}"><title>${esc(title)}</title>${body}</svg>`;
-const text = (x, y, s, cls = "lbl", extra = "") => `<text x="${x}" y="${y}" class="${cls}" text-anchor="middle"${extra}>${esc(s)}</text>`;
+const text = (x: number, y: number, s: unknown, cls = "lbl", extra = "") => `<text x="${x}" y="${y}" class="${cls}" text-anchor="middle"${extra}>${esc(s)}</text>`;
 
 // ---- crossing: top view, 300×300, centre 150, road width 70
 const C = 150, HW = 35;
-const ARM = {
+const ARM: Record<string, { x: number; y: number; w: number; h: number }> = {
   n: { x: C - HW, y: 0, w: 2 * HW, h: C - HW },
   s: { x: C - HW, y: C + HW, w: 2 * HW, h: C - HW },
   w: { x: 0, y: C - HW, w: C - HW, h: 2 * HW },
   e: { x: C + HW, y: C - HW, w: C - HW, h: 2 * HW },
 };
 // Right-hand traffic: a car coming from side `from` drives in the right half of that arm, pointing to the centre.
-const CAR_AT = {
+const CAR_AT: Record<string, { x: number; y: number; r: number }> = {
   s: { x: C + HW / 2, y: 255, r: 0 },
   n: { x: C - HW / 2, y: 45, r: 180 },
   w: { x: 45, y: C + HW / 2, r: 90 },
   e: { x: 255, y: C - HW / 2, r: 270 },
 };
-const EXIT = { n: [C + HW / 2, 20], s: [C - HW / 2, 280], w: [20, C - HW / 2], e: [280, C + HW / 2] };
+const EXIT: Record<string, [number, number]> = { n: [C + HW / 2, 20], s: [C - HW / 2, 280], w: [20, C - HW / 2], e: [280, C + HW / 2] };
 
-function crossing(f) {
+function crossing(f: { arms?: string[]; main?: string[]; unpaved?: string[]; yard?: string; cars?: { from: string; to: string; id: string; rail?: boolean }[] }) {
   const arms = f.arms || ["n", "e", "s", "w"];
   const main = new Set(f.main || []), unpaved = new Set(f.unpaved || []);
   let body = `<rect width="300" height="300" class="bg"/>`;
@@ -67,9 +68,9 @@ function crossing(f) {
 }
 
 // ---- section: road cross-strips, top view, strips stacked vertically
-const STRIP = { shoulder: ["обочина", 18], lane: ["", 30], strip: ["", 14], sidewalk: ["тротуар", 18] };
+const STRIP: Record<string, [string, number]> = { shoulder: ["обочина", 18], lane: ["", 30], strip: ["", 14], sidewalk: ["тротуар", 18] };
 
-function section(f) {
+function section(f: { strips: { k: string; label?: string }[] }) {
   const W = 320;
   let y = 0, body = "";
   for (const s of f.strips) {
@@ -82,13 +83,13 @@ function section(f) {
 }
 
 // ---- approach: a straight road towards a crossing object, marks at distances (metres) before it
-function approach(f) {
+function approach(f: { object: string; light?: number | null; marks?: { m: number; label?: string }[] }) {
   const W = 360, H = 120, X0 = 300, PX = 12; // object at X0, 12 px per metre
-  const obj = {
+  const obj = ({
     zebra: [`<g class="zebra">${[0, 1, 2, 3, 4].map(i => `<rect x="${X0}" y="${30 + i * 12}" width="20" height="6"/>`).join("")}</g>`, "переход"],
     barrier: [`<line x1="${X0}" y1="22" x2="${X0}" y2="90" class="barrier"/>`, "шлагбаум"],
     rails: [`<line x1="${X0}" y1="25" x2="${X0}" y2="95" class="rail"/><line x1="${X0 + 14}" y1="25" x2="${X0 + 14}" y2="95" class="rail"/>`, "рельс"],
-  }[f.object];
+  } as Record<string, [string, string]>)[f.object];
   if (!obj) throw new Error(`unknown approach object ${f.object}`);
   let body = `<rect x="0" y="25" width="${W}" height="70" class="road"/><line x1="0" y1="60" x2="${W}" y2="60" class="axis"/>` + obj[0];
   body += text(X0 + 10, 16, obj[1], "tag");
@@ -103,9 +104,9 @@ function approach(f) {
   return svg(W, H, "Подъезд к переходу или переезду (без масштаба, расстояния подписаны)", body);
 }
 
-export function figureSvg(f) {
+export function figureSvg(f: { kind: string; arms?: string[]; main?: string[]; unpaved?: string[]; yard?: string; cars?: { from: string; to: string; id: string; rail?: boolean }[]; strips?: { k: string; label?: string }[]; object?: string; light?: number | null; marks?: { m: number; label: string }[] }) {
   if (f.kind === "crossing") return crossing(f);
-  if (f.kind === "section") return section(f);
-  if (f.kind === "approach") return approach(f);
+  if (f.kind === "section") return section(f as { strips: { k: string; label?: string }[] });
+  if (f.kind === "approach") return approach(f as { object: string; light?: number | null; marks?: { m: number; label?: string }[] });
   throw new Error(`unknown figure kind ${f.kind}`);
 }

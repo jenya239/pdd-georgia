@@ -2,7 +2,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PAGES_PREFIX, resolvePages } from "../packages/domain/pageshost.mjs";
+import { PAGES_PREFIX, resolvePages } from "../packages/domain/pageshost.ts";
 
 const TYPES = {
   ".html": "text/html; charset=utf-8",

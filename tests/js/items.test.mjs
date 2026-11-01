@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isOwnId, parseId, itemAsTicket, misconceptionFor, TYPE_LABEL, idLabel, compareIds, questionText } from "../../packages/domain/items.mjs";
+import { isOwnId, parseId, itemAsTicket, misconceptionFor, TYPE_LABEL, idLabel, compareIds, questionText } from "../../packages/domain/items.ts";
 
 const ITEM = { id: "o-ep04-01", lesson: "ep04", type: "diagram", type_label: "схема", q: "Где стоять?",
   options: ["А", "Б"], answer: 1, explain: "Потому что.", rule: { key: "37.6", label: "ст. 37, п. 6 «а.а»" },

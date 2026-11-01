@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { linkify, lk, chunkOf, placePanel, clip, lawDetails, normMatches } from "../../packages/domain/normlinks.mjs";
+import { linkify, lk, chunkOf, placePanel, clip, lawDetails, normMatches } from "../../packages/domain/normlinks.ts";
 
 test("linkify escapes text and wraps annotated spans (UTF-16 offsets = JS indices)", () => {
   const t = "<b> ст. 5, п. 87 & знак 5.26";

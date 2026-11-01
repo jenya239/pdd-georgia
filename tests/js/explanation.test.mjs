@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { baseExplanationHtml } from "../../packages/domain/explanation.mjs";
-import { questionText } from "../../packages/domain/items.mjs";
+import { baseExplanationHtml } from "../../packages/domain/explanation.ts";
+import { questionText } from "../../packages/domain/items.ts";
 
 test("base explanation: Russian machine translation first (linked), Georgian original collapsed", () => {
   const t = { id: 1, ex: "36-ე მუხლი", ex_ru: "Согласно ст. 36 <Закона>", _r: { ex_ru: [[9, 15, "st36"]], ex: [[0, 10, "st36"]] } };

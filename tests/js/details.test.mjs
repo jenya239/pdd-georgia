@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ticketDetails, pickTab, detailsHtml, TAB_ORDER } from "../../packages/domain/details.mjs";
-import { applyAnswer, MASTERY_STREAK } from "../../packages/domain/progress.mjs";
-import { itemAsTicket } from "../../packages/domain/items.mjs";
+import { ticketDetails, pickTab, detailsHtml, TAB_ORDER } from "../../packages/domain/details.ts";
+import { applyAnswer, MASTERY_STREAK } from "../../packages/domain/progress.ts";
+import { itemAsTicket } from "../../packages/domain/items.ts";
 
 const ONT = {
   mc: { "mc-x": { belief: "Справа — всегда помеха", truth: "Только на равнозначных" }, "mc-y": { belief: "Другое", truth: "Так" } },

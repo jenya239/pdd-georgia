@@ -1,11 +1,11 @@
 /** «Разбор»: the written breakdown of a bank ticket (built by tools/pdd/breakdowns.py) — the body of the «Разбор» tab under the answer. */
-import { anchor, lk } from "./normlinks.mjs";
+import { anchor, lk } from "./normlinks.ts";
 
 const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ESC[c]);
+const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, c => ESC[c as keyof typeof ESC]);
 
 /** HTML of the breakdown; `mc` maps misconception ids to {belief}. */
-export function breakdownHtml(br, mc = {}) {
+export function breakdownHtml(br: { quotes: { ref: string; n?: string; text?: string; _r?: unknown }[]; why_not: { i: number; t?: string; mc?: string; _r?: unknown }[]; steps: { t?: string; _r?: unknown }[]; trap?: { t?: string; _r?: unknown }; lesson: { id: string; num: number | string; title: string }; concepts: string[] }, mc: Record<string, { belief?: string; _r?: unknown }> = {}) {
   const quotes = br.quotes.map(q => `<blockquote class="lawquote"><div class="small mut">${anchor(q.ref, q.n)} — дословно, рус. перевод Matsne, ред. 25.06.2026</div>«${lk(q, "text")}»</blockquote>`).join("");
   const wrong = br.why_not.map(w => {
     const m = w.mc && mc[w.mc];

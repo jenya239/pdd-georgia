@@ -16,37 +16,37 @@ const LETTERS = /[„“"]([^„“”"]{1,5})[“”"]/g;
 const CHAPTER = /(\S+)\s+თავის/g;
 const ANNEX = /(\S+)\s+დანართის/g;
 
-function matches(text, regex) {
+function matches(text: string, regex: RegExp) {
   regex.lastIndex = 0;
   return [...text.matchAll(regex)];
 }
 
-function numberToken(token) {
+function numberToken(token: string): number | null {
   if (token.startsWith("პირველ")) return 1;
   const found = token.match(/\d+/);
   return found ? Number(found[0]) : null;
 }
 
-function ruLetters(ka) {
+function ruLetters(ka: string): string | null {
   const parts = ka.split(".");
   if (parts.every((part) => KA_TO_RU[part])) return parts.map((part) => KA_TO_RU[part]).join(".");
   return null;
 }
 
-function escapeRegExp(text) {
+function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function coversId(spec, normId) {
+export function coversId(spec: string, normId: string): boolean {
   return normId === spec || normId.startsWith(`${spec}.`);
 }
 
-export function resolveSpec(spec, ids) {
+export function resolveSpec(spec: string, ids: Set<string>): string[] {
   if (ids.has(spec)) return [spec];
   return [...ids].filter((id) => id.startsWith(`${spec}.`)).sort();
 }
 
-export function subpointFor(explanation, article, paragraph) {
+export function subpointFor(explanation: string | undefined, article: string | number, paragraph: number): string | null {
   for (const match of matches(explanation || "", CITATION)) {
     if (numberToken(match[1]) === Number(article) && numberToken(match[2]) === paragraph) {
       const letters = match[3].split(".");
@@ -59,7 +59,7 @@ export function subpointFor(explanation, article, paragraph) {
   return null;
 }
 
-export function primaryRef(ticket) {
+export function primaryRef(ticket: QuestionRow) {
   const laws = ticket.law_refs || [];
   if (laws.length) {
     const article = String(laws[0].article);
@@ -74,16 +74,16 @@ export function primaryRef(ticket) {
   return null;
 }
 
-function lawId(article, paragraph, sub, normIds) {
+function lawId(article: string | number, paragraph: number | null, sub: string | null, normIds: Set<string>): string | null {
   const base = paragraph == null ? String(article) : `${article}.${paragraph}`;
   if (sub && normIds.has(`${base}.${sub}`)) return `${base}.${sub}`;
   return normIds.has(base) ? base : null;
 }
 
-export function noteCitations(question, normIds, normText) {
+export function noteCitations(question: QuestionRow, normIds: Set<string>, normText: Map<string, string>): string[] {
   const text = question.explanation_ka || "";
   const items = (question.annex_refs || []).flatMap((annex) => (annex.items || []).map(String));
-  const out = [];
+  const out: string[] = [];
   for (const match of matches(text, NOTE)) {
     const before = text.slice(0, match.index);
     let annex = 1;
@@ -91,7 +91,7 @@ export function noteCitations(question, normIds, normText) {
       const n = numberToken(found[1]);
       if (n) annex = n;
     }
-    let chapter = null;
+    let chapter: number | null = null;
     for (const found of matches(before, CHAPTER)) {
       const n = numberToken(found[1]);
       if (n) chapter = n;
@@ -115,10 +115,10 @@ export function noteCitations(question, normIds, normText) {
   return out;
 }
 
-export function citedNorms(question, normIds, normText, extra = []) {
-  const norms = [];
-  const unresolved = [];
-  const add = (id) => {
+export function citedNorms(question: QuestionRow, normIds: Set<string>, normText: Map<string, string>, extra: string[] = []) {
+  const norms: string[] = [];
+  const unresolved: string[] = [];
+  const add = (id: string) => {
     if (!norms.includes(id)) norms.push(id);
   };
   for (const ref of question.law_refs || []) {
@@ -144,8 +144,8 @@ export function citedNorms(question, normIds, normText, extra = []) {
     }
   }
   const ref = primaryRef(question);
-  let primary = null;
-  if (ref?.kind === "law") primary = lawId(ref.major, ref.minor, ref.sub, normIds);
+  let primary: string | null = null;
+  if (ref?.kind === "law") primary = lawId(ref.major, ref.minor == null ? null : Number(ref.minor), ref.sub, normIds);
   else if (ref) {
     const id = `A${ref.major}:${ref.minor}`;
     primary = normIds.has(id) ? id : null;
@@ -153,16 +153,47 @@ export function citedNorms(question, normIds, normText, extra = []) {
   return { primary, norms, unresolved };
 }
 
-function pyList(keys) {
+function pyList(keys: Iterable<string>): string {
   return `[${[...keys].sort().map((key) => `'${key}'`).join(", ")}]`;
 }
 
-function sortedObject(entries) {
+interface ConceptRow { id: string; label: string; norms?: string[]; part_of?: string[]; gap?: string }
+interface MisconceptionRow { id: string; norms?: string[]; concepts?: string[]; belief?: string; truth?: string }
+interface LessonRow { id: string; introduces?: string[]; relies_on?: string[]; assumes?: string[]; states?: string[] }
+interface TicketRow { norms?: string[]; context_norms?: string[]; concepts?: string[]; distractors?: Record<string, string | null>; note?: string }
+interface OntologyDoc { concepts: ConceptRow[]; misconceptions: MisconceptionRow[]; lessons: LessonRow[]; tickets: Record<string, TicketRow> }
+interface NormRow { id: string; kind?: string; ru?: string }
+interface LawRef { article: string | number; paragraph?: string | number | null }
+interface AnnexRef { annex: string | number; items?: (string | number)[] }
+interface QuestionRow {
+  id: number; law_refs?: LawRef[]; annex_refs?: AnnexRef[]; explanation_ka?: string;
+  correct: number; answers: string[];
+}
+interface EpisodeRow {
+  id: string; num: number; teaches?: string[]; kind?: string; format?: string;
+  quote_refs?: [string | number, string | number | null][];
+  annex_quotes?: [string | number, string | number][];
+}
+
+function sortedObject(entries: [string, number][]): Record<string, number> {
   return Object.fromEntries([...entries].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 }
 
 export class World {
-  constructor(doc, norms, questions, episodes) {
+  doc: OntologyDoc;
+  normList: NormRow[];
+  questionList: QuestionRow[];
+  norms: Map<string, NormRow>;
+  normIds: Set<string>;
+  normText: Map<string, string>;
+  questions: Map<number, QuestionRow>;
+  episodes: EpisodeRow[];
+  concepts: Record<string, ConceptRow>;
+  misconceptions: Record<string, MisconceptionRow>;
+  lessons: Record<string, LessonRow>;
+  lessonOrder: string[];
+
+  constructor(doc: OntologyDoc, norms: NormRow[], questions: QuestionRow[], episodes: EpisodeRow[]) {
     this.doc = doc;
     this.normList = norms;
     this.questionList = questions;
@@ -177,15 +208,17 @@ export class World {
     this.lessonOrder = this.episodes.map((episode) => episode.id);
   }
 
-  episode(lesson) {
-    return this.episodes.find((episode) => episode.id === lesson);
+  episode(lesson: string): EpisodeRow {
+    const found = this.episodes.find((episode) => episode.id === lesson);
+    if (!found) throw new Error(`unknown lesson ${lesson}`);
+    return found;
   }
 
-  teaches(lesson) {
+  teaches(lesson: string): string[] {
     return [...(this.episode(lesson).teaches || [])];
   }
 
-  quoted(lesson) {
+  quoted(lesson: string): string[] {
     const episode = this.episode(lesson);
     const specs = (episode.quote_refs || []).map(([article, paragraph]) => (
       paragraph == null ? String(article) : `${article}.${paragraph}`
@@ -194,16 +227,16 @@ export class World {
     return [...this.teaches(lesson), ...specs, ...((this.lessons[lesson] || {}).states || [])];
   }
 
-  lessonCovers(lesson, normId) {
+  lessonCovers(lesson: string, normId: string | null): boolean {
     return normId != null && this.teaches(lesson).some((spec) => coversId(spec, normId));
   }
 
-  upto(lesson) {
+  upto(lesson: string): string[] {
     return this.lessonOrder.slice(0, this.lessonOrder.indexOf(lesson) + 1);
   }
 
   introducedIn() {
-    const out = {};
+    const out: Record<string, string> = {};
     for (const lesson of this.lessonOrder) {
       for (const concept of (this.lessons[lesson] || {}).introduces || []) {
         if (!(concept in out)) out[concept] = lesson;
@@ -212,8 +245,8 @@ export class World {
     return out;
   }
 
-  availableConcepts(lesson) {
-    const out = new Set();
+  availableConcepts(lesson: string): Set<string> {
+    const out = new Set<string>();
     for (const id of this.upto(lesson)) {
       const row = this.lessons[id] || {};
       for (const concept of row.introduces || []) out.add(concept);
@@ -224,7 +257,7 @@ export class World {
 
   assumed() {
     const introduced = new Set(Object.keys(this.introducedIn()));
-    const names = new Set();
+    const names = new Set<string>();
     for (const lesson of this.doc.lessons) for (const concept of lesson.assumes || []) names.add(concept);
     return [...names].filter((concept) => !introduced.has(concept)).sort();
   }
@@ -235,12 +268,13 @@ export class World {
     return Object.keys(this.concepts).filter((id) => !introduced.has(id) && !assumed.has(id)).sort();
   }
 
-  annotation(id) {
+  annotation(id: number | string): TicketRow {
     return this.doc.tickets[String(id)] || {};
   }
 
-  questionNorms(id) {
+  questionNorms(id: number) {
     const question = this.questions.get(id);
+    if (!question) return { primary: null, norms: [], unresolved: [] };
     const cited = citedNorms(question, this.normIds, this.normText, this.annotation(id).norms || []);
     const context = this.annotation(id).context_norms || [];
     if (!context.length) return cited;
@@ -252,29 +286,30 @@ export class World {
     };
   }
 
-  ticketNorms(id) {
+  ticketNorms(id: number) {
     return this.questionNorms(id);
   }
 
-  noteCitations(id) {
-    return noteCitations(this.questions.get(id), this.normIds, this.normText);
+  noteCitations(id: number): string[] {
+    const question = this.questions.get(id);
+    return question ? noteCitations(question, this.normIds, this.normText) : [];
   }
 
-  conceptsForNorms(normIds) {
+  conceptsForNorms(normIds: string[]): string[] {
     return Object.entries(this.concepts)
       .filter(([, concept]) => (concept.norms || []).some((spec) => normIds.some((norm) => coversId(spec, norm))))
       .map(([id]) => id)
       .sort();
   }
 
-  ticketConcepts(id) {
+  ticketConcepts(id: number): string[] {
     const norms = this.questionNorms(id).norms;
     return [...new Set([...this.conceptsForNorms(norms), ...(this.annotation(id).concepts || [])])].sort();
   }
 
   deriveAssignment() {
-    const assigned = {};
-    const blocked = {};
+    const assigned: Record<number, string> = {};
+    const blocked: Record<number, { lesson: string; missing: string[] }> = {};
     for (const id of [...this.questions.keys()].sort((a, b) => a - b)) {
       const primary = this.questionNorms(id).primary;
       const covering = this.lessonOrder.filter((lesson) => this.lessonCovers(lesson, primary));
@@ -292,7 +327,7 @@ export class World {
   }
 
   strictAssignment() {
-    const out = {};
+    const out: Record<number, string> = {};
     for (const id of [...this.questions.keys()].sort((a, b) => a - b)) {
       const norms = this.questionNorms(id).norms;
       if (!norms.length) continue;
@@ -307,12 +342,12 @@ export class World {
     return out;
   }
 
-  specOk(spec) {
+  specOk(spec: string): boolean {
     return resolveSpec(spec, this.normIds).length > 0;
   }
 
   integrityErrors() {
-    const errors = [];
+    const errors: string[] = [];
     const conceptIds = new Set(Object.keys(this.concepts));
     for (const concept of this.doc.concepts) {
       for (const spec of [...(concept.norms || []), ...(concept.part_of || [])]) {
@@ -327,14 +362,14 @@ export class World {
         if (!conceptIds.has(concept)) errors.push(`misconception ${item.id}: unknown concept ${concept}`);
       }
     }
-    const seen = {};
+    const seen: Record<string, string> = {};
     for (const lesson of this.doc.lessons) {
       const id = lesson.id;
       if (!this.lessonOrder.includes(id)) {
         errors.push(`lesson ${id}: not in episodes.json`);
         continue;
       }
-      for (const key of ["introduces", "relies_on", "assumes"]) {
+      for (const key of ["introduces", "relies_on", "assumes"] as const) {
         for (const concept of lesson[key] || []) {
           if (!conceptIds.has(concept)) errors.push(`lesson ${id}: ${key} unknown concept ${concept}`);
         }
@@ -416,20 +451,20 @@ export class World {
     return errors;
   }
 
-  withTicketAnnotation(id, patch) {
+  withTicketAnnotation(id: number | string, patch: Partial<TicketRow>): World {
     const doc = structuredClone(this.doc);
     const key = String(id);
     doc.tickets[key] = { ...(doc.tickets[key] || {}), ...patch };
     return new World(doc, this.normList, this.questionList, this.episodes);
   }
 
-  report(items = []) {
+  report(items: { lesson: string; type: string; distractors: Record<string, string | null> }[] = []) {
     const derived = this.deriveAssignment();
     const strict = this.strictAssignment();
     const assigned = derived.assigned;
-    const kinds = {};
+    const kinds: Record<string, number> = {};
     for (const norm of this.normList) {
-      const kind = norm.id.includes(".прим") ? "annex note" : norm.kind;
+      const kind = norm.id.includes(".прим") ? "annex note" : (norm.kind ?? "undefined");
       kinds[kind] = (kinds[kind] || 0) + 1;
     }
     const ids = new Set([...Object.keys(assigned), ...Object.keys(strict)].map(Number));
@@ -438,21 +473,21 @@ export class World {
       .map((id) => ({ ticket: id, derived: assigned[id] ?? null, strict: strict[id] ?? null }));
     const annotated = this.doc.tickets;
     const distractors = Object.values(annotated).flatMap((row) => Object.values(row.distractors || {}));
-    const count = (map) => Object.fromEntries(this.lessonOrder.map((lesson) => [
+    const count = (map: Record<number, string>) => Object.fromEntries(this.lessonOrder.map((lesson) => [
       lesson, Object.values(map).filter((value) => value === lesson).length,
     ]));
-    const use = {};
-    const bump = (id) => {
+    const use: Record<string, number> = {};
+    const bump = (id: string | null | undefined) => {
       if (id) use[id] = (use[id] || 0) + 1;
     };
     for (const row of Object.values(annotated)) for (const id of Object.values(row.distractors || {})) bump(id);
     for (const item of items) for (const id of Object.values(item.distractors)) bump(id);
-    const blockedTickets = {};
+    const blockedTickets: Record<string, { lesson: string; missing: string[]; note?: string }> = {};
     for (const id of Object.keys(derived.blocked).map(Number).sort((a, b) => a - b)) {
       const note = this.annotation(id).note;
       blockedTickets[String(id)] = note ? { ...derived.blocked[id], note } : { ...derived.blocked[id] };
     }
-    const byType = {};
+    const byType: Record<string, number> = {};
     for (const item of items) byType[item.type] = (byType[item.type] || 0) + 1;
     return {
       _generated: "node tools/ontology-report.mjs; do not edit",

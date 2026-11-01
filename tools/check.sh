@@ -26,6 +26,7 @@ if ! node_ok; then
   exit 1
 fi
 
+echo "== tsc: domain";               node node_modules/typescript/bin/tsc -p packages/domain --noEmit
 echo "== node: domain modules";      node --test tests/js/*.test.mjs
 echo "== pytest: build, ontology, lessons, video"; "$PY" -m pytest -q tests/py tests/video
 echo "== build: site/ is up to date"; "$PY" tools/build.py --check

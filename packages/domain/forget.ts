@@ -5,14 +5,14 @@
  * loses answers for those ids, so the questions come up again. Finished checks of
  * other lessons stay as recorded. Notes, exams and settings are outside this state.
  */
-export function forgetLesson(state, lessonId, ids) {
+export function forgetLesson(state: { progress?: Record<string, unknown>; runs?: { lesson?: string }[]; active?: Record<string, { answers?: Record<string, unknown> }> }, lessonId: string, ids: (string | number)[]) {
   const drop = new Set((ids || []).map(String));
-  const progress = {};
+  const progress: Record<string, unknown> = {};
   for (const [id, rec] of Object.entries(state.progress || {})) {
     if (!drop.has(id)) progress[id] = rec;
   }
   const runs = (state.runs || []).filter(r => r.lesson !== lessonId);
-  const active = {};
+  const active: Record<string, { answers?: Record<string, unknown> }> = {};
   for (const [id, run] of Object.entries(state.active || {})) {
     if (id === lessonId || !run) continue;
     const answers = { ...(run.answers || {}) };

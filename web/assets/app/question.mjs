@@ -104,7 +104,7 @@ export function renderQuestion(el, t, opts = {}) {
     btns.forEach((b, i) => b.onclick = () => {
       if (state.answered) return;
       const ok = reveal(i);
-      if (!opts.noRecord) record(t.id, ok, i, opts.where || "practice");
+      if (!opts.noRecord) record(t.id, ok, i, opts.where || "practice", t.hash);
       opts.onAnswer && opts.onAnswer(i, ok);   // callers with noRecord record synchronously here, before the panel reads history
       details(i);
       placeUndo();

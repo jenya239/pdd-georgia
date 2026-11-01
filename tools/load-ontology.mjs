@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { World } from "../packages/domain/ontology.mjs";
+import { World } from "../packages/domain/ontology.ts";
 
 const readJson = (file) => JSON.parse(readFileSync(file, "utf8"));
 

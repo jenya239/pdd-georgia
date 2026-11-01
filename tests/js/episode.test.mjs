@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import * as Episode from "../../packages/domain/episode.mjs";
+import * as Episode from "../../packages/domain/episode.ts";
 const { episodeKind, splitLesson, LESSON_MARKER } = Episode;
 
 test("episodes are video unless declared text", () => {

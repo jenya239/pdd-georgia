@@ -1,22 +1,23 @@
 /** Lesson scope and the cumulative ticket set (pure). */
-export const releasedLessons = released => [...released].sort((a, b) => a.num - b.num);
+type LessonRow = { id: string; num: number; tickets_lesson?: (string | number)[]; own_items?: (string | number)[] };
+export const releasedLessons = (released: LessonRow[]) => [...released].sort((a, b) => a.num - b.num);
 
-export function currentLesson(released) {
+export function currentLesson(released: LessonRow[]) {
   const list = releasedLessons(released);
   return list.length ? list[list.length - 1] : null;
 }
 
 /** Tickets of this lesson (`current`) and of all earlier lessons (`previous`);
  *  with {own: true} each lesson's own check items follow its tickets. */
-export function cumulativeScope(released, lessonId, { own = false } = {}) {
+export function cumulativeScope(released: LessonRow[], lessonId: string, { own = false } = {}) {
   const list = releasedLessons(released);
   const idx = list.findIndex(l => l.id === lessonId);
   if (idx < 0) throw new Error(`unknown lesson ${lessonId}`);
-  const ids = l => [...(l.tickets_lesson || []), ...(own ? l.own_items || [] : [])];
+  const ids = (l: LessonRow) => [...(l.tickets_lesson || []), ...(own ? l.own_items || [] : [])];
   return { current: ids(list[idx]), previous: list.slice(0, idx).flatMap(ids) };
 }
 
-export function shuffle(items, rng = Math.random) {
+export function shuffle<T>(items: T[], rng: () => number = Math.random): T[] {
   const a = [...items];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -26,11 +27,11 @@ export function shuffle(items, rng = Math.random) {
 }
 
 /** "new-first": the new lesson in its order, then earlier lessons shuffled; "mixed": all shuffled. */
-export function cumulativeOrder({ current, previous }, { order = "new-first", rng = Math.random } = {}) {
+export function cumulativeOrder({ current, previous }: { current: (string | number)[]; previous: (string | number)[] }, { order = "new-first", rng = Math.random as () => number } = {}) {
   return order === "mixed" ? shuffle([...current, ...previous], rng) : [...current, ...shuffle(previous, rng)];
 }
 
-export function scopeStatus(ids, progress) {
+export function scopeStatus(ids: (string | number)[], progress: Record<string, { l?: number; s: number; w: number } | undefined>) {
   let solved = 0, correctNow = 0, attempts = 0, wrong = 0;
   for (const id of ids) {
     const r = progress[id];

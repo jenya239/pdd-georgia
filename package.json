@@ -7,6 +7,11 @@
   },
   "scripts": {
     "dev": "node tools/dev-server.mjs",
-    "test": "node --test tests/js/*.test.mjs"
+    "typecheck": "tsc -p packages/domain --noEmit",
+    "test": "tsc -p packages/domain --noEmit && node --test tests/js/*.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
   }
 }

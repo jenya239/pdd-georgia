@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { overflowsX, fitBox, FIG_HINT } from "../../packages/domain/figview.mjs";
+import { overflowsX, fitBox, FIG_HINT } from "../../packages/domain/figview.ts";
 
 test("a figure overflows only when it is wider than its box by more than rounding", () => {
   assert.equal(overflowsX(520, 358), true);

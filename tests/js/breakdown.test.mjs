@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { breakdownHtml } from "../../packages/domain/breakdown.mjs";
+import { breakdownHtml } from "../../packages/domain/breakdown.ts";
 
 const BR = {
   steps: [{ t: "Вопрос — ст. 5, п. 9.", _r: { t: [[9, 20, "st5-p9"]] } }, { t: "Ответ <3>." }],

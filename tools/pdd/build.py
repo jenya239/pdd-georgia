@@ -1,4 +1,4 @@
-"""Site build: assembles the published directory (site/) from web/, packages/domain, content/ and data/.
+"""Site build: assembles the published directory (site/) from web/, packages/domain (TypeScript, emitted as .mjs), content/ and data/.
 
     python3 tools/build.py            # rebuild site/
     python3 tools/build.py --check    # fail if site/ is not what the sources produce
@@ -30,6 +30,36 @@ EPISODE_SOURCE_KEYS = ("ticket_refs", "ticket_ids", "quote_refs", "annex_quotes"
 
 def dumps_compact(obj):
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+
+def emit_domain() -> dict:
+    """Browser ESM compiled from packages/domain/*.ts. The site never loads the TypeScript sources."""
+    completed = subprocess.run(
+        ["node", "tools/emit-domain.mjs"],
+        cwd=paths.REPO, capture_output=True, text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or "tools/emit-domain.mjs failed")
+    files = json.loads(completed.stdout)
+    if not files or any(not name.endswith(".mjs") for name in files):
+        raise RuntimeError("domain emit did not produce .mjs modules")
+    return files
+
+
+def stamp_ticket_hashes(tickets: list) -> None:
+    """Hash of each bank ticket's question, options and correct index. The hash is computed in Node."""
+    completed = subprocess.run(
+        ["node", "tools/stamp-ticket-hashes.mjs"],
+        cwd=paths.REPO, input=json.dumps(tickets, ensure_ascii=False),
+        capture_output=True, text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or "tools/stamp-ticket-hashes.mjs failed")
+    hashes = json.loads(completed.stdout)
+    if len(hashes) != len(tickets):
+        raise RuntimeError("ticket hash count does not match tickets")
+    for ticket, digest in zip(tickets, hashes):
+        ticket["hash"] = digest
 
 
 def load_law_index() -> LawIndex:
@@ -229,6 +259,7 @@ def generate():
 
     meta = {"built_from": META, "count": len(tickets), "topics": topics, "stats": stat,
             **attach_ticket_details(tickets, items_export, items, world, eps)}
+    stamp_ticket_hashes(tickets)
     files["data/tickets.json"] = dumps_compact({"meta": meta, "tickets": tickets, "laws": idx.quotes})
     files["data/items.json"] = dumps_compact(items_export)
     files["data/episodes.json"] = json.dumps({"plan": plan, "released": eps}, ensure_ascii=False, indent=1)
@@ -239,8 +270,8 @@ def generate():
     for src in sorted(paths.WEB.rglob("*")):
         if src.is_file():
             copies[src.relative_to(paths.WEB).as_posix()] = src
-    for src in sorted(paths.DOMAIN.glob("*.mjs")):
-        copies["assets/domain/" + src.name] = src
+    for name, text in sorted(emit_domain().items()):
+        files["assets/domain/" + name] = text
     files[".nojekyll"] = ""
 
     report = {"stats": dict(stat), "quotes": len(idx.quotes), "plan": len(plan),

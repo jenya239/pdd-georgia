@@ -2,7 +2,7 @@
 
 Lesson HTML is rewritten (text nodes only; never inside <a>, <svg>, <summary>, <script>, <style> — status 'unlinkable').
 Data strings rendered by the client get a `_r` annotation instead: {field: [[start, end, slug], ...]} with
-offsets in UTF-16 code units (JavaScript string indices); packages/domain/normlinks.mjs turns them into links.
+offsets in UTF-16 code units (JavaScript string indices); packages/domain/normlinks.ts turns them into links.
 Every decision is counted in Linker.stats; non-linked references are listed in Linker.misses."""
 import collections
 import html as htmlmod

@@ -69,7 +69,7 @@ import { parseId, compareIds } from "../domain/items.mjs";
   $("#next").onclick = () => { if (i + 1 < list.length) { i++; show(); scrollTo({ top: 0 }); } else finish(); };
   $("#stop").onclick = () => { $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
   document.addEventListener("keydown", e => {
-    if ($("#run").style.display === "none" || e.target.closest("button,select,input,textarea")) return;
+    if ($("#run").style.display === "none" || e.target.closest("select,input,textarea,[data-undo]")) return;
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= 4 && cur && cur._pick) { cur._pick(n - 1); e.preventDefault(); }
     else if ((e.key === "Enter" || e.key === "ArrowRight") && !$("#next").disabled) { e.preventDefault(); $("#next").click(); }

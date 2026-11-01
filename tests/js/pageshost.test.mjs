@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { resolvePages } from "../../packages/domain/pageshost.mjs";
+import { resolvePages } from "../../packages/domain/pageshost.ts";
 
 function site(files, dirs = []) {
   const fileSet = new Set(files);

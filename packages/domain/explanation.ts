@@ -1,8 +1,8 @@
 /** The ticket bank's own explanation. It exists only in Georgian; the build attaches a Russian machine
  *  translation (t.ex_ru, see tools/pdd/mt.py), shown first, with the Georgian original collapsed under it. */
-import { lk } from "./normlinks.mjs";
+import { lk } from "./normlinks.ts";
 
-export function baseExplanationHtml(t) {
+export function baseExplanationHtml(t: { ex?: string; ex_ru?: string; _r?: Record<string, [number, number, string][]> }) {
   if (!t.ex) return `<div class="expl small mut">Пояснения в исходной базе нет.</div>`;
   const ka = `<div class="ka" lang="ka">${lk(t, "ex")}</div>`;
   if (!t.ex_ru) return `<div class="expl"><div class="small mut">Пояснение из базы (только на грузинском):</div>${ka}</div>`;

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { forgetLesson } from "../../packages/domain/forget.mjs";
+import { forgetLesson } from "../../packages/domain/forget.ts";
 
 const rec = t => ({ s: 1, c: 1, w: 0, l: 1, t, k: 1 });
 

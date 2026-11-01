@@ -1,15 +1,15 @@
 /** Norm references in site text: build-time annotations → links, chunk names, and where the hover panel goes.
  *  Annotations come from tools/pdd/normlink.py: obj._r[field] = [[start, end, slug], ...] in UTF-16 units (= JS string indices). */
 const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ESC[c]);
+const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, c => ESC[c as keyof typeof ESC]);
 const SLUG = /^(st[\d_]+|sign|mark)(-[\w.]+)*$/;
 
-export function anchor(text, slug, root = "") {
+export function anchor(text: unknown, slug: string | undefined, root = "") {
   return `<a class="nref" href="${root}norm/${slug}.html" data-norm="${slug}">${esc(text)}</a>`;
 }
 
 /** Escaped HTML of `text` with its annotated spans as norm links (spans out of order, out of range or with odd slugs are skipped). */
-export function linkify(text, spans, root = "") {
+export function linkify(text: unknown, spans: [number, number, string][] | undefined, root = "") {
   const s = String(text ?? "");
   let out = "", pos = 0;
   for (const [a, b, slug] of [...(spans || [])].sort((x, y) => x[0] - y[0])) {
@@ -21,17 +21,20 @@ export function linkify(text, spans, root = "") {
 }
 
 /** linkify(obj[field]) with the annotation stored next to it. */
-export const lk = (obj, field, root = "") => linkify(obj?.[field], obj?._r?.[field], root);
+export const lk = (obj: object | null | undefined, field: string, root = "") => {
+  const rec = obj as Record<string, unknown> | null | undefined;
+  return linkify(rec?.[field], (rec?._r as Record<string, [number, number, string][]> | undefined)?.[field], root);
+};
 
 /** The lazily loaded JSON chunk holding a norm (mirrors pdd.normids.chunk_of): its article or its annex section. */
-export function chunkOf(slug) {
+export function chunkOf(slug: string) {
   if (slug.startsWith("st")) return slug.split("-")[0];
   const [head, rest] = [slug.slice(0, slug.indexOf("-")), slug.slice(slug.indexOf("-") + 1)];
-  return `${head}-${rest.match(/^\d+/)[0]}`;
+  return `${head}-${rest.match(/^\d+/)![0]}`;
 }
 
 /** Long law texts are shortened in the panel (the full text is one click away). */
-export function clip(text, max = 600) {
+export function clip(text: unknown, max = 600) {
   const s = String(text ?? "");
   if (s.length <= max) return { text: s, cut: false };
   const cut = s.slice(0, max);
@@ -41,8 +44,8 @@ export function clip(text, max = 600) {
 
 /** Where the panel goes, in viewport pixels: in the margin right of the text column, else left of it, else below/above the line.
  *  Returns {side, left, top, width}. */
-export function placePanel({ vw, vh, colLeft, colRight, anchorTop, anchorBottom, anchorLeft, minW = 260, maxW = 340, panelH = 240, gap = 12, margin = 8 }) {
-  const clampTop = t => Math.max(margin, Math.min(t, vh - panelH - margin));
+export function placePanel({ vw, vh, colLeft, colRight, anchorTop, anchorBottom, anchorLeft, minW = 260, maxW = 340, panelH = 240, gap = 12, margin = 8 }: { vw: number; vh: number; colLeft: number; colRight: number; anchorTop: number; anchorBottom: number; anchorLeft: number; minW?: number; maxW?: number; panelH?: number; gap?: number; margin?: number }) {
+  const clampTop = (t: number) => Math.max(margin, Math.min(t, vh - panelH - margin));
   const right = vw - colRight - gap - margin;
   if (right >= minW) {
     const width = Math.min(maxW, right);
@@ -61,15 +64,15 @@ export function placePanel({ vw, vh, colLeft, colRight, anchorTop, anchorBottom,
 }
 
 /** A collapsible law quote {ref, title?, text, n?, _r?}: auto-linked text plus the permanent page of the quoted norm (n = slug). */
-export function lawDetails(q, root = "") {
+export function lawDetails(q: { n?: string; ref: string; title?: string; text?: string; _r?: Record<string, [number, number, string][]> }, root = "") {
   const perma = q.n && SLUG.test(q.n) ? `<a class="small nperma" href="${root}norm/${q.n}.html">Постоянная ссылка на норму →</a>` : "";
   return `<details class="law"><summary>${esc(q.ref)}${q.title ? " — " + esc(q.title) : ""}</summary><div class="lawtext">${lk(q, "text", root)}</div>${perma}</details>`;
 }
 
-const fold = s => String(s ?? "").toLowerCase().replace(/ё/g, "е").replace(/[^\p{L}\p{N}.]+/gu, " ").replace(/\.(?=\s|$)/g, "").replace(/\s+/g, " ").trim();
+const fold = (s: unknown) => String(s ?? "").toLowerCase().replace(/ё/g, "е").replace(/[^\p{L}\p{N}.]+/gu, " ").replace(/\.(?=\s|$)/g, "").replace(/\s+/g, " ").trim();
 
 /** Norm index search: a citation prefix («ст. 37, п. 6», «5.19») or words of the text («остановка»). */
-export function normMatches(query, label, text = "") {
+export function normMatches(query: string, label: string, text = "") {
   const q = fold(query);
   if (!q) return true;
   const L = fold(label);
