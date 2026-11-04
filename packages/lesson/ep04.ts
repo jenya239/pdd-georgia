@@ -1,8 +1,6 @@
-import { readFileSync } from "node:fs";
 import { chat, fig, gl, lq, signrow } from "./blocks.ts";
 import { figCrossingSigns, figCrossingZebra, figLevels, figRailway, figTown } from "./ep04-figs.ts";
-import { lessonHtml } from "./link-html.ts";
-import { explicitCites, findRu } from "./normref.ts";
+import { publishedTheory } from "./publish.ts";
 
 const IMG = "lessons/ep04/";
 const SIGNS: [string, string, string][] = [
@@ -17,7 +15,7 @@ const SIGNS: [string, string, string][] = [
 const SIGNS_CAPTION = "Рисунки знаков — из приложения 1 к закону (Matsne). Для 5.23.1, 5.25 и 5.26 в приложении вместо рисунка пример с названием города («Сурами», «Оками»), поэтому их здесь нет.";
 const MARKER = "<!--AFTER-TICKETS-->";
 
-function body(): string {
+export function ep04Source(): string {
   const parts = [
     chat(
       ["a", "В прошлый раз остановились на трёх словах: переход, переезд, населённый пункт. По-моему, это самое простое в курсе."],
@@ -103,37 +101,6 @@ function body(): string {
   return `${parts.join("\n")}\n`;
 }
 
-function episodeScope(id: string): [string, string | null][] {
-  const episodes = JSON.parse(readFileSync("content/episodes.json", "utf8")) as {
-    id: string;
-    lead?: string;
-    points?: { t: string; c: string }[];
-    quote_refs?: [string, string | null][];
-    annex_quotes?: [number, string][];
-    core_note?: string;
-    linked_note?: string;
-  }[];
-  const episode = episodes.find((item) => item.id === id);
-  if (!episode) return [];
-  const annex = { 1: "Приложение 1 (знаки)", 2: "Приложение 2 (разметка)" } as Record<number, string>;
-  const texts = [
-    episode.lead,
-    ...(episode.points ?? []).map((point) => `${point.t} ${point.c}`),
-    ...(episode.quote_refs ?? []).map(([art, par]) => (par == null ? `ст. ${art}` : `ст. ${art}, п. ${par}`)),
-    ...(episode.annex_quotes ?? []).map(([an, item]) => `${annex[an]}, п. ${item}`),
-    episode.core_note,
-    episode.linked_note,
-  ].filter((text): text is string => Boolean(text));
-  return texts.flatMap((text) => explicitCites(findRu(text)));
-}
-
-function normIds(): Set<string> {
-  const norms = JSON.parse(readFileSync("content/ontology/generated/norms.json", "utf8")) as { norms: { id: string }[] };
-  return new Set(norms.norms.map((item) => item.id));
-}
-
 export function ep04Theory(): string {
-  const html = lessonHtml(body(), normIds(), [episodeScope("ep04")]);
-  const at = html.indexOf(MARKER);
-  return at < 0 ? html : html.slice(0, at);
+  return publishedTheory(ep04Source(), "ep04");
 }
