@@ -21,4 +21,13 @@ export class AttemptJournal {
       await db.$disconnect();
     }
   }
+
+  async importEvents(learnerId: string, batches: { ticketKey: string; events: JournalEvent[] }[]): Promise<void> {
+    const db = openCourseDb();
+    try {
+      for (const batch of batches) await saveAttempts(db, learnerId, batch.ticketKey, batch.events);
+    } finally {
+      await db.$disconnect();
+    }
+  }
 }

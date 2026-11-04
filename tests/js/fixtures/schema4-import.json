@@ -1,0 +1,16 @@
+{
+  "format": "pddge-progress",
+  "schema": 4,
+  "app": "0.7",
+  "exportedAt": "2026-11-04T12:00:00.000Z",
+  "data": {
+    "progress": {
+      "1": {
+        "events": [
+          { "id": "10:0:0", "t": 10, "c": 0, "ok": 0, "w": "practice" },
+          { "id": "20:1:1", "t": 20, "c": 1, "ok": 1, "w": "practice", "hash": "26ab70a7e00969e1" }
+        ]
+      }
+    }
+  }
+}

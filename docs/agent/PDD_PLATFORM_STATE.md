@@ -1,8 +1,8 @@
-current_step: 3
+current_step: 4
 status: ready
-last_result: done step 3: одно событие схемы 4 пишется один раз, освоение считает домен
-last_verify: node --test tests/js/api-journal.test.mjs => exit 0
-next_step: 4
+last_result: done step 4: импорт схемы 4 дважды не удваивает попытки
+last_verify: node --test tests/js/api-import.test.mjs => exit 0
+next_step: 5
 consult_count: 0
 consult_response:
 consult_verdict:
