@@ -7,11 +7,19 @@
   },
   "scripts": {
     "dev": "node tools/dev-server.mjs",
-    "typecheck": "tsc -p packages/domain --noEmit",
-    "test": "tsc -p packages/domain --noEmit && node --test tests/js/*.test.mjs"
+    "typecheck": "tsc -p packages/domain --noEmit && tsc -p packages/course --noEmit",
+    "test": "prisma generate && prisma migrate deploy && tsc -p packages/domain --noEmit && tsc -p packages/course --noEmit && node --test tests/js/*.test.mjs",
+    "release": "node tools/load-release.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.23.1",
+    "prisma": "^7.10.1",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "pg": "^8.23.1"
   }
 }

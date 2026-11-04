@@ -32,6 +32,8 @@ video/              видеоконвейер
   episodes/epNN/      только своё: scenes.py (сценарий), boards.py (доски), timeline.json
 tests/              js (node --test), py (pytest), video (кадры против эталонов), e2e (Playwright)
 site/               СОБРАННЫЙ САЙТ (артефакт сборки, коммитится)
+prisma/             схема PostgreSQL: неизменяемый выпуск и журнал попыток
+prisma/             схема PostgreSQL: неизменяемый выпуск и журнал попыток
 docs/               документация по разработке (не публикуемый сайт)
 ci/test.yml         шаблон workflow GitHub Actions (см. «CI»)
 ```
@@ -49,7 +51,7 @@ python3 tools/build.py --out=DIR # собрать в другую папку
 ```
 Сборка генерирует `site/data/tickets.json`, `site/data/items.json` (наши вопросы и заблуждения), `site/data/episodes.json`, HTML текстовых уроков, копирует страницы, `web/assets`, собирает `packages/domain/*.ts` в `site/assets/domain/*.mjs` (`tools/emit-domain.mjs`), картинки билетов (→ `site/img/`), видео и знаки, пишет `.nojekyll`.
 
-Локальный просмотр: `nvm use && npm run dev` → http://127.0.0.1:8000/pdd-georgia/ (с `file://` не работает — данные грузятся через `fetch`). Нужен Node.js 24.22+, Active LTS.
+Локальный просмотр собранного сайта: `nvm use && npm run dev` → http://127.0.0.1:8000/pdd-georgia/ (с `file://` не работает — данные грузятся через `fetch`). Нужен Node.js 24.22+, Active LTS. Билеты, наши вопросы и выпуски (`data/tickets.json`, `data/items.json`, `data/episodes.json`) dev-сервер читает из последнего выпуска в PostgreSQL. Остальные файлы сайта — с диска. Перед просмотром нужен загруженный выпуск: `npm run release`. Страница одного билета из той же базы: `cd apps/web && npm run dev` → http://127.0.0.1:3000/ticket/1.
 
 ## Публикация (GitHub Pages)
 
@@ -71,7 +73,7 @@ python3 -m pytest -q tests/py          # сборка, назначение би
 python3 -m pytest -q tests/video       # кадры видео пиксель-в-пиксель против tests/video/baseline (пропускается без видео-venv)
 python3 tests/e2e/site_e2e.py [--root=site] [--shots=DIR]   # Playwright, сайт как на Pages (под /pdd-georgia/)
 ```
-Переменные `check.sh`: `PYTHON` (с pytest), `E2E_PYTHON` (с playwright), `VIDEO_PYTHON`, `E2E=0` — пропустить браузер, `E2E_CHANNEL=chromium` — встроенный Chromium вместо Chrome.
+Переменные `check.sh`: `PYTHON` (с pytest), `E2E_PYTHON` (с playwright), `VIDEO_PYTHON`, `E2E=0` — пропустить браузер, `E2E_CHANNEL=chromium` — встроенный Chromium вместо Chrome, `DATABASE_URL` — PostgreSQL выпуска (по умолчанию локальная база `pdd_georgia` через сокет текущего пользователя; создать: `createdb pdd_georgia`). Загрузка собранного курса: `npm run release`.
 Зависимости: `pip install -r requirements-dev.txt`, затем `python -m playwright install chromium`.
 
 ### CI

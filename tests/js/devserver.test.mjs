@@ -59,3 +59,54 @@ test("the dev server serves the site under /pdd-georgia/ and keeps files outside
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("course json comes from the release, not from the file", async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "pdd-pages-"));
+  fs.mkdirSync(path.join(root, "data"));
+  fs.writeFileSync(path.join(root, "data", "tickets.json"), JSON.stringify({ from: "file" }));
+  fs.writeFileSync(path.join(root, "index.html"), "HOME");
+  fs.writeFileSync(path.join(root, "404.html"), "MISSING");
+  const course = {
+    async body(path) {
+      if (path === "data/tickets.json") return JSON.stringify({ from: "db" });
+      return null;
+    },
+  };
+  const started = await startPagesServer({ root, course });
+  try {
+    const tickets = await read(`${started.url}data/tickets.json`);
+    assert.equal(tickets.status, 200);
+    assert.match(tickets.type, /application\/json/);
+    assert.deepEqual(JSON.parse(tickets.body), { from: "db" });
+
+    const head = await read(`${started.url}data/tickets.json`, "HEAD");
+    assert.equal(head.status, 200);
+    assert.equal(head.body, "");
+
+    const items = await read(`${started.url}data/items.json`);
+    assert.equal(items.status, 404);
+    assert.equal(items.body, "course release is not loaded");
+
+    const home = await read(started.url);
+    assert.equal(home.body, "HOME");
+  } finally {
+    await started.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a failed course read does not fall back to the file", async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "pdd-pages-"));
+  fs.mkdirSync(path.join(root, "data"));
+  fs.writeFileSync(path.join(root, "data", "tickets.json"), JSON.stringify({ from: "file" }));
+  const course = { async body() { throw new Error("down"); } };
+  const started = await startPagesServer({ root, course });
+  try {
+    const tickets = await read(`${started.url}data/tickets.json`);
+    assert.equal(tickets.status, 500);
+    assert.equal(tickets.body, "course release failed");
+  } finally {
+    await started.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

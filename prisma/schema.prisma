@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Immutable published course. The JSON objects are the built site files, unchanged.
+model CourseRelease {
+  id        String   @id
+  tickets   Json
+  items     Json
+  episodes  Json
+  norms     Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("course_release")
+}
+
+/// One row is one journal event. Mastery is not stored: the domain counts it from these rows.
+model Attempt {
+  learnerId String  @map("learner_id")
+  id        String
+  ticketKey String  @map("ticket_key")
+  t         BigInt
+  c         Int?
+  ok        Int
+  w         String?
+  hash      String?
+
+  @@id([learnerId, id])
+  @@index([learnerId, ticketKey, t])
+  @@map("attempt")
+}

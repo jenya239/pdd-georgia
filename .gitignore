@@ -1,6 +1,11 @@
 __pycache__/
 .pytest_cache/
 node_modules/
+.next/
+generated/prisma/
+.env
+.env.*
+!.env.example
 # raw teoria.on.ge HTML: its terms restrict republication, keep it local only
 data/tickets/raw/
 data/tickets/*.log
