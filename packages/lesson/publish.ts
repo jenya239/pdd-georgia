@@ -33,8 +33,12 @@ function normIds(): Set<string> {
   return new Set(norms.norms.map((item) => item.id));
 }
 
+export function publishedLesson(html: string, episodeId: string): string {
+  return lessonHtml(html, normIds(), [episodeScope(episodeId)]);
+}
+
 export function publishedTheory(html: string, episodeId: string): string {
-  const linked = lessonHtml(html, normIds(), [episodeScope(episodeId)]);
+  const linked = publishedLesson(html, episodeId);
   const at = linked.indexOf(MARKER);
   return at < 0 ? linked : linked.slice(0, at);
 }

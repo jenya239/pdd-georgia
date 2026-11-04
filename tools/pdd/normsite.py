@@ -352,10 +352,24 @@ class Site:
         return _page("Закон: все нормы", "\n".join(h), "Все статьи, пункты, знаки и разметка закона Грузии о дорожном движении", "normindex.mjs")
 
 
+    def html_model(self) -> dict:
+        intro = self.world.introduced_in
+        packed = {}
+        for nid in self.order:
+            got = self.backlinks(nid)
+            packed[nid] = {
+                "lessons": got["lessons"],
+                "concepts": [{"label": c["label"], "intro": self.eps[intro[c["id"]]]["num"]
+                              if c["id"] in intro and intro[c["id"]] in self.eps else None} for c in got["concepts"]],
+                "misconceptions": [{"belief": m["belief"], "truth": m["truth"]} for m in got["misconceptions"]],
+                "tickets": got["tickets"],
+                "items": [{"id": it["id"], "q": it["q"]} for it in got["items"]],
+                "cited": got["cited_by"],
+            }
+        return {"backlinks": packed}
+
+
 def norm_files(norms: dict, world, linker: Linker, eps, tickets, items_export):
     site = Site(norms, world, linker, eps, tickets, items_export)
-    files = {f"norm/{slug(i)}.html": site.page(i) for i in norms}
-    files["norm/index.html"] = site.index()
-    files.update(site.chunks())
     copies = {f"norm/img/{img}": paths.SIGNS / img for i in norms for img in [image_name(i)] if img}
-    return files, copies, site
+    return site.html_model(), copies, site

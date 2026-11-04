@@ -20,6 +20,13 @@ function theoryHash(htmlPath) {
   return createHash("sha256").update(html.subarray(0, at)).digest("hex");
 }
 
+test("Node lesson files match the published lesson pages", async () => {
+  const { lessonFiles } = await import("../../packages/lesson/files.ts");
+  for (const [rel, html] of Object.entries(lessonFiles())) {
+    assert.equal(html, readFileSync(`site/${rel}`, "utf8"), rel);
+  }
+});
+
 for (const [id, page] of Object.entries(pages)) {
   test(`${id} theory hash matches the saved fixture`, () => {
     const expected = readFileSync(new URL(`./fixtures/${id}-theory.sha256`, import.meta.url), "utf8").trim();

@@ -2,11 +2,14 @@ import { readFileSync } from "node:fs";
 import { explicitCites, findRu, resolveRu, type NormRef } from "../lesson/normref.ts";
 import { slug } from "../lesson/slug.ts";
 
-type Norm = {
+export type Norm = {
   id: string;
   kind: string;
   parent?: string | null;
   article?: string;
+  title?: string;
+  title_ka?: string;
+  annex?: number;
   ru?: string;
   ka?: string;
   en?: string;
@@ -53,7 +56,11 @@ function renderLinked(text: string, spans: [number, number, string][]): string {
   return out + escapePlain(text.slice(pos));
 }
 
-function linkedRu(norm: Norm, missing: string): string {
+export function allNorms(): Norm[] {
+  return norms;
+}
+
+export function linkedRu(norm: Norm, missing: string): string {
   if (!norm.ru) return missing;
   const refs = findRu(norm.ru);
   const ownArticle = norm.id.startsWith("A") ? null : norm.article ?? null;

@@ -82,17 +82,18 @@ def load_lesson(lesson_dir: Path):
             del sys.modules[name]
 
 
-def render_plain_lesson(lesson_id: str) -> str | None:
-    """HTML of content/lessons/<id>/plain.mjs, or None when that edition does not exist.
+def node_json(script: str, payload=None):
+    completed = subprocess.run(["node", script], cwd=paths.REPO, capture_output=True, text=True,
+                               input=None if payload is None else json.dumps(payload, ensure_ascii=False))
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or script)
+    return json.loads(completed.stdout)
 
-    Figures are the lesson's existing figs.py. The statute quotes stay inside the module.
-    """
+
+def render_plain_lesson(lesson_id: str) -> str | None:
     if not (paths.LESSONS / lesson_id / "plain.mjs").is_file():
         return None
-    completed = subprocess.run(
-        ["node", "tools/render-plain-lesson.mjs", lesson_id],
-        cwd=paths.REPO, capture_output=True, text=True,
-    )
+    completed = subprocess.run(["node", "tools/render-plain-lesson.mjs", lesson_id], cwd=paths.REPO, capture_output=True, text=True)
     if completed.returncode != 0:
         raise RuntimeError(completed.stderr.strip() or f"plain lesson {lesson_id} failed")
     return completed.stdout
@@ -198,6 +199,7 @@ def generate():
         raise ValueError("own check items are invalid:\n" + "\n".join(errors))
 
     files, copies, lessons, plains = {}, {}, {}, {}
+    rendered = node_json("tools/render-lessons.mjs")
     for ep in eps:
         ep["kind"] = episode_kind(ep)
         own = [i["id"] for i in items if i["lesson"] == ep["id"]]
@@ -213,7 +215,7 @@ def generate():
             assert q["text"], q
         for k in EPISODE_SOURCE_KEYS:
             ep.pop(k, None)
-        plain = render_plain_lesson(ep["id"])
+        plain = rendered["raw"].get(f"{ep['id']}-plain")
         if plain and ep["kind"] != "text":
             plains[ep["id"]] = plain
             ep["editions"] = [
@@ -222,7 +224,7 @@ def generate():
             ]
         if ep["kind"] == "text":
             lesson_dir = paths.LESSONS / ep["id"]
-            html = load_lesson(lesson_dir).render()
+            html = rendered["raw"][ep["id"]]
             lessons[ep["id"]] = html
             if plain:
                 plains[ep["id"]] = plain
@@ -248,11 +250,11 @@ def generate():
     linker = normsite.link_content(world.norms, world, eps, lessons, tickets, Q, idx.quotes, items_export, plains)
     for ep in eps:
         if ep["id"] in lessons:
-            files[ep["lesson"]] = lessons[ep["id"]]
+            files[ep["lesson"]] = rendered["linked"][ep["lesson"]]
         if ep["id"] in plains:
-            files[f"lessons/{ep['id']}-plain.html"] = plains[ep["id"]]
-    norm_pages, norm_copies, _ = normsite.norm_files(world.norms, world, linker, eps, tickets, items_export)
-    files.update(norm_pages)
+            files[f"lessons/{ep['id']}-plain.html"] = rendered["linked"][f"lessons/{ep['id']}-plain.html"]
+    norm_model, norm_copies, _ = normsite.norm_files(world.norms, world, linker, eps, tickets, items_export)
+    files.update(node_json("tools/render-norm-pages.mjs", norm_model))
     copies.update(norm_copies)
     _LINKS[:] = [linker]
     stat["norm_links"] = sum(c.get("linked", 0) for c in linker.report()["stats"].values())

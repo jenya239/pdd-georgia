@@ -19,6 +19,11 @@ test("st36-p4-v norm text matches the published page", async () => {
   assert.deepEqual(normTexts("st36-p4-v"), expected);
 });
 
+test("Node norm index matches the published index", async () => {
+  const { normFiles } = await import("../../packages/norm/pages.ts");
+  assert.equal(normFiles({})["norm/index.html"], readFileSync("site/norm/index.html", "utf8"));
+});
+
 test(`norm_pages ids=${pageIds.length}`, async () => {
   const { normPageIds, normTexts } = await import("../../packages/norm/text.ts");
   assert.deepEqual(normPageIds().sort(), pageIds);
