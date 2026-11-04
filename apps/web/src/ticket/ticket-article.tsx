@@ -1,6 +1,6 @@
 import type { TicketFace } from "@course/ticket-face.ts";
 
-export function TicketArticle({ face }: { face: TicketFace }) {
+export function TicketArticle({ face, attempts }: { face: TicketFace; attempts: number | null }) {
   return (
     <article>
       <h1>{`Билет № ${face.id}`}</h1>
@@ -10,6 +10,7 @@ export function TicketArticle({ face }: { face: TicketFace }) {
           <li key={index}>{option}</li>
         ))}
       </ol>
+      {attempts === null ? null : <p>{`Попыток: ${attempts}`}</p>}
       <p>
         Хеш текста: <code>{face.hash}</code>
       </p>
