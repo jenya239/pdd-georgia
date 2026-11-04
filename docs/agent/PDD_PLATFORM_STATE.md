@@ -1,8 +1,8 @@
-current_step: 8
+current_step: 9
 status: ready
-last_result: done step 8: Node повторяет теорию ep01–ep06, хеши совпали с фикстурами
-last_verify: node --test tests/js/lesson-theory-hash.test.mjs => exit 0, stdout contains ep01 ep02 ep03 ep04 ep05 ep06
-next_step: 9
+last_result: done step 9: Node повторяет текст нормы st36-p4-v
+last_verify: node --test tests/js/norm-page.test.mjs => exit 0, stdout contains st36-p4-v
+next_step: 10
 consult_count: 0
 consult_response:
 consult_verdict:
