@@ -16,3 +16,10 @@ test("ep04 theory hash matches the saved fixture", () => {
   const expected = readFileSync(new URL("./fixtures/ep04-theory.sha256", import.meta.url), "utf8").trim();
   assert.equal(theoryHash("site/lessons/ep04.html"), expected);
 });
+
+test("Node ep04 theory matches the saved fixture", async () => {
+  const expected = readFileSync(new URL("./fixtures/ep04-theory.sha256", import.meta.url), "utf8").trim();
+  const { ep04Theory } = await import("../../packages/lesson/ep04.ts");
+  const hash = createHash("sha256").update(ep04Theory()).digest("hex");
+  assert.equal(hash, expected);
+});
