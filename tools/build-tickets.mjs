@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseAnnex, parseLaw } from "../packages/build/law-ru.ts";
+import { applyTranslations } from "../packages/build/mt-apply.ts";
 import { buildTicketRecords } from "../packages/build/ticket-record.ts";
 import { dumps } from "../packages/build/pyjson.ts";
 import { ticketHash } from "../packages/domain/ticket-hash.ts";
@@ -17,7 +18,7 @@ function readJson(rel) {
   return JSON.parse(readText(rel));
 }
 
-export function buildTicketsJson() {
+function loadTickets() {
   const questions = readJson("data/tickets/tickets_ru.json").questions;
   const episodes = readJson("content/episodes.json");
   const pitfalls = {};
@@ -31,6 +32,10 @@ export function buildTicketsJson() {
     assigned: loadWorld(root).deriveAssignment().assigned,
     pitfalls,
   });
+  return { questions, tickets };
+}
+
+function stamp(tickets) {
   for (const ticket of tickets) {
     const question = ticket.get("q");
     const answers = ticket.get("a");
@@ -40,5 +45,17 @@ export function buildTicketsJson() {
       c: ticket.get("c"),
     }));
   }
+}
+
+export function buildTicketsJson() {
+  const { tickets } = loadTickets();
+  stamp(tickets);
+  return dumps(tickets);
+}
+
+export function buildTicketsTranslatedJson() {
+  const { questions, tickets } = loadTickets();
+  applyTranslations(tickets, questions, readJson("content/translations/explanations_ru.json").items);
+  stamp(tickets);
   return dumps(tickets);
 }
