@@ -5,8 +5,8 @@
 #   PYTHON     interpreter with pytest            (default: python3)
 #   E2E_PYTHON interpreter with playwright        (default: $PYTHON; set E2E=0 to skip)
 #   VIDEO_PYTHON interpreter of the video venv    (video still tests skip without it)
-# Python still builds the pages and the browser test. The ontology report and the
-# ticket-to-lesson assignment come from Node (tools/ontology-report.mjs).
+# Site freshness is `node tools/build.mjs --check`. Pytest, e2e and video stay on Python.
+# The ontology report and the ticket-to-lesson assignment come from Node (tools/ontology-report.mjs).
 # New code is Node; do not add Python.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -32,7 +32,7 @@ echo "== tsc: domain";               node node_modules/typescript/bin/tsc -p pac
 echo "== tsc: course";               node node_modules/typescript/bin/tsc -p packages/course --noEmit
 echo "== node: domain modules";      node --test tests/js/*.test.mjs
 echo "== pytest: build, ontology, lessons, video"; "$PY" -m pytest -q tests/py tests/video
-echo "== build: site/ is up to date"; "$PY" tools/build.py --check
+echo "== build: node tools/build.mjs --check"; node tools/build.mjs --check
 if [ "${E2E:-1}" != 0 ]; then
   echo "== e2e: headless browser on site/"; "${E2E_PYTHON:-$PY}" tests/e2e/site_e2e.py
 fi
