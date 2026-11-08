@@ -150,5 +150,18 @@
    "main-road"
   ],
   "assumes": []
+ },
+ {
+  "id": "ep07",
+  "introduces": [
+   "stopping",
+   "parking",
+   "forced-stop"
+  ],
+  "relies_on": [
+   "vehicle",
+   "driver"
+  ],
+  "assumes": []
  }
 ]

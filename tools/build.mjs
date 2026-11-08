@@ -40,7 +40,7 @@ import { renderNormPages } from "./render-norm-pages.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const META = "teoria.on.ge (кат. B/B1), выгрузка 20.10.2026; закон: Matsne, ред. 25.06.2026";
-const SOURCE_KEYS = new Set(["ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "pitfalls", "linked"]);
+const SOURCE_KEYS = new Set(["ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "pitfalls", "linked", "edition_labels"]);
 
 const readText = (rel) => readFileSync(path.join(root, rel), "utf8");
 const readJson = (rel) => JSON.parse(readText(rel));
@@ -170,20 +170,33 @@ function assembleEpisode(episode, questions, assigned, items, ru, annexRu) {
 }
 
 function withEditions(built, episode, kind) {
-  const plain = existsSync(path.join(root, "content/lessons", episode.id, "plain.mjs"));
+  const plain = hasPlain(episode.id);
   if (plain && kind !== "text") {
     built.editions = [
       { id: "dialogue", label: "Ролик", href: episode.video },
       { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
     ];
   }
-  if (kind === "text" && plain) {
-    built.editions = [
-      { id: "dialogue", label: "С диалогом", href: episode.lesson },
-      { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
+  if (kind === "text" && plain) built.editions = textEditions(episode);
+  return built;
+}
+
+function hasPlain(id) {
+  return existsSync(path.join(root, "content/lessons", id, "plain.mjs")) || Object.hasOwn(lessonBundle().raw, `${id}-plain`);
+}
+
+function textEditions(episode) {
+  const labels = episode.edition_labels;
+  if (Array.isArray(labels) && labels.length === 2) {
+    return [
+      { id: "full", label: labels[0], href: episode.lesson },
+      { id: "short", label: labels[1], href: `lessons/${episode.id}-plain.html` },
     ];
   }
-  return built;
+  return [
+    { id: "dialogue", label: "С диалогом", href: episode.lesson },
+    { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
+  ];
 }
 
 function finishTicket(record, br, ann, world, byNorm) {

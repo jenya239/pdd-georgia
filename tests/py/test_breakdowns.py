@@ -77,11 +77,12 @@ def test_repository_breakdowns_are_valid_and_varied(world):
     items = breakdowns.load()
     assert breakdowns.validate(items, world) == []
     assigned = world.derive_assignment()["assigned"]
-    lessons = {assigned[b["ticket"]] for b in items}
-    assert {"ep02", "ep03", "ep04", "ep05", "ep06"} <= lessons
     got = {b["ticket"] for b in items}
-    for lesson in ("ep02", "ep03", "ep04", "ep05", "ep06"):
-        ids = {tid for tid, les in assigned.items() if les == lesson}
+    by_lesson = {}
+    for tid, lesson in assigned.items():
+        by_lesson.setdefault(lesson, set()).add(tid)
+    assert by_lesson, "ontology assigned no tickets"
+    for lesson, ids in sorted(by_lesson.items()):
         assert ids <= got, f"{lesson} missing {sorted(ids - got)}"
 
 

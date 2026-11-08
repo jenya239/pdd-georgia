@@ -26,8 +26,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   const lesson = lessonHref ? splitLesson(await (await fetch(lessonHref)).text()) : null;
   const editionBar = editions.length > 1
     ? `<div class="editions" role="group" aria-label="Редакция текста">${editions.map(e =>
-      `<button type="button" data-edition="${esc(e.id)}" aria-pressed="${e.id === chosen.id}">${esc(e.label)}</button>`).join("")}</div>
-       <p class="small mut">Обе редакции про одни и те же нормы. «Без персонажей» разбирает, почему правило устроено так.</p>`
+      `<button type="button" data-edition="${esc(e.id)}" aria-pressed="${e.id === chosen.id}">${esc(e.label)}</button>`).join("")}</div>`
     : "";
   const lawPart = `<h2>Главное</h2>
    <ol class="points">${r.points.map(p => `<li>${lk(p, "t")} <span class="cite">${lk(p, "c")}</span></li>`).join("")}</ol>

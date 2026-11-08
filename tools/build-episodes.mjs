@@ -9,6 +9,7 @@ import {
   lessonTicketIds,
   linkedTicketIds,
 } from "../packages/build/episodes.ts";
+import { lessonBundle } from "../packages/lesson/files.ts";
 import { loadWorld } from "./load-ontology.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -63,7 +64,8 @@ export function episodesJson() {
     built.set("tickets_lesson", lessonIds);
     built.set("tickets_core", core);
     built.set("tickets_linked", linkedTicketIds(ep, questions, core, lessonIds));
-    const plain = existsSync(path.join(root, "content/lessons", ep.id, "plain.mjs"));
+    const plainFile = existsSync(path.join(root, "content/lessons", ep.id, "plain.mjs"));
+    const plain = plainFile || Object.hasOwn(lessonBundle().raw, `${ep.id}-plain`);
     if (plain && kind !== "text") {
       built.set("editions", [
         edition("dialogue", "Ролик", ep.video),
@@ -71,10 +73,16 @@ export function episodesJson() {
       ]);
     }
     if (kind === "text" && plain) {
-      built.set("editions", [
-        edition("dialogue", "С диалогом", ep.lesson),
-        edition("plain", "Без персонажей", `lessons/${ep.id}-plain.html`),
-      ]);
+      const labels = ep.edition_labels;
+      built.set("editions", Array.isArray(labels) && labels.length === 2
+        ? [
+          edition("full", labels[0], ep.lesson),
+          edition("short", labels[1], `lessons/${ep.id}-plain.html`),
+        ]
+        : [
+          edition("dialogue", "С диалогом", ep.lesson),
+          edition("plain", "Без персонажей", `lessons/${ep.id}-plain.html`),
+        ]);
     }
   }
   return dumps(doc, { indent: 1 });

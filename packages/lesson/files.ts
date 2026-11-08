@@ -10,6 +10,8 @@ import { ep05Source } from "./ep05.ts";
 import { figBoarding, figOutside, figRoles } from "./ep05-figs.ts";
 import { ep06Source } from "./ep06.ts";
 import { figScale, figTram, figTree } from "./ep06-figs.ts";
+import { ep07Source } from "./ep07.ts";
+import { ep07ShortSource } from "./ep07-short.ts";
 import { publishedLesson } from "./publish.ts";
 
 const figs04 = {
@@ -40,6 +42,8 @@ const raw: Record<string, string> = {
   "ep05-plain": renderPlain05(figs05),
   ep06: ep06Source(),
   "ep06-plain": renderPlain06(figs06),
+  ep07: ep07Source(),
+  "ep07-plain": ep07ShortSource(),
 };
 
 export function lessonFiles(): Record<string, string> {
@@ -53,6 +57,8 @@ export function lessonFiles(): Record<string, string> {
     "lessons/ep05-plain.html": publishedLesson(raw["ep05-plain"], "ep05"),
     "lessons/ep06.html": publishedLesson(raw.ep06, "ep06"),
     "lessons/ep06-plain.html": publishedLesson(raw["ep06-plain"], "ep06"),
+    "lessons/ep07.html": publishedLesson(raw.ep07, "ep07"),
+    "lessons/ep07-plain.html": publishedLesson(raw["ep07-plain"], "ep07"),
   };
 }
 

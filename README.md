@@ -10,7 +10,7 @@
 content/            ИСХОДНИКИ, которые пишет человек
   checkitems/         наши проверочные вопросы к урокам (epNN.json, пишутся вручную — это исходник, генератора нет)
   episodes.json       выпуски: план (E-номера), ключевые пункты, цитаты, teaches, pitfalls
-  lessons/epNN/       генераторы текстовых уроков (lesson.py → HTML; figs.py — SVG-схемы)
+  lessons/epNN/       архив текстовых уроков ep01–ep06 (lesson.py, figs.py); с ep07 источник — packages/lesson
   media/              опубликованные видео и постеры выпусков (epNN.mp4/.jpg)
   assets/signs/       картинки знаков (общие для уроков и видео)
   plan/               план курса (structure.md: блоки и E001–E107)
@@ -82,9 +82,9 @@ python3 tests/e2e/site_e2e.py [--root=site] [--shots=DIR]   # Playwright, сай
 ## Новый выпуск
 Выпуск бывает двух видов (`kind` вычисляет сборка):
 - **видео** — `content/media/epNN.mp4` и `epNN.jpg`; исходники видео — `video/episodes/epNN/`;
-- **текст** — генератор `content/lessons/epNN/lesson.py` с функцией `render()` → фрагмент HTML (маркер `<!--AFTER-TICKETS-->` делит теорию и заключение; между ними сайт показывает билеты и «наши вопросы» из `content/checkitems/`. Своих вопросов прямо в тексте урока нет — `tests/py/test_lessons.py`). id внутри SVG обязаны начинаться с `epNN-` (проверяет `tests/py/test_lessons.py`, там же — что все цитаты дословно есть в законе). Вторая редакция — `content/lessons/epNN/plain.mjs`: тот же закон, без персонажей. Сборка пишет её в `lessons/epNN-plain.html`. У текстового выпуска она выбирается рядом с диалогом, у видеовыпуска — рядом с роликом.
+- **текст** — `packages/lesson/epNN.ts`: функция `epNNSource()` возвращает фрагмент HTML. Маркер `<!--AFTER-TICKETS-->` делит теорию и заключение; между ними сайт показывает билеты и «наши вопросы» из `content/checkitems/`. Схемы — `packages/lesson/epNN-figs.ts`. Цитаты опубликованного HTML сверяет `tests/js/lesson-quotes.test.mjs` с текстом закона. С ep07 персонажей нет и второй редакции нет. У ep01–ep06 архив `content/lessons/epNN/lesson.py` и `figs.py` остаётся; вторая редакция — `content/lessons/epNN/plain.mjs`, сборка пишет её в `lessons/epNN-plain.html`. У текстового выпуска она выбирается рядом с диалогом, у видеовыпуска — рядом с роликом. Новый урок в `lesson.py` не писать.
 
-Затем добавьте запись в `content/episodes.json` и запустите `python3 tools/build.py`.
+Затем добавьте запись в `content/episodes.json`, урок в `content/ontology/lessons.json` и пересоберите сайт: `node tools/build.mjs`.
 
 ### Видео
 ```

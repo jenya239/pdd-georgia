@@ -4,6 +4,7 @@ import { render as renderEp03 } from "../../content/lessons/ep03/plain.mjs";
 import { ep04Source } from "./ep04.ts";
 import { ep05Source } from "./ep05.ts";
 import { ep06Source } from "./ep06.ts";
+import { ep07Source } from "./ep07.ts";
 import { publishedTheory } from "./publish.ts";
 
 const sources: Record<string, () => string> = {
@@ -13,6 +14,7 @@ const sources: Record<string, () => string> = {
   ep04: ep04Source,
   ep05: ep05Source,
   ep06: ep06Source,
+  ep07: ep07Source,
 };
 
 export function lessonTheory(id: string): string {

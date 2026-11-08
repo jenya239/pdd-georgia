@@ -66,6 +66,7 @@ import { parseId, compareIds } from "../domain/items.mjs";
     list = pool(); if ($("#order").value === "rnd") list = shuffle(list); else list = list.slice().sort((a, b) => compareIds(a.id, b.id));
     i = ok = bad = 0; $("#setup").style.display = "none"; $("#run").style.display = ""; show();
   };
+  if (qs.get("start") === "1" && byIds.length) $("#go").click();
   $("#next").onclick = () => { if (i + 1 < list.length) { i++; show(); scrollTo({ top: 0 }); } else finish(); };
   $("#stop").onclick = () => { $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
   document.addEventListener("keydown", e => {

@@ -499,5 +499,40 @@
    "1": "mc-wheelie",
    "2": "mc-wheelie"
   }
+ },
+ "356": {
+  "concepts": [
+   "forced-stop"
+  ],
+  "distractors": {
+   "1": "mc-forced-is-choice",
+   "2": "mc-forced-is-choice"
+  }
+ },
+ "357": {
+  "concepts": [
+   "parking"
+  ],
+  "distractors": {
+   "1": "mc-parking-is-stop",
+   "2": "mc-forced-is-choice"
+  }
+ },
+ "886": {
+  "concepts": [
+   "stopping"
+  ],
+  "distractors": {
+   "0": "mc-stop-is-signal",
+   "1": "mc-stop-is-signal"
+  }
+ },
+ "894": {
+  "concepts": [
+   "parking"
+  ],
+  "distractors": {
+   "0": "mc-parking-is-stop"
+  }
  }
 }

@@ -51,7 +51,7 @@ def test_rule_of_norm_matches_ticket_rule_keys():
 
 
 def test_files_exist_for_ep01_to_ep06():
-    assert sorted(p.stem for p in CHECKITEMS.glob("ep*.json")) == ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06"]
+    assert sorted(p.stem for p in CHECKITEMS.glob("ep*.json")) == ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07"]
 
 
 def test_items_are_valid(items, world):
@@ -60,7 +60,7 @@ def test_items_are_valid(items, world):
 
 def test_every_type_is_used_and_every_lesson_has_items(items):
     assert {i["type"] for i in items} == set(checkitems.TYPES)
-    assert {i["lesson"] for i in items} == {"ep01", "ep02", "ep03", "ep04", "ep05", "ep06"}
+    assert {i["lesson"] for i in items} == {"ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07"}
 
 
 def test_items_json_export(items, world):

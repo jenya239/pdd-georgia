@@ -8,21 +8,22 @@
    "article": 69,
    "law": 1003
   },
-  "concepts": 81,
+  "concepts": 82,
   "introduced": {
    "ep01": 6,
    "ep02": 12,
    "ep03": 10,
    "ep04": 15,
    "ep05": 9,
-   "ep06": 16
+   "ep06": 16,
+   "ep07": 3
   },
-  "assumed": 5,
+  "assumed": 3,
   "untaught": 8,
-  "misconceptions": 50,
-  "annotated_tickets": 78,
-  "distractors": 135,
-  "distractors_mapped": 126
+  "misconceptions": 53,
+  "annotated_tickets": 82,
+  "distractors": 142,
+  "distractors_mapped": 133
  },
  "assignment": {
   "derived": {
@@ -31,7 +32,8 @@
    "ep03": 13,
    "ep04": 26,
    "ep05": 3,
-   "ep06": 14
+   "ep06": 14,
+   "ep07": 4
   },
   "strict": {
    "ep01": 0,
@@ -39,7 +41,8 @@
    "ep03": 15,
    "ep04": 15,
    "ep05": 3,
-   "ep06": 10
+   "ep06": 10,
+   "ep07": 4
   },
   "blocked": 13,
   "blocked_tickets": {
@@ -262,16 +265,8 @@
     "label": "Обгон"
    },
    {
-    "id": "parking",
-    "label": "Стоянка (дольше 5 минут)"
-   },
-   {
     "id": "priority",
     "label": "Преимущество (приоритет)"
-   },
-   {
-    "id": "stopping",
-    "label": "Остановка (до 5 минут)"
    }
   ],
   "untaught_concepts": [
@@ -422,14 +417,15 @@
   }
  },
  "own_items": {
-  "total": 52,
+  "total": 54,
   "by_lesson": {
    "ep01": 5,
    "ep02": 8,
    "ep03": 9,
    "ep04": 14,
    "ep05": 7,
-   "ep06": 9
+   "ep06": 9,
+   "ep07": 2
   },
   "by_type": {
    "cloze": 8,
@@ -437,7 +433,7 @@
    "flashcard": 9,
    "max-error": 9,
    "priority": 8,
-   "ticket": 12
+   "ticket": 14
   }
  },
  "misconception_use": {
@@ -458,6 +454,7 @@
   "mc-crossing-stop-place": 2,
   "mc-different-levels": 3,
   "mc-enter-when-blocked": 1,
+  "mc-forced-is-choice": 5,
   "mc-houses-settlement": 2,
   "mc-lanes-need-marking": 3,
   "mc-law-citizens-only": 2,
@@ -468,6 +465,7 @@
   "mc-moped-age": 5,
   "mc-oncoming-side": 7,
   "mc-overtake-crossing": 4,
+  "mc-parking-is-stop": 2,
   "mc-pedestrian-on-foot-only": 4,
   "mc-pedestrian-side": 2,
   "mc-railway-bypass": 3,
@@ -483,6 +481,7 @@
   "mc-shoulder-driving": 6,
   "mc-sign-distance": 11,
   "mc-sign-zone": 1,
+  "mc-stop-is-signal": 3,
   "mc-stop-near-crossing": 5,
   "mc-tram-no-priority": 12,
   "mc-unknown-surface-main": 5,

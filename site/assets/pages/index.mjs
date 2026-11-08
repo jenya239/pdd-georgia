@@ -23,7 +23,7 @@ import { progress, store, summary } from "../app/progress.mjs";
     c.innerHTML = `<h3 style="margin-top:0">Текущий урок: выпуск ${cl.num}</h3><p class="small mut">${esc(cl.title)}</p>
      <p class="small">Накопительно (уроки 1–${cl.num}${withOwn ? ", с нашими вопросами" : ""}): ${nq(ss.inScope)} · решено ${ss.solved} · верно сейчас ${ss.correctNow}${ss.errorRate != null ? ` · доля ошибок ${Math.round(100 * ss.errorRate)}%` : ""}</p>
      <div class="bar"><i style="width:${ss.inScope ? (100 * ss.solved / ss.inScope).toFixed(1) : 0}%"></i></div>
-     <div class="row" style="margin-top:8px"><a class="btn" href="check.html?lesson=${cl.id}">${act ? "Продолжить проверку" : "Накопительная проверка"}</a><a class="btn ghost" href="errors.html">Типичные ошибки</a></div>`;
+     <div class="row" style="margin-top:8px"><a class="btn" href="check.html?lesson=${cl.id}">${act ? "Продолжить проверку" : "Накопительная проверка"}</a><a class="btn ghost" href="session.html">Занятие</a><a class="btn ghost" href="errors.html">Типичные ошибки</a></div>`;
     $("#quick").prepend(c);
   }
   const rel = new Set(E.released.flatMap(r => r.plan));

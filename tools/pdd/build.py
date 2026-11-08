@@ -25,7 +25,7 @@ from pdd.plan import parse_plan
 from pdd.ticketdata import LawIndex, matched_refs, ticket_record, ANNEX_NAME
 
 META = "teoria.on.ge (кат. B/B1), выгрузка 20.10.2026; закон: Matsne, ред. 25.06.2026"
-EPISODE_SOURCE_KEYS = ("ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "pitfalls", "linked")
+EPISODE_SOURCE_KEYS = ("ticket_refs", "ticket_ids", "quote_refs", "annex_quotes", "teaches", "pitfalls", "linked", "edition_labels")
 
 
 def dumps_compact(obj):
@@ -213,6 +213,7 @@ def generate():
         ep["law_quotes"] += [idx.annex_quote(an, it) for an, it in ep.get("annex_quotes", [])]
         for q in ep["law_quotes"]:
             assert q["text"], q
+        labels = ep.get("edition_labels")
         for k in EPISODE_SOURCE_KEYS:
             ep.pop(k, None)
         plain = rendered["raw"].get(f"{ep['id']}-plain")
@@ -228,10 +229,16 @@ def generate():
             lessons[ep["id"]] = html
             if plain:
                 plains[ep["id"]] = plain
-                ep["editions"] = [
-                    {"id": "dialogue", "label": "С диалогом", "href": ep["lesson"]},
-                    {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
-                ]
+                if labels:
+                    ep["editions"] = [
+                        {"id": "full", "label": labels[0], "href": ep["lesson"]},
+                        {"id": "short", "label": labels[1], "href": f"lessons/{ep['id']}-plain.html"},
+                    ]
+                else:
+                    ep["editions"] = [
+                        {"id": "dialogue", "label": "С диалогом", "href": ep["lesson"]},
+                        {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
+                    ]
             prefix = f"lessons/{ep['id']}/"
             names = set(lesson_asset_refs(html, prefix))
             if plain:
