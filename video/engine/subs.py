@@ -27,7 +27,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 ev=[]
 for b in tl["beats"]:
-    who=b["who"]; tag="{\\c"+COL[who]+"\\b1}"+NAMES[who]+":{\\r} "
+    who=b["who"]; name=NAMES.get(who, "")
+    tag=("{\\c"+COL[who]+"\\b1}"+name+":{\\r} ") if name and who in COL else ""
     for c0,c1,s in b["cues"]:
         cs=chunks(s); tot=sum(len(x) for x in cs); t=c0
         for x in cs:

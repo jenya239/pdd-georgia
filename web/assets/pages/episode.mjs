@@ -35,11 +35,21 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
   const kindLine = `<div class="small mut"><a href="index.html">Выпуски</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
+  const film = r.video
+    ? `<video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
+   <p class="small mut">Ролик разбирает те же границы. Ниже — полный текст урока.</p>`
+    : "";
+  const ticketsFilm = r.tickets_video
+    ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>
+   <p class="small mut">Ролик по билетам выпуска: ситуация, признак, верный вариант. Под каждым билетом тот же разбор остаётся текстом.</p>`
+    : "";
   m.innerHTML = (isText || showPlain)
     ? `${kindLine}<h1>${esc(r.title)}</h1><p class="lead">${lk(r, "lead")}</p>
+   ${isText ? film : ""}
    ${editionBar}
    <article class="lesson" id="lb">${lesson.before}</article>
    ${lawPart}
+   ${ticketsFilm}
    <h2>Билеты к выпуску</h2>
    <div id="tk"></div>
    <div id="own-items"></div>
@@ -51,6 +61,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
    <p>${lk(r, "lead")}</p>
    ${lawPart}
+   ${ticketsFilm}
    <h2>Билеты к выпуску</h2>
    <div id="tk"></div>
    <div id="own-items"></div>

@@ -246,7 +246,7 @@ def generate():
             for name in sorted(names):
                 src = lesson_dir / name
                 copies[prefix + name] = src if src.exists() else paths.SIGNS / name
-        for key in ("poster", "video"):
+        for key in ("poster", "video", "tickets_video"):
             rel = ep.get(key)
             if rel and rel.startswith("lessons/"):
                 copies[rel] = paths.LESSONS / rel[len("lessons/"):]

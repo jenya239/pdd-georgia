@@ -23,17 +23,6 @@ test("recordAnswer persists through the backend", () => {
     h: [{ t: 5, c: 2, ok: 0 }], events: [{ id: "5:2:0", t: 5, c: 2, ok: 0 }] });
 });
 
-test("a paused study stays next to the cumulative run and does not replace it", () => {
-  const st = createStore(memoryBackend());
-  st.saveActiveRun({ id: "r", lesson: "ep07", ids: [886], answers: {} });
-  st.saveStudy({ id: "s", lesson: "ep07", steps: [{ kind: "theory", ref: "ostanovka" }], cursor: 1 });
-  assert.equal(st.activeRun("ep07").id, "r");
-  assert.equal(st.study().cursor, 1);
-  st.clearStudy();
-  assert.equal(st.study(), null);
-  assert.equal(st.activeRun("ep07").id, "r");
-});
-
 test("active runs are stored per lesson and finished runs are appended", () => {
   const st = createStore(memoryBackend());
   st.saveActiveRun({ id: "r", lesson: "ep04", ids: [1], answers: {} });

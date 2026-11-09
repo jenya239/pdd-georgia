@@ -243,7 +243,7 @@ function copyMap(episodes, records, raw, normList) {
         lessonAssets.push({ dest: prefix + name, source: lessonAssetSource(episode.id, name, inLesson) });
       }
     }
-    for (const key of ["poster", "video"]) {
+    for (const key of ["poster", "video", "tickets_video"]) {
       const rel = episode[key];
       const source = typeof rel === "string" ? mediaSource(rel) : null;
       if (source) media.push({ dest: rel, source });

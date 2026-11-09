@@ -25,4 +25,5 @@ tests/e2e/shots/
 
 # local virtualenvs
 .venv/
+.videovenv/
 __pycache__/

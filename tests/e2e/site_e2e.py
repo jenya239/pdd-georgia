@@ -486,7 +486,12 @@ def main():
             page.goto(base + f"episode.html?id={r['id']}")
             page.wait_for_selector("#tk .q")
             n = len(r["tickets_core"]) + len(r["tickets_linked"])
-            check(page.locator("video").count() == 0 and page.locator(".badge.kind.text").count() == 1, f"{r['id']}: text lesson badge, no video")
+            videos = (1 if r.get("video") else 0) + (1 if r.get("tickets_video") else 0)
+            check(page.locator("video").count() == videos and page.locator(".badge.kind.text").count() == 1,
+                  f"{r['id']}: text lesson badge, video={videos}")
+            if videos:
+                durs = page.evaluate("Promise.all([...document.querySelectorAll('video')].map(v => new Promise(r=>{if(v.readyState>=1) r(v.duration); else v.onloadedmetadata=()=>r(v.duration); setTimeout(()=>r(-1),8000)})))")
+                check(all(d > 60 for d in durs), f"{r['id']}: lesson video metadata loads ({durs})")
             check(page.locator("#tk .q").count() == n, f"{r['id']}: {n} tickets rendered")
             check(page.locator("figure.fig svg").count() >= 3, f"{r['id']}: svg figures")
             ids = page.evaluate("[...document.querySelectorAll('[id]')].map(e => e.id)")

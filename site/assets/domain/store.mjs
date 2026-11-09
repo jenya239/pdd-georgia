@@ -100,9 +100,6 @@ export function createStore(backend) {
             return res;
         },
         activeRun: (lesson) => actives()[lesson] ?? null,
-        study: () => actives().study ?? null,
-        saveStudy(study) { write(KEYS.active, { ...actives(), study }); },
-        clearStudy() { const a = actives(); delete a.study; write(KEYS.active, a); },
         saveActiveRun(run) { write(KEYS.active, { ...actives(), [run.lesson]: run }); },
         clearActiveRun(lesson) { const a = actives(); delete a[lesson]; write(KEYS.active, a); },
         finishRun(lesson, result) {

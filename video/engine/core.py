@@ -246,7 +246,10 @@ for j,bl in enumerate(BLOCKS): bl["T1"]=BLOCKS[j+1]["T0"] if j+1<len(BLOCKS) els
 def speaker_tag(fr,T,x,y):
     sp=[b for b in BEATS if b["start"]<=T<=b["end"]+0.2]
     if not sp: return
-    who=sp[0]["who"]; d=ImageDraw.Draw(fr,"RGBA"); nm=f"{NAMES[who]} · {ROLES[who]}"; w=F(DJB,14).getlength(nm)+46
+    who=sp[0]["who"]
+    name, role = NAMES.get(who, ""), ROLES.get(who, "")
+    if not name and not role: return
+    d=ImageDraw.Draw(fr,"RGBA"); nm=f"{name} · {role}"; w=F(DJB,14).getlength(nm)+46
     d.rounded_rectangle([x,y,x+w,y+26],13,fill=(15,18,26,230)); d.ellipse([x+7,y+6,x+21,y+20],fill=NAMECOL[who]+(255,))
     d.text((x+30,y+13),nm,font=F(DJB,14),fill=(235,235,235),anchor="lm")
 def loc_card(fr,t,setting):
