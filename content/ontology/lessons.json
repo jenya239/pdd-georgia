@@ -163,5 +163,17 @@
    "driver"
   ],
   "assumes": []
+ },
+ {
+  "id": "ep08",
+  "introduces": [
+   "give-way",
+   "priority"
+  ],
+  "relies_on": [
+   "driver",
+   "road-user"
+  ],
+  "assumes": []
  }
 ]

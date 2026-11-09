@@ -5,6 +5,7 @@ import { ep04Source } from "./ep04.ts";
 import { ep05Source } from "./ep05.ts";
 import { ep06Source } from "./ep06.ts";
 import { ep07Source } from "./ep07.ts";
+import { ep08Source } from "./ep08.ts";
 import { publishedTheory } from "./publish.ts";
 
 const sources: Record<string, () => string> = {
@@ -15,6 +16,7 @@ const sources: Record<string, () => string> = {
   ep05: ep05Source,
   ep06: ep06Source,
   ep07: ep07Source,
+  ep08: ep08Source,
 };
 
 export function lessonTheory(id: string): string {

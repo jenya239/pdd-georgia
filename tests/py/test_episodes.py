@@ -1,4 +1,5 @@
 """Episode assembly helpers (tools/pdd/episodes.py)."""
+import json
 import sys, pathlib
 import pytest
 
@@ -52,3 +53,15 @@ def test_lesson_ticket_ids_sorted():
 def test_linked_can_come_from_lesson_assignment():
     ep = {"plan": ["E005"], "linked": "lesson"}
     assert linked_ticket_ids(ep, Q, core=[1], lesson_ids=[4, 1, 2]) == [4, 2]
+
+
+def test_ep04_film_separates_a_jam_from_a_stop():
+    root = pathlib.Path(__file__).resolve().parents[2]
+    script = (root / "video/episodes/ep04/scenes.py").read_text(encoding="utf-8")
+    assert "нарушает запрет остановки на самом переходе" not in script
+    assert "стояние в потоке остановкой не считается" in script
+    episodes = json.loads((root / "content/episodes.json").read_text(encoding="utf-8"))
+    note = next(ep["video_note"] for ep in episodes if ep["id"] == "ep04")
+    assert "ст. 5, п. 11" in note and "ст. 25, п. 6" in note
+    page = (root / "web/assets/pages/episode.mjs").read_text(encoding="utf-8")
+    assert 'lk(r, "video_note")' in page

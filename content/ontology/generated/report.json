@@ -16,14 +16,15 @@
    "ep04": 15,
    "ep05": 9,
    "ep06": 16,
-   "ep07": 3
+   "ep07": 3,
+   "ep08": 2
   },
-  "assumed": 3,
+  "assumed": 1,
   "untaught": 8,
-  "misconceptions": 53,
-  "annotated_tickets": 82,
-  "distractors": 142,
-  "distractors_mapped": 133
+  "misconceptions": 54,
+  "annotated_tickets": 84,
+  "distractors": 144,
+  "distractors_mapped": 135
  },
  "assignment": {
   "derived": {
@@ -33,7 +34,8 @@
    "ep04": 26,
    "ep05": 3,
    "ep06": 14,
-   "ep07": 4
+   "ep07": 4,
+   "ep08": 2
   },
   "strict": {
    "ep01": 0,
@@ -42,7 +44,8 @@
    "ep04": 15,
    "ep05": 3,
    "ep06": 10,
-   "ep07": 4
+   "ep07": 4,
+   "ep08": 2
   },
   "blocked": 13,
   "blocked_tickets": {
@@ -257,16 +260,8 @@
  "gaps": {
   "assumed_concepts": [
    {
-    "id": "give-way",
-    "label": "Уступить дорогу (не создавать помех)"
-   },
-   {
     "id": "overtaking",
     "label": "Обгон"
-   },
-   {
-    "id": "priority",
-    "label": "Преимущество (приоритет)"
    }
   ],
   "untaught_concepts": [
@@ -417,7 +412,7 @@
   }
  },
  "own_items": {
-  "total": 54,
+  "total": 56,
   "by_lesson": {
    "ep01": 5,
    "ep02": 8,
@@ -425,7 +420,8 @@
    "ep04": 14,
    "ep05": 7,
    "ep06": 9,
-   "ep07": 2
+   "ep07": 2,
+   "ep08": 2
   },
   "by_type": {
    "cloze": 8,
@@ -433,7 +429,7 @@
    "flashcard": 9,
    "max-error": 9,
    "priority": 8,
-   "ticket": 14
+   "ticket": 16
   }
  },
  "misconception_use": {
@@ -455,6 +451,7 @@
   "mc-different-levels": 3,
   "mc-enter-when-blocked": 1,
   "mc-forced-is-choice": 5,
+  "mc-give-way-is-priority": 2,
   "mc-houses-settlement": 2,
   "mc-lanes-need-marking": 3,
   "mc-law-citizens-only": 2,

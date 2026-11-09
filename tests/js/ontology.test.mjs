@@ -42,7 +42,8 @@ test("assignment is the earliest lesson that teaches the primary norm and alread
   assert.deepEqual(blocked["1262"].missing, ["sign-zone-of-action"]);
   for (const id of [611, 670, 671, 515]) assert.equal(assigned[id], "ep04");
   for (const id of [21, 59, 256, 605, 614, 618, 794]) assert.ok(blocked[id], String(id));
-  assert.deepEqual(world.lessonOrder, ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07"]);
+  assert.deepEqual(world.lessonOrder, ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07", "ep08"]);
+  for (const id of [879, 889]) assert.equal(assigned[id], "ep08");
   for (const id of [886, 894, 357, 356]) assert.equal(assigned[id], "ep07");
   assert.deepEqual(world.integrityErrors(), []);
 });

@@ -11,6 +11,7 @@ import { figBoarding, figOutside, figRoles } from "./ep05-figs.ts";
 import { ep06Source } from "./ep06.ts";
 import { figScale, figTram, figTree } from "./ep06-figs.ts";
 import { ep07Source } from "./ep07.ts";
+import { ep08Source } from "./ep08.ts";
 import { publishedLesson } from "./publish.ts";
 
 const figs04 = {
@@ -42,6 +43,7 @@ const raw: Record<string, string> = {
   ep06: ep06Source(),
   "ep06-plain": renderPlain06(figs06),
   ep07: ep07Source(),
+  ep08: ep08Source(),
 };
 
 export function lessonFiles(): Record<string, string> {
@@ -56,6 +58,7 @@ export function lessonFiles(): Record<string, string> {
     "lessons/ep06.html": publishedLesson(raw.ep06, "ep06"),
     "lessons/ep06-plain.html": publishedLesson(raw["ep06-plain"], "ep06"),
     "lessons/ep07.html": publishedLesson(raw.ep07, "ep07"),
+    "lessons/ep08.html": publishedLesson(raw.ep08, "ep08"),
   };
 }
 

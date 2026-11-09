@@ -43,6 +43,7 @@ export function linkCourse(input: LinkCourse): Map<string, Json> {
       ...(episode.law_quotes ?? []).map((quote: Bag) => quote.ref),
       episode.core_note,
       episode.linked_note,
+      episode.video_note,
     ]);
     if (lessons[episode.id] != null) lessons[episode.id] = linker.linkHtml("lessons", episode.id, lessons[episode.id], [cited]);
     if (input.plains[episode.id] != null) {
@@ -50,7 +51,7 @@ export function linkCourse(input: LinkCourse): Map<string, Json> {
     }
     const fromLesson = linker.cites([(lessons[episode.id] ?? "").replace(/<[^>]+>/g, SEP)]);
     scopeOf.set(episode.id, [...cited, ...fromLesson]);
-    linker.ruFields("episodes", episode.id, episode, ["lead", "core_note", "linked_note"], [cited, fromLesson]);
+    linker.ruFields("episodes", episode.id, episode, ["lead", "core_note", "linked_note", "video_note"], [cited, fromLesson]);
     for (const point of episode.points ?? []) linker.ruFields("episodes", episode.id, point, ["t", "c"], [cited, fromLesson]);
     for (const quote of episode.law_quotes ?? []) linkQuote(linker, "episodes", episode.id, quote, articles);
   }

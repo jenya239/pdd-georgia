@@ -37,6 +37,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   const kindLine = `<div class="small mut"><a href="index.html">Выпуски</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
   const film = r.video
     ? `<video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
+   ${r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : ""}
    <p class="small mut">Ролик разбирает те же границы. Ниже — полный текст урока.</p>`
     : "";
   const ticketsFilm = r.tickets_video

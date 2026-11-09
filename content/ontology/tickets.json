@@ -518,6 +518,11 @@
    "2": "mc-forced-is-choice"
   }
  },
+ "879": {
+  "distractors": {
+   "0": "mc-give-way-is-priority"
+  }
+ },
  "886": {
   "concepts": [
    "stopping"
@@ -525,6 +530,11 @@
   "distractors": {
    "0": "mc-stop-is-signal",
    "1": "mc-stop-is-signal"
+  }
+ },
+ "889": {
+  "distractors": {
+   "0": "mc-give-way-is-priority"
   }
  },
  "894": {

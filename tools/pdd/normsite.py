@@ -46,7 +46,8 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
     ep_scope = {}                       # episode id → explicit cites of its data + lesson (context for bare «п. N»)
     for ep in eps:
         texts = [ep.get("lead"), *[p["t"] + " " + p["c"] for p in ep.get("points", [])],
-                 *[q["ref"] for q in ep.get("law_quotes", [])], ep.get("core_note"), ep.get("linked_note")]
+                 *[q["ref"] for q in ep.get("law_quotes", [])], ep.get("core_note"), ep.get("linked_note"),
+                 ep.get("video_note")]
         ep_cites = L.cites(texts)
         if ep["id"] in lessons:
             lessons[ep["id"]] = L.lesson_html("lessons", ep["id"], lessons[ep["id"]], scopes=[ep_cites])
@@ -54,7 +55,7 @@ def link_content(norms: dict, world, eps: list, lessons: dict, tickets: list, ra
             plains[ep["id"]] = L.lesson_html("lessons", f"{ep['id']}:plain", plains[ep["id"]], scopes=[ep_cites])
         lesson_cites = L.cites([re.sub(r"<[^>]+>", "\x00", lessons.get(ep["id"], ""))])
         ep_scope[ep["id"]] = ep_cites + lesson_cites
-        L.ru_fields("episodes", ep["id"], ep, ["lead", "core_note", "linked_note"], scopes=[ep_cites, lesson_cites])
+        L.ru_fields("episodes", ep["id"], ep, ["lead", "core_note", "linked_note", "video_note"], scopes=[ep_cites, lesson_cites])
         for p in ep.get("points", []):
             L.ru_fields("episodes", ep["id"], p, ["t", "c"], scopes=[ep_cites, lesson_cites])
         for q in ep.get("law_quotes", []):
