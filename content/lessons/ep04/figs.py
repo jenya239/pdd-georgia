@@ -68,7 +68,7 @@ def fig_crossing_signs():
     b += f'<text x="12" y="246" class="t small">5.19.1 — ближняя граница</text>'
     b += f'<text x="438" y="40" class="t small">5.19.2 —</text><text x="438" y="60" class="t small">дальняя</text>'
     b += f'<text x="382" y="110" class="t small onroad" text-anchor="middle">пере-</text><text x="382" y="128" class="t small onroad" text-anchor="middle">ход</text>'
-    b += f'<text x="12" y="268" class="t small mut">прил. 1, п. 5.19; ст. 5, п. 86 (груз. текст)</text>'
+    b += f'<text x="12" y="268" class="t small mut">без разметки края задают знаки 5.19</text>'
     return svg(W, H, b, "Переход без разметки: границы задают знак 5.19.1 справа и знак 5.19.2 слева", "ep04-f1b")
 
 def fig_railway():

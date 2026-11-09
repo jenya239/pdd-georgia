@@ -493,7 +493,8 @@ def main():
                 durs = page.evaluate("Promise.all([...document.querySelectorAll('video')].map(v => new Promise(r=>{if(v.readyState>=1) r(v.duration); else v.onloadedmetadata=()=>r(v.duration); setTimeout(()=>r(-1),8000)})))")
                 check(all(d > 60 for d in durs), f"{r['id']}: lesson video metadata loads ({durs})")
             check(page.locator("#tk .q").count() == n, f"{r['id']}: {n} tickets rendered")
-            check(page.locator("figure.fig svg").count() >= 3, f"{r['id']}: svg figures")
+            figs = page.locator("figure.fig").count()
+            check(page.locator("figure.fig svg").count() == figs, f"{r['id']}: every lesson figure is an svg")
             ids = page.evaluate("[...document.querySelectorAll('[id]')].map(e => e.id)")
             check(len(ids) == len(set(ids)), f"{r['id']}: element ids unique on the page")
             dangling = page.evaluate("""[...document.querySelectorAll('svg [marker-end],svg [fill^="url("],svg [marker-start]')]
