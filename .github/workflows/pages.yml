@@ -1,8 +1,4 @@
-# GitHub Actions workflow template. It lives in ci/ (not .github/workflows/) because the
-# token used to push this repo has no `workflow` scope. To enable it, copy it once with a
-# token/UI that can write workflows, then set Pages to "GitHub Actions":
-#   mkdir -p .github/workflows && cp ci/pages.yml .github/workflows/pages.yml
-# The workflow publishes the already built site/ directory. It does not rebuild it.
+# Публикует уже собранный site/. Сайт не пересобирает.
 name: pages
 on:
   push:

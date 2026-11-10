@@ -83,10 +83,7 @@ def test_plain_editions_keep_the_statute_and_drop_the_characters(plain_lessons, 
         assert miss == []
         assert "Аня" not in html and "Макс" not in html and "Сергей" not in html
         assert 'class="chat"' not in html and 'class="say ' not in html
-        if name == "ep04":
-            assert 'class="ask"' not in html and "Наш вывод" not in html
-        else:
-            assert html.count('class="ask"') >= 4
+        assert 'class="ask"' not in html and "Наш вывод" not in html
         assert "<!--AFTER-TICKETS-->" in html
         ids = re.findall(r'\sid="([^"]+)"', html)
         assert len(ids) == len(set(ids))
