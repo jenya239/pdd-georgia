@@ -10,6 +10,7 @@
  * - pause is set only when this session steps into a later lesson whose earlier questions are all answered
  * - done is set only on a text step, and only when every question in scope was last answered correctly
  * - repeat, once that stop is passed, serves answered questions again and does not open new ones
+ * - a repetition pass walks every currently correct question before it starts over
  * - review never opens a question that has not been answered
  */
 import { releasedLessons, studyLesson } from "./scope.ts";
@@ -25,6 +26,7 @@ export type FlowStep = {
   pause: boolean;
   done: boolean;
   again?: boolean;
+  fresh?: boolean;
 };
 type FlowLesson = {
   id: string;
@@ -35,16 +37,18 @@ type FlowLesson = {
   own_items?: (string | number)[];
 };
 type Attempt = { l?: number };
-type FlowOpts = { mode?: string; own?: boolean; last?: FlowKind; anchor?: string; avoid?: string[]; just?: string; repeat?: boolean };
+type FlowOpts = { mode?: string; own?: boolean; last?: FlowKind; anchor?: string; avoid?: string[]; just?: string; served?: string[]; repeat?: boolean };
 
-export type FlowRun = { last?: FlowKind; anchor?: string; avoid: string[]; part: number; partLesson?: string; repeat: boolean };
+export type FlowRun = { last?: FlowKind; anchor?: string; avoid: string[]; served: string[]; part: number; partLesson?: string; repeat: boolean };
 
 /** The flow's place in the browser. Unknown fields are dropped; `just` is only for the open page. */
 export function cleanFlowRun(value: unknown): FlowRun {
   const raw = value && typeof value === "object" ? value as Record<string, unknown> : {};
-  const avoid = Array.isArray(raw.avoid) ? raw.avoid.filter((item): item is string => typeof item === "string" && item.length > 0).slice(0, 80) : [];
+  const texts = (value: unknown, cap: number) => Array.isArray(value) ? value.filter((item): item is string => typeof item === "string" && item.length > 0).slice(0, cap) : [];
+  const avoid = texts(raw.avoid, 80);
+  const served = texts(raw.served, 400);
   const part = typeof raw.part === "number" && Number.isInteger(raw.part) && raw.part > 0 ? raw.part : 0;
-  const run: FlowRun = { avoid, part, repeat: raw.repeat === true };
+  const run: FlowRun = { avoid, served, part, repeat: raw.repeat === true };
   if (raw.last === "theory" || raw.last === "question" || raw.last === "review") run.last = raw.last;
   if (typeof raw.anchor === "string" && raw.anchor) run.anchor = raw.anchor;
   if (typeof raw.partLesson === "string" && raw.partLesson) run.partLesson = raw.partLesson;
@@ -101,12 +105,13 @@ export function nextFlowItem(released: FlowLesson[], progress: Record<string, At
   const avoid = new Set(opts.avoid || []);
   const just = opts.just ? new Set([opts.just]) : new Set<string>();
   const blocked = new Set([...avoid, ...just]);
-  return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, opts.repeat === true)
-    ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, opts.repeat === true)
-    ?? pick(list, progress, own, mode, opts.last, opts.anchor, new Set(), opts.repeat === true);
+  const served = new Set((opts.served || []).map(String));
+  return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, served, opts.repeat === true)
+    ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, served, opts.repeat === true)
+    ?? pick(list, progress, own, mode, opts.last, opts.anchor, new Set(), served, opts.repeat === true);
 }
 
-function pick(list: FlowLesson[], progress: Record<string, Attempt>, own: boolean, mode: FlowMode, last: FlowKind | undefined, anchor: string | undefined, blocked: Set<string>, repeat: boolean): FlowStep | null {
+function pick(list: FlowLesson[], progress: Record<string, Attempt>, own: boolean, mode: FlowMode, last: FlowKind | undefined, anchor: string | undefined, blocked: Set<string>, served: Set<string>, repeat: boolean): FlowStep | null {
   const unanswered = (lesson: FlowLesson) => work(lesson, own).filter(id => !progress[id]);
   const wrong = (lesson: FlowLesson) => work(lesson, own).filter(id => progress[id]?.l === 0);
   const hasWork = list.some(lesson => work(lesson, own).length);
@@ -145,8 +150,17 @@ function pick(list: FlowLesson[], progress: Record<string, Attempt>, own: boolea
   const openQ = () => firstOf("question", unanswered);
   const badQ = () => firstOf("review", wrong);
   const againQ = () => {
-    const step = firstOf("question", lesson => work(lesson, own).filter(id => progress[id]?.l === 1));
-    if (step) step.again = true;
+    const ids: (string | number)[] = [];
+    for (const lesson of list) for (const id of work(lesson, own)) if (progress[id]?.l === 1) ids.push(id);
+    const waiting = ids.filter(id => !served.has(String(id)) && !blocked.has(String(id)));
+    const pool = waiting.length ? waiting : ids.filter(id => !blocked.has(String(id)));
+    const id = pool[0];
+    if (id == null) return null;
+    const lesson = list.find(item => work(item, own).some(itemId => String(itemId) === String(id)));
+    const step = lesson ? asQuestion(lesson, id, "question") : null;
+    if (!step) return null;
+    step.again = true;
+    if (!waiting.length) step.fresh = true;
     return step;
   };
   const studiedText = () => {

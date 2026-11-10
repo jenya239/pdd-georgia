@@ -139,10 +139,25 @@ test("a finished course continues with repetition after the stop", () => {
   assert.equal(next.ticketId, 2);
 });
 
+test("repetition walks every answered question before the pass starts again", () => {
+  const progress = { 1: { l: 1 }, 2: { l: 1 }, o1: { l: 1 }, 3: { l: 1 } };
+  const seen = [];
+  let served = [];
+  let just;
+  for (let n = 0; n < 8; n++) {
+    const step = nextFlowItem(L, progress, { own: true, repeat: true, just, served });
+    seen.push(step.ticketId);
+    served = step.fresh ? [String(step.ticketId)] : [...served, String(step.ticketId)];
+    just = flowKey(step);
+  }
+  assert.deepEqual(seen, [1, 2, "o1", 3, 1, 2, "o1", 3]);
+});
+
 test("the flow place survives a reload", () => {
   const run = cleanFlowRun({ last: "theory", anchor: "ep01", avoid: ["theory:ep01:1", 4], part: 2, partLesson: "ep01", repeat: true, just: "1" });
-  assert.deepEqual(run, { last: "theory", anchor: "ep01", avoid: ["theory:ep01:1"], part: 2, partLesson: "ep01", repeat: true });
-  assert.deepEqual(cleanFlowRun(null), { avoid: [], part: 0, repeat: false });
+  assert.deepEqual(run, { last: "theory", anchor: "ep01", avoid: ["theory:ep01:1"], served: [], part: 2, partLesson: "ep01", repeat: true });
+  assert.deepEqual(cleanFlowRun({ served: ["1", 2, ""] }), { avoid: [], served: ["1"], part: 0, repeat: false });
+  assert.deepEqual(cleanFlowRun(null), { avoid: [], served: [], part: 0, repeat: false });
 });
 
 test("lesson status follows answers, not publication", () => {

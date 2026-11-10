@@ -24,6 +24,7 @@ let anchor = saved.anchor;
 let part = saved.part;
 let partLesson = saved.partLesson;
 let repeat = saved.repeat;
+let served = saved.served;
 let just, held;
 let bank = null;
 let token = 0;
@@ -32,12 +33,12 @@ const partsCache = new Map();
 const lessonOf = (id) => E.released.find(item => item.id === id);
 
 function persist() {
-  st.saveSettings({ flowRun: { last, anchor, avoid, part, partLesson, repeat } });
+  st.saveSettings({ flowRun: { last, anchor, avoid, served, part, partLesson, repeat } });
 }
 
 function stepNow() {
   const own = st.settings().own !== false;
-  const opts = { mode: modeEl.value, own, last, anchor, avoid, just, repeat };
+  const opts = { mode: modeEl.value, own, last, anchor, avoid, just, served, repeat };
   if (repeat && !nextFlowItem(E.released, st.progress(), { ...opts, repeat: false })?.done) {
     repeat = false;
     persist();
@@ -50,6 +51,11 @@ function forward(step, skip) {
   if ($("#next")) $("#next").disabled = true;
   const key = flowKey(step);
   if (skip && !avoid.includes(key)) avoid.push(key);
+  if (step.again && step.ticketId != null) {
+    if (step.fresh) served = [];
+    const id = String(step.ticketId);
+    if (!served.includes(id)) served.push(id);
+  }
   just = key;
   last = step.kind;
   anchor = step.lessonId;
@@ -186,7 +192,7 @@ modeEl.onchange = () => {
   part = 0;
   partLesson = undefined;
   repeat = false;
-  st.saveSettings({ flow: modeEl.value, flowRun: { avoid, part: 0, repeat: false } });
+  st.saveSettings({ flow: modeEl.value, flowRun: { avoid, served, part: 0, repeat: false } });
   void render(stepNow());
 };
 

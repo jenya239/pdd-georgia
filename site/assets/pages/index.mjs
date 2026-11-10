@@ -17,7 +17,7 @@ const own = st.settings().own !== false;
 const progress = st.progress();
 const run = cleanFlowRun(st.settings().flowRun);
 const step = nextFlowItem(E.released, progress, {
-  mode: st.settings().flow, own, last: run.last, anchor: run.anchor, avoid: run.avoid, repeat: run.repeat,
+  mode: st.settings().flow, own, last: run.last, anchor: run.anchor, avoid: run.avoid, served: run.served, repeat: run.repeat,
 });
 $("#know").textContent = knowledgeLine(E.released, progress, { own });
 const now = document.createElement("section");
