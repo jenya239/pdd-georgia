@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: "Iowan Old Style", Palatino, Georgia, serif;
-  line-height: 1.45;
+  font-family: "Noto Sans", "Liberation Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.58;
   color: #1c1915;
   background: #f7f4ee;
 }
@@ -14,7 +14,8 @@ article {
 }
 
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
+  line-height: 1.3;
   font-weight: 600;
 }
 
