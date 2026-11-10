@@ -13,6 +13,13 @@
 .playbar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:28px}
 .playmode{font-size:13px;color:var(--mut)}
 .playmode select{margin-left:8px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:2px 2px 3px;color:var(--fg)}
+.playnote{margin:-12px 0 24px;max-width:68ch;color:var(--mut);font-size:14px;line-height:1.45}
+.atlas #stage .reading{font-family:var(--serif);font-size:19px;line-height:1.65}
+.atlas #stage .reading p,.atlas #stage .reading li{max-width:68ch}
+.atlas #stage .reading h2{font-size:30px;margin:0 0 .55em}
+.atlas #stage .reading .lq{background:transparent;padding:2px 0 2px 14px}
+.atlas #stage .whole{margin:8px 0 18px;font-size:14px}
+.atlas #stage .whole a{color:var(--mut)}
 .atlas #stage{margin-top:0}
 .atlas #stage.step{animation:atlas-in .28s ease}
 @keyframes atlas-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}

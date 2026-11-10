@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { flowKey, knowledgeLine, lessonStatus, nextFlowItem } from "../../packages/domain/flow.ts";
+import { cleanFlowRun, flowKey, knowledgeLine, lessonStatus, nextFlowItem } from "../../packages/domain/flow.ts";
 
 const L = [
   { id: "ep01", num: 1, title: "Дорога", lead: "Что считается дорогой.", tickets_lesson: [1, 2], own_items: ["o1"] },
@@ -110,7 +110,7 @@ test("no lessons means no step", () => {
 
 test("knowledge is told by lesson, not by a solved count", () => {
   assert.match(knowledgeLine(L, {}), /Ответов пока нет/);
-  assert.match(knowledgeLine(L, { 1: { l: 1 }, 2: { l: 1 }, o1: { l: 1 } }, { own: true }), /Без ошибок: Дорога/);
+  assert.match(knowledgeLine(L, { 1: { l: 1 }, 2: { l: 1 }, o1: { l: 1 } }, { own: true }), /На все вопросы сейчас отвечено правильно: Дорога/);
   assert.match(knowledgeLine(L, { 1: { l: 1 }, 2: { l: 1 }, o1: { l: 1 } }, { own: true }), /Ещё не начаты: Знаки/);
   assert.match(knowledgeLine(L, { 1: { l: 0 } }, { own: true }), /Требуют внимания: Дорога/);
   assert.match(knowledgeLine(L, { 1: { l: 1 } }, { own: true }), /В работе: Дорога/);
@@ -118,6 +118,31 @@ test("knowledge is told by lesson, not by a solved count", () => {
   const progress = { 1: { l: 1 }, 2: { l: 1 }, 3: { l: 1 }, 4: { l: 1 } };
   assert.match(knowledgeLine(many, progress), /Тема 1 и ещё 3/);
   assert.doesNotMatch(knowledgeLine(L, progress), /921|Решено/);
+});
+
+test("review stays with mistakes and answered questions", () => {
+  const studied = { 1: { l: 1 }, 2: { l: 1 }, o1: { l: 1 } };
+  const step = nextFlowItem(L, studied, { mode: "review", own: true });
+  assert.equal(step.again, true);
+  assert.equal(step.ticketId, 1);
+  assert.equal(nextFlowItem(L, {}, { mode: "review" }).kind, "theory");
+  assert.equal(nextFlowItem(L, {}, { mode: "review" }).lessonId, "ep01");
+});
+
+test("a finished course continues with repetition after the stop", () => {
+  const progress = { 1: { l: 1 }, 2: { l: 1 }, o1: { l: 1 }, 3: { l: 1 } };
+  const step = nextFlowItem(L, progress, { own: true, repeat: true });
+  assert.equal(step.again, true);
+  assert.equal(step.done, false);
+  assert.equal(step.ticketId, 1);
+  const next = nextFlowItem(L, progress, { own: true, repeat: true, just: flowKey(step) });
+  assert.equal(next.ticketId, 2);
+});
+
+test("the flow place survives a reload", () => {
+  const run = cleanFlowRun({ last: "theory", anchor: "ep01", avoid: ["theory:ep01:1", 4], part: 2, partLesson: "ep01", repeat: true, just: "1" });
+  assert.deepEqual(run, { last: "theory", anchor: "ep01", avoid: ["theory:ep01:1"], part: 2, partLesson: "ep01", repeat: true });
+  assert.deepEqual(cleanFlowRun(null), { avoid: [], part: 0, repeat: false });
 });
 
 test("lesson status follows answers, not publication", () => {

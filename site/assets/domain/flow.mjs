@@ -9,8 +9,24 @@
  * - after a wrong answer, mix offers that lesson's text before another of its questions
  * - pause is set only when this session steps into a later lesson whose earlier questions are all answered
  * - done is set only on a text step, and only when every question in scope was last answered correctly
+ * - repeat, once that stop is passed, serves answered questions again and does not open new ones
+ * - review never opens a question that has not been answered
  */
 import { releasedLessons, studyLesson } from "./scope.mjs";
+/** The flow's place in the browser. Unknown fields are dropped; `just` is only for the open page. */
+export function cleanFlowRun(value) {
+    const raw = value && typeof value === "object" ? value : {};
+    const avoid = Array.isArray(raw.avoid) ? raw.avoid.filter((item) => typeof item === "string" && item.length > 0).slice(0, 80) : [];
+    const part = typeof raw.part === "number" && Number.isInteger(raw.part) && raw.part > 0 ? raw.part : 0;
+    const run = { avoid, part, repeat: raw.repeat === true };
+    if (raw.last === "theory" || raw.last === "question" || raw.last === "review")
+        run.last = raw.last;
+    if (typeof raw.anchor === "string" && raw.anchor)
+        run.anchor = raw.anchor;
+    if (typeof raw.partLesson === "string" && raw.partLesson)
+        run.partLesson = raw.partLesson;
+    return run;
+}
 const MODES = new Set(["mix", "situations", "explain", "review"]);
 const STATUS = { text: "Текст", new: "Не начат", open: "В работе", wrong: "Есть ошибки", solid: "Вопросы отвечены" };
 const work = (lesson, own) => [...(lesson.tickets_lesson || []), ...(own ? lesson.own_items || [] : [])];
@@ -43,7 +59,7 @@ export function knowledgeLine(released, progress = {}, { own = false } = {}) {
         return "Ответов пока нет. Курс начинается с первого выпуска.";
     const named = (state) => list.filter(lesson => lessonState(lesson, progress, own) === state);
     const parts = [
-        ["Без ошибок", named("solid")],
+        ["На все вопросы сейчас отвечено правильно", named("solid")],
         ["В работе", named("open")],
         ["Требуют внимания", named("wrong")],
         ["Ещё не начаты", named("new")],
@@ -62,11 +78,11 @@ export function nextFlowItem(released, progress = {}, opts = {}) {
     const avoid = new Set(opts.avoid || []);
     const just = opts.just ? new Set([opts.just]) : new Set();
     const blocked = new Set([...avoid, ...just]);
-    return pick(list, progress, own, mode, opts.last, opts.anchor, blocked)
-        ?? pick(list, progress, own, mode, opts.last, opts.anchor, just)
-        ?? pick(list, progress, own, mode, opts.last, opts.anchor, new Set());
+    return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, opts.repeat === true)
+        ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, opts.repeat === true)
+        ?? pick(list, progress, own, mode, opts.last, opts.anchor, new Set(), opts.repeat === true);
 }
-function pick(list, progress, own, mode, last, anchor, blocked) {
+function pick(list, progress, own, mode, last, anchor, blocked, repeat) {
     const unanswered = (lesson) => work(lesson, own).filter(id => !progress[id]);
     const wrong = (lesson) => work(lesson, own).filter(id => progress[id]?.l === 0);
     const hasWork = list.some(lesson => work(lesson, own).length);
@@ -108,16 +124,30 @@ function pick(list, progress, own, mode, last, anchor, blocked) {
     };
     const openQ = () => firstOf("question", unanswered);
     const badQ = () => firstOf("review", wrong);
+    const againQ = () => {
+        const step = firstOf("question", lesson => work(lesson, own).filter(id => progress[id]?.l === 1));
+        if (step)
+            step.again = true;
+        return step;
+    };
+    const studiedText = () => {
+        const studied = list.filter(lesson => work(lesson, own).some(id => progress[id]));
+        for (const lesson of (studied.length ? studied : [list[0]])) {
+            const step = asTheory(lesson);
+            if (step)
+                return step;
+        }
+        return null;
+    };
+    if (repeat && doneAll)
+        return againQ() || asTheory(list[list.length - 1]);
     const next = anchorLesson ? list[list.findIndex(lesson => lesson.id === anchorLesson.id) + 1] : undefined;
     const tail = () => asTheory(next) || asTheory(list[list.length - 1]);
     const anyAnswer = list.some(lesson => work(lesson, own).some(id => progress[id]));
     if (mode === "situations")
         return openQ() || badQ() || asTheory(list.find(lesson => lesson.id === studyLesson(list, progress, { own })?.id));
-    if (mode === "review") {
-        if (last === "review")
-            return badQ() || asTheory(anchorLesson) || openQ() || tail();
-        return badQ() || openQ() || tail();
-    }
+    if (mode === "review")
+        return badQ() || againQ() || studiedText();
     if (mode === "explain") {
         if (last === "theory" && anchorLesson)
             return inLesson(anchorLesson, "question") || inLesson(anchorLesson, "review") || tail();

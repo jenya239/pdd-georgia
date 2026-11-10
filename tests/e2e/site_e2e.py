@@ -476,7 +476,21 @@ def main():
         page.goto(base + "flow.html")
         page.wait_for_selector("#stage h2")
         check(first["title"] in page.locator("#stage").inner_text(), "flow opens on the first lesson text")
-        page.click("#next")
+        page.wait_for_selector("#stage .reading figure.fig, #stage .reading .lq")
+        check(page.locator("#stage .reading").count() == 1, "flow shows a lesson fragment")
+        for _ in range(12):
+            if page.locator("#stage .q").count():
+                break
+            heading = page.locator("#stage h2").first.inner_text()
+            page.locator("#next").click()
+            page.wait_for_function(
+                """prev => {
+                  const q = document.querySelector("#stage .q");
+                  const h = document.querySelector("#stage h2");
+                  return !!q || (!!h && h.textContent !== prev);
+                }""",
+                arg=heading,
+            )
         page.wait_for_selector("#stage .q")
         check(page.locator("#stage .q").count() == 1, "flow continues with one question")
         page.select_option("#mode", "explain")
