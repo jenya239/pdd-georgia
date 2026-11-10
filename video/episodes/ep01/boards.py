@@ -8,10 +8,6 @@ def _amend():
     for l in laws: y=int(l[-4:]); yrs[y]=yrs.get(y,0)+1
     return len(laws),yrs
 N_AMEND,AMEND_YRS=_amend()
-CHAPTERS=[("I","Общие положения","ст. 1–5"),("II","Организация движения и безопасность","ст. 6–19"),("III","Правила дорожного движения","ст. 20–47"),
-          ("IV","Звуковые, световые и спецсигналы","ст. 48–52"),("V","Регистрация транспортных средств","ст. 53"),("VI","Право на управление ТС","ст. 54–59¹"),
-          ("VII","Автошколы и учебная езда","ст. 60–61"),("VIII","Переходные и заключит. положения","ст. 62–64")]
-ANNEX=[("1","«Дорожные знаки»"),("2","«Дорожная разметка»"),("3","«Опознавательные знаки, прикрепляемые к ТС»"),("4","«Типы светофоров»"),("5","«Таблица сокращения количества баллов…»")]
 def b_law_card(img,d,t,B,D):
     # a: "where's the rulebook?"  m: lights  t: the law itself
     if t<B.S(2)-0.3:
@@ -28,33 +24,19 @@ def b_law_card(img,d,t,B,D):
         txt(d,(365,110),"Закон Грузии",20,(60,60,70),a,"mm",SERIF)
         txt(d,(365,160),"«О дорожном движении»",30,(30,30,40),a,"mm",SERIFB)
         txt(d,(365,215),"№ 1830-რს · Кутаиси, 24 декабря 2013 г.",17,(70,70,80),a,"mm",SERIF)
-        txt(d,(365,265),"8 глав · ст. 1–64 · 5 приложений",17,(70,70,80),appear(t,B.S(2)+2.0),"mm")
+        txt(d,(365,265),"знак описан в приложении, и это часть закона",17,(70,70,80),appear(t,B.S(2)+2.0),"mm")
         txt(d,(365,300),"консолидированная редакция 25.06.2026",15,(150,40,40),appear(t,B.S(2)+3.0),"mm")
         txt(d,(365,365),"matsne.gov.ge · рег. код 310150000.05.001.017312",13,(110,110,120),appear(t,B.S(2)+3.5),"mm")
         txt(d,(365,450),"Отдельного свода ПДД нет: правила, знаки и разметка — в самом законе",15,WHITE,appear(t,B.S(2)+1.0),"mm")
 def b_structure(img,d,t,B,D):
-    txt(d,(30,22),"Закон «О дорожном движении»: 8 глав + 5 приложений",22,WHITE,1,"la",DJB)
-    for i,(n,name,arts) in enumerate(CHAPTERS):
-        a=appear(t,0.6+i*0.35); y=70+i*44; key=n in ("I","III")
-        hl=t>B.S(1) and key
-        if hl: d.rounded_rectangle([24*SS,(y-6)*SS,560*SS,(y+32)*SS],8*SS,fill=GOLD+(40,),outline=GOLD+(255,),width=2*SS)
-        txt(d,(36,y+13),f"Гл. {n}",16,BLUE,a,"lm",DJB); txt(d,(104,y+13),name,16,WHITE if (hl or t<B.S(1)) else GREY,a,"lm"); txt(d,(548,y+13),arts,14,GREY,a,"rm")
-    if t>B.S(1): txt(d,(36,432),"I — термины (ст. 5)   III — сами правила (ст. 20–47)",15,GOLD,appear(t,B.S(1)+1),"la",DJB)
-    # annexes
-    if t>B.S(2)-0.2:
-        x0=600; txt(d,(x0,62),"Приложения — ст. 2, п. 1",16,BLUE,appear(t,B.S(2)),"la",DJB)
-        for i,(n,name) in enumerate(ANNEX):
-            a=appear(t,B.S(2)+0.4+i*0.9); y=92+i*72
-            d.rounded_rectangle([x0*SS,y*SS,1215*SS,(y+62)*SS],10*SS,fill=(255,255,255,int(255*a)),outline=(200,204,210,int(255*a)),width=SS)
-            txt(d,(x0+14,y+18),f"№{n}",18,GOLD,a,"lm",DJB); para(d,x0+62,y+8,name,15,300,WHITE,a)
-            if n=="1":
-                for k,s_ in enumerate(["sign_2_1.png","sign_2_3.png","sign_3_1.png","sign_5_19_1.png"]): sign(img,s_,1000+k*52,y+8,46,a)
-            if n=="2": sign(img,"mark_1_1.png",1000,y+18,26,a)
-            if n=="3": sign(img,"id_learner.png",1040,y+6,50,a)
-            if n=="4": sign(img,"light_T1.png",1080,y+4,54,a)
-            if n=="5": txt(d,(1100,y+31),"−баллы",18,RED,a,"mm",DJB)
-    if t>B.S(3)-0.2:
-        quote(d,600,460,615,"Приложения, определенные пунктом первым настоящей статьи, являются неотъемлемыми частями настоящего Закона.","ст. 2, п. 2",appear(t,B.S(3)),15)
+    txt(d,(30,22),"Что требует знак",22,WHITE,1,"la",DJB)
+    a=appear(t,0.4)
+    sign(img,"sign_2_3.png",80,120,220,a)
+    txt(d,(360,160),"«Уступите дорогу»",28,WHITE,a,"lm",DJB)
+    txt(d,(360,210),"описание знака — в приложении 1",20,WHITE,a,"lm")
+    txt(d,(360,260),"это часть закона, не подпись к картинке",18,GOLD,appear(t,1.2),"lm")
+    if t>B.S(1)-0.2:
+        quote(d,80,420,1100,"Приложения, определенные пунктом первым настоящей статьи, являются неотъемлемыми частями настоящего Закона.","ст. 2, п. 2",appear(t,B.S(1)),18)
 def b_split(img,d,t,B,D):
     txt(d,(30,22),"Правило, знак, штраф: где что лежит",22,WHITE,1,"la",DJB)
     a=appear(t,0.3)
@@ -122,13 +104,13 @@ def b_exam_law(img,d,t,B,D):
     if t>B.S(3)-0.2:
         a=appear(t,B.S(3)); x0=640
         d.rounded_rectangle([x0*SS,64*SS,1215*SS,330*SS],12*SS,fill=(255,255,255,int(255*a)),outline=(200,204,210,int(255*a)),width=SS)
-        txt(d,(x0+20,82),"Не в законе: данные агентства (sa.gov.ge), кат. B",15,GREY,a,"la",DJB)
+        txt(d,(x0+20,82),"Не в статье 55: приказ МВД № 598, ред. № 69",15,GREY,a,"la",DJB)
         for k,(big,small,col) in enumerate([("30","вопросов",BLUE),("≥ 25","верных",GREEN),("≤ 5","ошибок",RED)]):
             aa=appear(t,B.S(3)+0.8+k*1.0); x=x0+30+k*180
             txt(d,(x+70,160),big,44,col,aa,"mm",DJB); txt(d,(x+70,205),small,16,WHITE,aa,"mm")
         if t>B.S(4)-0.2:
             aa=appear(t,B.S(4)); txt(d,(x0+20,250),"до 2026: ≥ 27 верных (≤ 3 ошибок)",15,GREY,aa,"la")
-            txt(d,(x0+20,280),"время: 30 мин — по сообщению 1TV (21.05.2026)",15,GREY,appear(t,B.S(4)+3),"la")
+            txt(d,(x0+20,280),"30 вопросов, 30 мин, ≥ 25 верных — приказ № 69",15,GREY,appear(t,B.S(4)+3),"la")
     if t>B.S(5)-0.2:
         a=appear(t,B.S(5)); y=360
         d.rounded_rectangle([640*SS,y*SS,1215*SS,(y+70)*SS],10*SS,fill=(255,236,232,int(255*a)),outline=RED+(int(255*a),),width=2*SS)
