@@ -1,5 +1,5 @@
 # Shared drawing helpers for the ПДД series (exec'd by core.py; board coords in 1x px, drawn at SS).
-SERIF="/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"; SERIFB="/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
+SERIF="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"; SERIFB="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 MONO="/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 ASSETS=str(SIGNS)+"/"
 def appear(t,t0,d=0.5): return ease((t-t0)/d)
