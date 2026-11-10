@@ -37,4 +37,10 @@ export function misconceptionFor(t, choice, mcMap, ticketDistractors) {
     const m = id && mcMap ? mcMap[id] : null;
     return m ? { id, belief: m.belief, truth: m.truth } : null;
 }
+/** The sentence shown above the panel after a wrong answer. Only an annotated misconception supplies it. */
+export function answerLead(t, choice, mcMap, ticketDistractors) {
+    if (choice == null)
+        return null;
+    return misconceptionFor(t, choice, mcMap, ticketDistractors)?.truth ?? null;
+}
 export const idLabel = (id) => (isOwnId(id) ? `наш вопрос ${id.slice(2)}` : `№ ${id}`);

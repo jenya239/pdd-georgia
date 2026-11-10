@@ -1,6 +1,8 @@
 /** Lesson scope and the cumulative ticket set (pure). */
 type LessonRow = { id: string; num: number; tickets_lesson?: (string | number)[]; own_items?: (string | number)[] };
-export const releasedLessons = (released: LessonRow[]) => [...released].sort((a, b) => a.num - b.num);
+export function releasedLessons<T extends LessonRow>(released: T[]): T[] {
+  return [...released].sort((a, b) => a.num - b.num);
+}
 
 export function currentLesson(released: LessonRow[]) {
   const list = releasedLessons(released);
@@ -11,7 +13,7 @@ type Attempt = { l?: number };
 
 /** The lesson to open next. No answers yet → the first lesson. Otherwise the earliest
  * lesson that still has an unanswered question, then the earliest with a wrong last answer. */
-export function studyLesson(released: LessonRow[], progress: Record<string, Attempt> = {}, { own = false } = {}) {
+export function studyLesson<T extends LessonRow>(released: T[], progress: Record<string, Attempt> = {}, { own = false } = {}): T | null {
   const list = releasedLessons(released);
   if (!list.length) return null;
   const work = (lesson: LessonRow) => [...(lesson.tickets_lesson || []), ...(own ? lesson.own_items || [] : [])];

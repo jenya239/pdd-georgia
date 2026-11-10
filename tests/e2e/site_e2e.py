@@ -126,7 +126,7 @@ def norms(br, base):
     shot(page, "norm_page_st5-p87.png", full_page=False)
     page.locator(".backlinks a.btn[href*='practice.html?ids=']").first.click()
     page.wait_for_selector("#set option[value=ids]", state="attached")
-    check(page.input_value("#set") == "ids", "«solve all» opens practice with exactly these questions")
+    check(page.input_value("#set") == "ids" and page.input_value("#len") == "all", "«solve all» opens the whole linked list, not the default 15")
     page.goto(base + "norm/sign-5.19.1.html")
     check(page.locator("figure.nimg img").evaluate("i => i.complete && i.naturalWidth > 0"), "sign page shows the sign image")
     page.goto(base + "norm/index.html")
@@ -153,15 +153,16 @@ def norms(br, base):
     mp.click("#npop .npop-close")
     check(mp.locator("#npop[hidden]").count() == 1, "mobile: close button closes the sheet")
     sw = mp.evaluate("document.documentElement.scrollWidth")
-    check(sw <= 390, f"mobile: no horizontal overflow with the «Закон» nav item ({sw})")
+    check(sw <= 390, f"mobile: no horizontal overflow with the «Справочник» nav item ({sw})")
     mp.goto(base + "norm/st37-p6-a-a.html")
     sw = mp.evaluate("document.documentElement.scrollWidth")
     check(sw <= 390, f"mobile: norm page has no horizontal overflow ({sw})")
     mob.close()
 
 
-HEADER_PAGES = [("index.html", "eps"), ("practice.html", "practice"), ("exam.html", "exam"), ("errors.html", "errors"),
-                ("about.html", "about"), ("check.html?ep=ep04", "eps"), ("episode.html?id=ep05", "eps"),
+HEADER_PAGES = [("index.html", "home"), ("flow.html", "home"), ("course.html", "course"),
+                ("practice.html", "exam"), ("exam.html", "exam"), ("errors.html", "exam"),
+                ("check.html?ep=ep04", "course"), ("episode.html?id=ep05", "course"),
                 ("norm/index.html", "law"), ("norm/st5-p87.html", "law")]
 # the visible top-level header items; all of them must sit on one line
 HEADER_ITEMS = """[...document.querySelectorAll('header.top .brand, header.top .menubtn, header.top nav.main > a, header.top .tools .iconbtn')]
@@ -372,8 +373,8 @@ def header_layout(br, base):
             menu.click()
             links = page.locator("header.top nav.main a")
             boxes = links.evaluate_all("as => as.map(a => { const r = a.getBoundingClientRect(); return [r.left, r.right, r.height]; })")
-            check(menu.get_attribute("aria-expanded") == "true" and links.nth(5).is_visible() and all(l >= 0 and r <= w and h >= 32 for l, r, h in boxes),
-                  f"{w}px {pg}: menu opens, all 6 links visible and tappable")
+            check(menu.get_attribute("aria-expanded") == "true" and links.nth(3).is_visible() and all(l >= 0 and r <= w and h >= 32 for l, r, h in boxes),
+                  f"{w}px {pg}: menu opens, all 4 links visible and tappable")
             check(page.evaluate("document.documentElement.scrollWidth") <= w, f"{w}px {pg}: open menu does not overflow")
             if w == 390 and pg == "index.html":
                 shot(page, "header_mobile_menu_open.png")
@@ -388,7 +389,7 @@ def header_layout(br, base):
             check(menu.get_attribute("aria-expanded") == "false" and not links.first.is_visible(), f"{w}px {pg}: click outside closes the menu")
             menu.click()
             links.nth(1).click()
-            page.wait_for_url("**/practice.html")
+            page.wait_for_url("**/course.html")
             check(True, f"{w}px {pg}: menu link navigates")
         if w == 1280:
             page.goto(base + "episode.html?id=ep05")
@@ -453,18 +454,34 @@ def main():
         page.goto(base + "index.html")
         page.evaluate("localStorage.clear()")
 
-        # index
+        # index, course, flow
         page.goto(base + "index.html")
-        page.wait_for_selector("#cumstatus")
-        cards = page.locator("#released a.card")
-        kinds = [cards.nth(i).locator(".badge.kind").inner_text() for i in range(cards.count())]
-        want = ["текст" if r.get("kind") == "text" else "видео" for r in E["released"]]
-        check(kinds == want, f"index kind badges {kinds}")
-        st = page.locator("#cumstatus").inner_text()
+        page.wait_for_selector("#now")
+        check(page.locator("#released").count() == 0 and page.locator("#plan").count() == 0, "home is not a lesson catalog")
+        home = page.locator("main").inner_text()
+        check("Решено" not in home and "из 921" not in home, "home does not show a solved count")
         first = min(E["released"], key=lambda r: r["num"])
-        check("Начать обучение" in st and f"Выпуск {first['num']}" in st, f"home starts at lesson {first['num']}, not the last published one")
-        check(page.locator("#plan tr.soon").count() > 90, "course plan table rendered")
+        now = page.locator("#now").inner_text()
+        check(first["title"] in now and "объяснение" in now, f"home recommends the first lesson text")
+        check(page.locator("#now a[href='flow.html']").count() == 1, "home starts the flow")
+        check("Ответов пока нет" in page.locator("#know").inner_text(), "home describes knowledge, not activity")
         shot(page, "index_desktop.png")
+        page.goto(base + "course.html")
+        page.wait_for_selector("#lessons a")
+        titles = page.locator("#lessons a h3").all_inner_texts()
+        want = [r["title"] for r in sorted(E["released"], key=lambda r: r["num"])]
+        check(titles == want, f"course lists released lessons in order")
+        check("урока нет" in page.locator("#gaps").inner_text(), "course names topics without a lesson")
+        check(page.locator("#gaps details").count() > 5, "topics without a lesson are grouped")
+        page.goto(base + "flow.html")
+        page.wait_for_selector("#stage h2")
+        check(first["title"] in page.locator("#stage").inner_text(), "flow opens on the first lesson text")
+        page.click("#next")
+        page.wait_for_selector("#stage .q")
+        check(page.locator("#stage .q").count() == 1, "flow continues with one question")
+        page.select_option("#mode", "explain")
+        page.wait_for_selector("#stage h2")
+        check(page.locator("#stage .q").count() == 0, "explain mode returns to the lesson text")
 
         # video episodes open the new text; the filmed lesson is a small button
         for r in E["released"]:
@@ -612,6 +629,27 @@ def main():
         page.click("#go")
         page.wait_for_selector("#qbox .ans")
         check(page.locator("#qbox .katoggle").count() == 1, "practice: KA toggle on the ticket")
+        bank = json.loads((ROOT / "data/tickets.json").read_text())["tickets"]
+        linked = ",".join(str(t["id"]) for t in bank if "ru" not in (t.get("nu") or []))
+        linked = ",".join(linked.split(",")[:20])
+        page.goto(base + "practice.html?ids=" + linked)
+        page.wait_for_selector("#len")
+        page.wait_for_function("() => document.querySelector('#cnt').textContent.length > 0")
+        offered = page.inner_text("#cnt")
+        offered_n = int(re.search(r"\d+", offered).group())
+        check(page.input_value("#len") == "all" and "из" not in offered and offered_n > 15, f"linked ids are offered whole ({offered})")
+        page.click("#go")
+        page.wait_for_selector("#sess")
+        check(f"из {offered_n}" in page.inner_text("#sess"), "linked ids are not cut to 15")
+        page.goto(base + "practice.html?ids=" + linked + "&len=10")
+        page.wait_for_function("() => document.querySelector('#cnt').textContent.includes('10')")
+        check(page.input_value("#len") == "10", "an explicit length on the link is kept")
+        page.goto(base + "practice.html?ids=1&len=all")
+        page.click("#go")
+        page.locator('#qbox .ans[data-i="0"]').click()
+        page.wait_for_selector("#qbox .whyline")
+        check(page.locator("#qbox .verdict").inner_text().strip() == "Неверно." and "Безрельсовые" in page.locator("#qbox .whyline").inner_text()
+              and "Верный вариант" in page.locator("#qbox .optnum").inner_text(), "a wrong answer leads with the marked rule, then the option number")
 
         # exam
         page.goto(base + "exam.html")

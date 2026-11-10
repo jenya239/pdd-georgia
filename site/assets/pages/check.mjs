@@ -8,12 +8,12 @@ import { currentLesson, cumulativeScope, cumulativeOrder, scopeStatus } from "..
 import { idLabel, isOwnId } from "../domain/items.mjs";
 import { startRun, answerRun, nextTicket, isFinished, runResult, lessonTrend, answeredCount } from "../domain/run.mjs";
 
-header("eps");
+header("course");
 const [D, E, st] = await Promise.all([loadTickets(), loadEpisodes(), store]);
 const m = $("#m");
 const lessonId = new URLSearchParams(location.search).get("lesson") || (currentLesson(E.released) || {}).id;
 const L = E.released.find(x => x.id === lessonId);
-if (!L) { m.innerHTML = `<h1>Урок не найден</h1><p><a href="index.html">К списку выпусков</a></p>`; throw new Error("unknown lesson"); }
+if (!L) { m.innerHTML = `<h1>Урок не найден</h1><p><a href="course.html">К курсу</a></p>`; throw new Error("unknown lesson"); }
 document.title = `Накопительная проверка: выпуск ${L.num} — ПДД Грузии`;
 let scope, allIds;
 const rescope = () => { scope = cumulativeScope(E.released, L.id, { own: st.settings().own !== false }); allIds = [...scope.current, ...scope.previous]; };

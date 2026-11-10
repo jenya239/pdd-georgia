@@ -9,7 +9,7 @@ import { undoLast } from "../domain/progress.mjs";
 import { zoom } from "./layout.mjs";
 import { renderDetails } from "./details.mjs";
 import { figureSvg } from "../domain/figure.mjs";
-import { questionText } from "../domain/items.mjs";
+import { answerLead, questionText } from "../domain/items.mjs";
 
 const noteMark = (t, opts) => (opts.mode === "exam" ? ""
   : `<span class="badge note notemark" title="У этого билета есть ваша заметка (вкладка «Заметка» после ответа)"${store.notes()[t.id] ? "" : " hidden"}>заметка</span>`);
@@ -58,7 +58,11 @@ export function renderQuestion(el, t, opts = {}) {
     state.answered = true; state.choice = choice;
     btns.forEach((b, i) => { b.disabled = true; if (i === t.c) b.classList.add("ok"); if (i === choice && choice !== t.c) b.classList.add("bad"); });
     const ok = choice === t.c;
-    el.querySelector(".fb").innerHTML = `<div class="verdict ${ok ? "ok" : "bad"}">${choice == null ? "Нет ответа." : ok ? "Верно." : "Неверно."} Правильный ответ: ${t.c + 1}.</div>`;
+    const D = loadedTickets();
+    const lead = answerLead(t, choice, D.mc, D.ticketDistractors);
+    el.querySelector(".fb").innerHTML = `<div class="verdict ${ok ? "ok" : "bad"}">${choice == null ? "Нет ответа." : ok ? "Верно." : "Неверно."}</div>`
+      + (lead ? `<p class="whyline">${esc(lead)}</p>` : "")
+      + (choice == null ? "" : `<p class="small mut optnum">Верный вариант — ${t.c + 1}.</p>`);
     return ok;
   }
   const details = choice => renderDetails(el.querySelector(".fb"), t, choice);
@@ -84,8 +88,8 @@ export function renderQuestion(el, t, opts = {}) {
       opts.onUndo && opts.onUndo(res.undone, { session });
     };
     const fb = el.querySelector(".fb");
-    const verdict = fb.querySelector(".verdict");
-    if (verdict) verdict.insertAdjacentElement("afterend", b);
+    const spot = fb.querySelector(".optnum") || fb.querySelector(".verdict");
+    if (spot) spot.insertAdjacentElement("afterend", b);
     else fb.append(b);
   }
   if (opts.mode === "exam") {

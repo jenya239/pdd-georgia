@@ -17,7 +17,7 @@
 import { isOwnId } from "./items.mjs";
 export const MASTERY_STREAK = 2;
 export const HISTORY_CAP = 50;
-export const WHERE = { practice: "самопроверка", lesson: "урок", check: "накопительная проверка", exam: "экзамен", drill: "разбор ошибок" };
+export const WHERE = { practice: "самопроверка", lesson: "урок", check: "накопительная проверка", exam: "экзамен", drill: "разбор ошибок", flow: "поток" };
 const BALANCE_ID = "balance";
 const isCount = (v) => Number.isInteger(v) && v >= 0;
 const isRecord = (v) => !!v && typeof v === "object" && !Array.isArray(v);

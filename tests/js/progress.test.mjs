@@ -80,7 +80,7 @@ test("every answer is kept in the per-ticket history with the place it was given
   assert.equal(r.h[HISTORY_CAP - 1].t, 10 + HISTORY_CAP + 4);
   assert.equal(r.s, HISTORY_CAP + 7, "counters still count every answer");
   assert.equal(r.events.length, r.s, "the journal itself is not capped");
-  assert.ok(Object.keys(WHERE).includes("drill") && WHERE.check);
+  assert.ok(Object.keys(WHERE).includes("drill") && WHERE.check && WHERE.flow === "поток");
 });
 
 test("undoLast restores the previous record, and a sole answer clears the ticket", () => {

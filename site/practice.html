@@ -2,6 +2,7 @@
 <title>ПДД Грузии — самопроверка</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/app.css"></head>
 <body><main>
 <h1>Самопроверка</h1>
+<p class="small"><a href="exam.html">Экзамен</a> · <a href="errors.html">Ошибки</a></p>
 <div class="card" id="setup">
   <div class="row">
     <label>Набор: <select id="set"></select></label>
@@ -15,7 +16,7 @@
   <div class="row" style="margin-top:12px"><button class="btn" id="go">Начать</button><button class="btn ghost" id="resume" hidden>Продолжить занятие</button><span class="small mut" id="cnt"></span></div>
 </div>
 <div id="run" style="display:none">
-  <div class="row" style="justify-content:space-between;margin:12px 0 4px"><span class="stats" id="sess"></span><button class="iconbtn" id="stop">Сменить набор</button></div>
+  <div class="row" style="justify-content:space-between;margin:12px 0 4px"><span class="stats" id="sess"></span><button class="iconbtn" id="stop">Завершить занятие</button></div>
   <div class="bar"><i id="pbar" style="width:0"></i></div>
   <div id="qbox"></div>
   <div class="qnav"><span class="kbd"><kbd>1</kbd>–<kbd>4</kbd> ответ · <kbd>Enter</kbd> / <kbd>→</kbd> дальше</span><button class="btn" id="next" disabled>Дальше →</button></div>

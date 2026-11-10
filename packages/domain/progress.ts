@@ -18,7 +18,7 @@ import { isOwnId } from "./items.ts";
 
 export const MASTERY_STREAK = 2;
 export const HISTORY_CAP = 50;
-export const WHERE = { practice: "самопроверка", lesson: "урок", check: "накопительная проверка", exam: "экзамен", drill: "разбор ошибок" } as const;
+export const WHERE = { practice: "самопроверка", lesson: "урок", check: "накопительная проверка", exam: "экзамен", drill: "разбор ошибок", flow: "поток" } as const;
 const BALANCE_ID = "balance";
 
 export type WhereName = keyof typeof WHERE;

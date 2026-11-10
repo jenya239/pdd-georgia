@@ -1,4 +1,6 @@
-export const releasedLessons = (released) => [...released].sort((a, b) => a.num - b.num);
+export function releasedLessons(released) {
+    return [...released].sort((a, b) => a.num - b.num);
+}
 export function currentLesson(released) {
     const list = releasedLessons(released);
     return list.length ? list[list.length - 1] : null;

@@ -7,14 +7,14 @@ import { renderQuestion } from "../app/question.mjs";
 import { shuffle } from "../domain/scope.mjs";
 import { parseId, compareIds } from "../domain/items.mjs";
 (async () => {
-  header("practice");
+  header("exam");
   const [D, E] = await Promise.all([loadTickets(), loadEpisodes()]);
   const qs = new URLSearchParams(location.search);
   const T = D.meta.topics;
   const epTitle = Object.fromEntries(E.plan.map(p => [p.e, p.title]));
   const epCount = Object.fromEntries(E.plan.map(p => [p.e, p.n]));
   let opts = `<option value="all">Все вопросы (${D.tickets.length})</option><option value="mistakes">Повторить ошибки</option><option value="new">Ещё не решённые</option>`;
-  opts += `<optgroup label="Выпуски">${E.released.map(r => `<option value="rel:${r.id}">Выпуск ${r.num}. ${esc(r.title)} (${r.tickets_core.length + r.tickets_linked.length})</option>`).join("")}</optgroup>`;
+  opts += `<optgroup label="Курс">${E.released.map(r => `<option value="rel:${r.id}">Выпуск ${r.num}. ${esc(r.title)} (${r.tickets_core.length + r.tickets_linked.length})</option>`).join("")}</optgroup>`;
   opts += `<optgroup label="Темы базы">${Object.entries(T).sort((a, b) => a[0] - b[0]).map(([k, v]) => `<option value="t:${k}">${k}. ${esc(v)} (${D.tickets.filter(t => t.t == k).length})</option>`).join("")}</optgroup>`;
   opts += `<optgroup label="Серии плана">${E.plan.filter(p => p.n).map(p => `<option value="ep:${p.e}">${p.e} · ${esc(p.title)} (${p.n})</option>`).join("")}</optgroup>`;
   // ?ids=12,o-ep05-02 — the questions a norm page links to («Решить все»)
@@ -24,6 +24,9 @@ import { parseId, compareIds } from "../domain/items.mjs";
   if (qs.get("mode") === "mistakes") $("#set").value = "mistakes";
   if (qs.get("ep")) $("#set").value = "ep:" + qs.get("ep");
   if (qs.get("topic")) $("#set").value = "t:" + qs.get("topic");
+  const askedLen = qs.get("len");
+  if (askedLen === "10" || askedLen === "15" || askedLen === "30" || askedLen === "all") $("#len").value = askedLen;
+  else if (byIds.length) $("#len").value = "all";
 
   function pool() {
     const v = $("#set").value, p = progress();
@@ -89,7 +92,11 @@ import { parseId, compareIds } from "../domain/items.mjs";
   };
   if (qs.get("start") === "1" && byIds.length) $("#go").click();
   $("#next").onclick = () => { if (i + 1 < list.length) { i++; held = false; persist(); show(); scrollTo({ top: 0 }); } else finish(); };
-  $("#stop").onclick = () => { store.clearSession(); paintResume(); $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
+  $("#stop").onclick = () => {
+    const left = list.length - i - (held ? 1 : 0);
+    if (left > 0 && !confirm("Завершить занятие? Неотвеченные вопросы этого набора не сохранятся.")) return;
+    store.clearSession(); paintResume(); $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics();
+  };
   document.addEventListener("keydown", e => {
     if ($("#run").style.display === "none" || e.target.closest("select,input,textarea,[data-undo]")) return;
     const n = parseInt(e.key, 10);

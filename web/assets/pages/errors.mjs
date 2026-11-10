@@ -9,7 +9,7 @@ import { MASTERY_STREAK, streakOf } from "../domain/progress.mjs";
 import { idLabel, parseId, questionText } from "../domain/items.mjs";
 import { lk } from "../domain/normlinks.mjs";
 
-header("errors");
+header("exam");
 const [D, E, st] = await Promise.all([loadTickets(), loadEpisodes(), store]);
 const m = $("#m");
 const hashOf = id => D.byId[id]?.hash;

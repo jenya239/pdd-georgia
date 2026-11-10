@@ -4,8 +4,8 @@ import { applyTheme, toggleTheme } from "./prefs.mjs";
 import { mountProgressButtons } from "./progress-file.mjs";
 import { mountNormPopups } from "./normpop.mjs";
 
-const NAV = [["index.html", "Выпуски", "eps"], ["practice.html", "Самопроверка", "practice"], ["exam.html", "Экзамен", "exam"],
-  ["errors.html", "Ошибки", "errors"], ["norm/index.html", "Закон", "law"], ["about.html", "О данных", "about"]];
+const NAV = [["index.html", "Главная", "home"], ["course.html", "Курс", "course"], ["exam.html", "Экзамен", "exam"],
+  ["norm/index.html", "Справочник", "law"]];
 /** Path from the current page to the site root ("../" on site/norm/*.html). */
 export const ROOT = document.documentElement.dataset.root || "";
 

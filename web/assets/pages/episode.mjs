@@ -8,12 +8,12 @@ import { TYPE_LABEL } from "../domain/items.mjs";
 import { episodeKind, splitLesson, lessonEditions, pickEdition } from "../domain/episode.mjs";
 import { lk, lawDetails } from "../domain/normlinks.mjs";
 (async () => {
-  header("eps");
+  header("course");
   const [D, E] = await Promise.all([loadTickets(), loadEpisodes()]);
   const id = new URLSearchParams(location.search).get("id") || "ep01";
   const r = E.released.find(x => x.id === id);
   const m = $("#m");
-  if (!r) { m.innerHTML = `<h1>Выпуск не найден</h1><p><a href="index.html">К списку выпусков</a></p>`; return; }
+  if (!r) { m.innerHTML = `<h1>Выпуск не найден</h1><p><a href="course.html">К курсу</a></p>`; return; }
   document.title = `Выпуск ${r.num}. ${r.title} — ПДД Грузии`;
   const idx = E.released.indexOf(r), prev = E.released[idx - 1], next = E.released[idx + 1];
   const core = r.tickets_core.map(i => D.byId[i]), linked = r.tickets_linked.map(i => D.byId[i]);
@@ -37,7 +37,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    <p class="small mut">Цитаты из русского перевода Matsne, ред. 25.06.2026. Юридическую силу имеет грузинский текст.</p>
    ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
-  const kindLine = `<div class="small mut"><a href="index.html">Выпуски</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
+  const kindLine = `<div class="small mut"><a href="course.html">Курс</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
   const filmNote = r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : "";
   const ticketsFilm = r.tickets_video
     ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>

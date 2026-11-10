@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isOwnId, parseId, itemAsTicket, misconceptionFor, TYPE_LABEL, idLabel, compareIds, questionText } from "../../packages/domain/items.ts";
+import { isOwnId, parseId, itemAsTicket, misconceptionFor, answerLead, TYPE_LABEL, idLabel, compareIds, questionText } from "../../packages/domain/items.ts";
 
 const ITEM = { id: "o-ep04-01", lesson: "ep04", type: "diagram", type_label: "схема", q: "Где стоять?",
   options: ["А", "Б"], answer: 1, explain: "Потому что.", rule: { key: "37.6", label: "ст. 37, п. 6 «а.а»" },
@@ -39,6 +39,10 @@ test("misconception for a wrong pick: own items and annotated bank tickets", () 
   assert.deepEqual(misconceptionFor({ id: 611 }, 2, mc, { "611": { "2": "mc-x" } }).truth, "Y");
   assert.equal(misconceptionFor({ id: 611 }, 1, mc, { "611": { "1": null } }), null);
   assert.equal(misconceptionFor({ id: 5 }, 1, mc, undefined), null);
+  assert.equal(answerLead(own, 0, mc, {}), "T");
+  assert.equal(answerLead(own, 1, mc, {}), null);
+  assert.equal(answerLead({ id: 611 }, 2, mc, { "611": { "2": "mc-x" } }), "Y");
+  assert.equal(answerLead({ id: 611 }, null, mc, {}), null);
 });
 
 test("every item type has a label", () => {
