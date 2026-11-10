@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { releasedLessons, currentLesson, cumulativeScope, cumulativeOrder, scopeStatus } from "../../packages/domain/scope.ts";
+import { releasedLessons, currentLesson, studyLesson, cumulativeScope, cumulativeOrder, scopeStatus } from "../../packages/domain/scope.ts";
 
 const RELEASED = [
   { id: "ep03", num: 3, tickets_lesson: [30, 31] },
@@ -15,6 +15,17 @@ test("lessons are ordered by number", () => {
 test("current lesson is the latest released one", () => {
   assert.equal(currentLesson(RELEASED).id, "ep03");
   assert.equal(currentLesson([]), null);
+});
+
+test("study continues at the first unfinished lesson", () => {
+  assert.equal(studyLesson(RELEASED, {}).id, "ep01");
+  assert.equal(studyLesson([], {}), null);
+  assert.equal(studyLesson(RELEASED, { 20: { l: 1 } }).id, "ep02");
+  assert.equal(studyLesson(RELEASED, { 20: { l: 1 }, 21: { l: 1 }, 22: { l: 1 } }).id, "ep03");
+  const done = { 20: { l: 1 }, 21: { l: 1 }, 22: { l: 1 }, 30: { l: 0 }, 31: { l: 1 } };
+  assert.equal(studyLesson(RELEASED, done).id, "ep03");
+  const mastered = { 20: { l: 1 }, 21: { l: 1 }, 22: { l: 1 }, 30: { l: 1 }, 31: { l: 1 } };
+  assert.equal(studyLesson(RELEASED, mastered).id, "ep03");
 });
 
 test("cumulative scope = this lesson + all previous lessons", () => {

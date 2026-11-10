@@ -20,13 +20,16 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   const own = (r.own_items || []).map(i => D.byId[i]);
   const isText = episodeKind(r) === "text";
   const editions = lessonEditions(r);
-  const chosen = pickEdition(editions, new URLSearchParams(location.search).get("edition") || store.settings().edition);
-  const showPlain = !isText && chosen?.id === "plain";
-  const lessonHref = isText ? (chosen ? chosen.href : r.lesson) : (showPlain ? chosen.href : null);
+  const chosen = pickEdition(editions, new URLSearchParams(location.search).get("edition"));
+  const showFilm = editions.length
+    ? chosen?.id === "film" || (!isText && chosen?.id !== "plain")
+    : !isText;
+  const lessonHref = showFilm ? null : (chosen ? chosen.href : r.lesson);
   const lesson = lessonHref ? splitLesson(await (await fetch(lessonHref)).text()) : null;
-  const editionBar = editions.length > 1
-    ? `<div class="editions" role="group" aria-label="Редакция текста">${editions.map(e =>
-      `<button type="button" data-edition="${esc(e.id)}" aria-pressed="${e.id === chosen.id}">${esc(e.label)}</button>`).join("")}</div>`
+  const others = editions.filter(e => e.id !== chosen?.id);
+  const editionBar = others.length
+    ? `<div class="editions" role="group" aria-label="Другие редакции">${others.map(e =>
+      `<button type="button" data-edition="${esc(e.id)}">${esc(e.label)}</button>`).join("")}</div>`
     : "";
   const lawPart = `<h2>Главное</h2>
    <ol class="points">${r.points.map(p => `<li>${lk(p, "t")} <span class="cite">${lk(p, "c")}</span></li>`).join("")}</ol>
@@ -35,18 +38,25 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
   const kindLine = `<div class="small mut"><a href="index.html">Выпуски</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
-  const film = r.video
-    ? `<video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
-   ${r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : ""}
-   <p class="small mut">Ролик разбирает те же границы. Ниже — полный текст урока.</p>`
-    : "";
+  const filmNote = r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : "";
   const ticketsFilm = r.tickets_video
     ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>
    <p class="small mut">Ролик по билетам выпуска: ситуация, признак, верный вариант. Под каждым билетом тот же разбор остаётся текстом.</p>`
     : "";
-  m.innerHTML = (isText || showPlain)
-    ? `${kindLine}<h1>${esc(r.title)}</h1><p class="lead">${lk(r, "lead")}</p>
-   ${isText ? film : ""}
+  m.innerHTML = showFilm
+    ? `${kindLine}<h1>${esc(r.title)}</h1>
+   ${editionBar}
+   <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
+   ${filmNote}
+   <p class="small mut">Снятый ролик.</p>
+   <p>${lk(r, "lead")}</p>
+   ${lawPart}
+   ${ticketsFilm}
+   <h2>Билеты к выпуску</h2>
+   <div id="tk"></div>
+   <div id="own-items"></div>
+   <div id="cum"></div>${nav}`
+    : `${kindLine}<h1>${esc(r.title)}</h1><p class="lead">${lk(r, "lead")}</p>
    ${editionBar}
    <article class="lesson" id="lb">${lesson.before}</article>
    ${lawPart}
@@ -55,37 +65,19 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    <div id="tk"></div>
    <div id="own-items"></div>
    <article class="lesson" id="la">${lesson.after}</article>
-   <div id="cum"></div>${nav}`
-    : `${kindLine}
-   <h1>${esc(r.title)}</h1>
-   ${editionBar}
-   <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
-   <p>${lk(r, "lead")}</p>
-   ${lawPart}
-   ${ticketsFilm}
-   <h2>Билеты к выпуску</h2>
-   <div id="tk"></div>
-   <div id="own-items"></div>
    <div id="cum"></div>${nav}`;
   const { enhanceFigures } = await import("../app/figzoom.mjs");
   enhanceFigures(m);
   const bar = document.querySelector(".editions");
-  if (bar) bar.addEventListener("click", async (e) => {
+  if (bar) bar.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-edition]");
-    if (!b || b.getAttribute("aria-pressed") === "true") return;
+    if (!b) return;
     const ed = editions.find(x => x.id === b.dataset.edition);
     if (!ed) return;
-    store.saveSettings({ edition: ed.id });
     const u = new URL(location.href);
     if (ed.id === editions[0].id) u.searchParams.delete("edition");
     else u.searchParams.set("edition", ed.id);
-    if (!isText) { location.assign(`${u.pathname}${u.search}${u.hash}`); return; }
-    history.replaceState(null, "", `${u.pathname}${u.search}${u.hash}`);
-    const parts = splitLesson(await (await fetch(ed.href)).text());
-    $("#lb").innerHTML = parts.before;
-    $("#la").innerHTML = parts.after;
-    bar.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-    enhanceFigures(m);
+    location.assign(`${u.pathname}${u.search}${u.hash}`);
   });
   // накопительная проверка: этот урок + все предыдущие
   const { cumulativeScope, scopeStatus } = await import("../domain/scope.mjs");

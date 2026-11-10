@@ -55,6 +55,22 @@ def test_linked_can_come_from_lesson_assignment():
     assert linked_ticket_ids(ep, Q, core=[1], lesson_ids=[4, 1, 2]) == [4, 2]
 
 
+def test_new_text_opens_before_the_old_editions():
+    root = pathlib.Path(__file__).resolve().parents[2]
+    released = {ep["id"]: ep for ep in json.loads((root / "site/data/episodes.json").read_text(encoding="utf-8"))["released"]}
+    for eid in ("ep01", "ep02", "ep03", "ep04", "ep05", "ep06"):
+        editions = released[eid]["editions"]
+        assert editions[0]["id"] == "plain", eid
+        assert editions[0]["label"] == "Без персонажей"
+        assert [e["id"] for e in editions].count("plain") == 1
+    assert [e["label"] for e in released["ep02"]["editions"]] == ["Без персонажей", "Ролик"]
+    assert [e["label"] for e in released["ep04"]["editions"]] == ["Без персонажей", "С диалогом", "Ролик"]
+    assert [e["label"] for e in released["ep05"]["editions"]] == ["Без персонажей", "С диалогом"]
+    page = (root / "web/assets/pages/episode.mjs").read_text(encoding="utf-8")
+    assert 'aria-label="Другие редакции"' in page
+    assert "settings().edition" not in page
+
+
 def test_ep04_film_separates_a_jam_from_a_stop():
     root = pathlib.Path(__file__).resolve().parents[2]
     script = (root / "video/episodes/ep04/scenes.py").read_text(encoding="utf-8")

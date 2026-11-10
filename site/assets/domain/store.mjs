@@ -4,7 +4,7 @@
  */
 import { applyAnswer, migrateProgress, undoLast } from "./progress.mjs";
 import { forgetLesson } from "./forget.mjs";
-import { makeBundle, parseBundle, applyImport, previewImport, cleanState, cleanNotes } from "./bundle.mjs";
+import { makeBundle, parseBundle, applyImport, previewImport, cleanState, cleanNotes, cleanSession } from "./bundle.mjs";
 import { STORAGE, KEYS, RETIRED, APP_VERSION } from "./registry.mjs";
 export { KEYS };
 const DEFAULT_SETTINGS = { order: "new-first", own: true };
@@ -30,6 +30,7 @@ export function createStore(backend) {
     const actives = () => obj(read(KEYS.active, {}));
     const settings = () => ({ ...DEFAULT_SETTINGS, ...obj(read(KEYS.settings, {})) });
     const notes = () => cleanNotes(read(KEYS.notes, {})) || {};
+    const session = () => cleanSession(read(KEYS.session, null)) ?? null;
     const exams = () => { const r = read(KEYS.exams, []); return Array.isArray(r) ? r : []; };
     /** Raw snapshot of every registered key (json parsed, text as is); absent keys are omitted. */
     const snapshot = () => {
@@ -109,6 +110,9 @@ export function createStore(backend) {
         saveSettings(s) { write(KEYS.settings, { ...obj(read(KEYS.settings, {})), ...s }); },
         exams,
         notes,
+        session,
+        saveSession(s) { write(KEYS.session, s); },
+        clearSession() { backend.removeItem(KEYS.session); },
         /** Saves the learner's note on a ticket; blank text deletes it. */
         saveNote(id, text, now) {
             const n = notes(), x = String(text ?? "").trim();

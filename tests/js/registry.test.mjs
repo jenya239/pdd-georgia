@@ -20,6 +20,7 @@ const SAMPLES = {
   exams: [{ d: 100, ok: 27, pass: true, s: 1200 }, { d: 200, ok: 22, pass: false, s: 1700 }],
   theme: "dark",
   notes: { 5: { x: "Помеха справа — только на равнозначных", t: 31 }, "o-ep05-01": { x: "своя", t: 4 } },
+  session: { ids: [5, 7], i: 1, ok: 1, bad: 0, held: false },
 };
 
 function files(dir, out = []) {

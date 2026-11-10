@@ -23,6 +23,7 @@ export type LearnerState = {
   exams?: { d: number }[];
   theme?: string;
   notes?: Record<string, Note>;
+  session?: { ids: (string | number)[]; i: number; ok: number; bad: number; held: boolean };
 };
 
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
@@ -40,6 +41,15 @@ export function cleanNotes(v: unknown): Record<string, Note> | undefined {
   return out;
 }
 
+/** Unfinished practice: the question list, the index still on screen, counters, and whether that question is already answered. */
+export function cleanSession(v: unknown) {
+  if (!isObj(v) || !Array.isArray(v.ids) || !v.ids.length) return undefined;
+  if (typeof v.i !== "number" || !Number.isInteger(v.i) || v.i < 0 || v.i >= v.ids.length) return undefined;
+  if (!v.ids.every(id => typeof id === "number" || (typeof id === "string" && id.length > 0))) return undefined;
+  const count = (n: unknown) => (typeof n === "number" && Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0);
+  return { ids: v.ids as (string | number)[], i: v.i, ok: count(v.ok), bad: count(v.bad), held: v.held === true };
+}
+
 /** Per-section validators: return the clean value or undefined (section dropped). */
 const CLEAN: Record<string, (v: unknown) => unknown> = {
   progress: v => migrateProgress(v),
@@ -49,6 +59,7 @@ const CLEAN: Record<string, (v: unknown) => unknown> = {
   exams: v => (Array.isArray(v) ? v.filter(e => isObj(e) && typeof e.d === "number") : undefined),
   theme: v => (typeof v === "string" && THEMES.includes(v) ? v : undefined),
   notes: cleanNotes,
+  session: cleanSession,
 };
 
 export function cleanState(data: Record<string, unknown>) {
@@ -110,6 +121,8 @@ export function mergeState(current: LearnerState, incoming: LearnerState): Learn
   if (Object.keys(notes).length) out.notes = notes;
   const theme = current.theme ?? incoming.theme;
   if (theme != null) out.theme = theme;
+  const session = current.session ?? incoming.session;
+  if (session) out.session = session;
   return out;
 }
 

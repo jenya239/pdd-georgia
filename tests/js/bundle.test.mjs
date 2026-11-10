@@ -107,8 +107,20 @@ test("retired «lang» (global question language, removed in 0.7): old exports s
   assert.equal("lang" in makeBundle({ ...STATE, lang: "ka" }, 1, "t").data, false);
 });
 
+test("schema 5 keeps an unfinished practice and still reads a schema-4 file", () => {
+  assert.equal(SCHEMA_VERSION, 5);
+  const session = { ids: [5, "o-ep08-01"], i: 1, ok: 1, bad: 0, held: true };
+  const saved = parseBundle(JSON.stringify({ format: FORMAT, schema: 5, data: { session } }));
+  assert.deepEqual(saved.state.session, session);
+  assert.equal(parseBundle(JSON.stringify({ format: FORMAT, schema: 5, data: { session: { ids: [], i: 0 } } })).state.session, undefined);
+  const older = parseBundle(JSON.stringify({ format: FORMAT, schema: 4, data: { progress: { 5: { s: 1, c: 1, w: 0, l: 1, t: 1, k: 1 } } } }));
+  assert.equal(older.migratedFrom, 4);
+  assert.equal(older.state.session, undefined);
+  assert.deepEqual(mergeState({ session }, {}).session, session);
+  assert.deepEqual(mergeState({}, { session }).session, session);
+});
+
 test("schema 4: a schema-3 history becomes events, the unseen tail is one balance, and importing it twice does not double", () => {
-  assert.equal(SCHEMA_VERSION, 4);
   const file = { format: FORMAT, schema: 3, app: "0.7", exportedAt: "x", data: { progress: {
     5: { s: 3, c: 2, w: 1, l: 1, t: 9, k: 1, h: [{ t: 9, c: 0, ok: 1 }] } } } };
   const once = parseBundle(JSON.stringify(file));

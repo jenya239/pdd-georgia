@@ -461,19 +461,23 @@ def main():
         want = ["текст" if r.get("kind") == "text" else "видео" for r in E["released"]]
         check(kinds == want, f"index kind badges {kinds}")
         st = page.locator("#cumstatus").inner_text()
-        check(f"выпуск {last['num']}" in st and f"{scope_n} вопрос" in st, f"home status: lesson {last['num']}, {scope_n} tickets in scope")
+        first = min(E["released"], key=lambda r: r["num"])
+        check("Начать обучение" in st and f"Выпуск {first['num']}" in st, f"home starts at lesson {first['num']}, not the last published one")
         check(page.locator("#plan tr.soon").count() > 90, "course plan table rendered")
         shot(page, "index_desktop.png")
 
-        # video episodes
+        # video episodes open the new text; the filmed lesson is a small button
         for r in E["released"]:
             if r.get("kind") == "text":
                 continue
             page.goto(base + f"episode.html?id={r['id']}")
-            page.wait_for_selector(".points li")
+            page.wait_for_selector("#lb")
             page.wait_for_timeout(200)
             n = len(r["tickets_core"]) + len(r["tickets_linked"])
-            check(page.locator("video").count() == 1 and page.locator("#tk .q").count() == n, f"{r['id']}: video + {n} tickets")
+            check(page.locator("video").count() == 0 and page.locator("#tk .q").count() == n, f"{r['id']}: new text + {n} tickets, no film")
+            check(page.locator(".editions button", has_text="Ролик").count() == 1, f"{r['id']}: small button for the film")
+            page.locator(".editions button", has_text="Ролик").click()
+            page.wait_for_selector("video")
             dur = page.evaluate("new Promise(r=>{const v=document.querySelector('video'); if(v.readyState>=1) r(v.duration); else v.onloadedmetadata=()=>r(v.duration); setTimeout(()=>r(-1),8000)})")
             check(dur > 60, f"{r['id']}: video metadata loads ({dur:.0f}s)")
             if r.get("linked_title") and r["tickets_linked"]:
@@ -486,7 +490,8 @@ def main():
             page.goto(base + f"episode.html?id={r['id']}")
             page.wait_for_selector("#tk .q")
             n = len(r["tickets_core"]) + len(r["tickets_linked"])
-            videos = (1 if r.get("video") else 0) + (1 if r.get("tickets_video") else 0)
+            film_button = any(e.get("id") == "film" for e in r.get("editions") or [])
+            videos = (0 if film_button else (1 if r.get("video") else 0)) + (1 if r.get("tickets_video") else 0)
             check(page.locator("video").count() == videos and page.locator(".badge.kind.text").count() == 1,
                   f"{r['id']}: text lesson badge, video={videos}")
             if videos:
@@ -739,8 +744,8 @@ def main():
         tmp = Path(tempfile.mkdtemp()) / "progress.json"
         dl.value.save_as(tmp)
         bundle = json.loads(tmp.read_text())
-        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 4 and bundle["app"] and bundle["exportedAt"]
-              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 4, sections {sorted(bundle['data'])}")
+        check(bundle["format"] == "pddge-progress" and bundle["schema"] == 5 and bundle["app"] and bundle["exportedAt"]
+              and {"progress", "runs", "exams", "theme", "settings"} <= set(bundle["data"]) and "lang" not in bundle["data"], f"export bundle: schema 5, sections {sorted(bundle['data'])}")
         page.evaluate("localStorage.clear()")
         page.reload()
         page.wait_for_selector("header.top [data-act=import]", state="attached")

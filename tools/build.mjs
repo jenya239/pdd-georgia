@@ -173,8 +173,8 @@ function withEditions(built, episode, kind) {
   const plain = hasPlain(episode.id);
   if (plain && kind !== "text") {
     built.editions = [
-      { id: "dialogue", label: "Ролик", href: episode.video },
       { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
+      { id: "dialogue", label: "Ролик", href: episode.video },
     ];
   }
   if (kind === "text" && plain) built.editions = textEditions(episode);
@@ -187,16 +187,17 @@ function hasPlain(id) {
 
 function textEditions(episode) {
   const labels = episode.edition_labels;
-  if (Array.isArray(labels) && labels.length === 2) {
-    return [
-      { id: "full", label: labels[0], href: episode.lesson },
+  const editions = Array.isArray(labels) && labels.length === 2
+    ? [
       { id: "short", label: labels[1], href: `lessons/${episode.id}-plain.html` },
+      { id: "full", label: labels[0], href: episode.lesson },
+    ]
+    : [
+      { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
+      { id: "dialogue", label: "С диалогом", href: episode.lesson },
     ];
-  }
-  return [
-    { id: "dialogue", label: "С диалогом", href: episode.lesson },
-    { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
-  ];
+  if (episode.video) editions.push({ id: "film", label: "Ролик", href: episode.video });
+  return editions;
 }
 
 function finishTicket(record, br, ann, world, byNorm) {

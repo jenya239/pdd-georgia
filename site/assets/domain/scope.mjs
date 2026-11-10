@@ -3,6 +3,21 @@ export function currentLesson(released) {
     const list = releasedLessons(released);
     return list.length ? list[list.length - 1] : null;
 }
+/** The lesson to open next. No answers yet → the first lesson. Otherwise the earliest
+ * lesson that still has an unanswered question, then the earliest with a wrong last answer. */
+export function studyLesson(released, progress = {}, { own = false } = {}) {
+    const list = releasedLessons(released);
+    if (!list.length)
+        return null;
+    const work = (lesson) => [...(lesson.tickets_lesson || []), ...(own ? lesson.own_items || [] : [])];
+    if (!Object.keys(progress).length)
+        return list[0];
+    const open = list.find(lesson => work(lesson).some(id => !progress[id]));
+    if (open)
+        return open;
+    const wrong = list.find(lesson => work(lesson).some(id => progress[id]?.l === 0));
+    return wrong ?? list[list.length - 1];
+}
 /** Tickets of this lesson (`current`) and of all earlier lessons (`previous`);
  *  with {own: true} each lesson's own check items follow its tickets. */
 export function cumulativeScope(released, lessonId, { own = false } = {}) {

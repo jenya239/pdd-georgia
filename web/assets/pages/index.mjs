@@ -14,16 +14,16 @@ import { progress, store, summary } from "../app/progress.mjs";
      <div class="row"><a class="btn" href="practice.html">Тренироваться</a>${mist ? `<a class="btn ghost" href="practice.html?mode=mistakes">Ошибки (${mist})</a>` : ""}</div></div>
    <div class="card"><h3 style="margin-top:0">Пробный экзамен</h3><p class="small mut">30 случайных вопросов, 30 минут, не больше 5 ошибок.</p><a class="btn" href="exam.html">Начать</a></div>`;
   // текущий урок и накопительный статус (этот урок + все предыдущие)
-  const [{ currentLesson, cumulativeScope, scopeStatus }, st] = await Promise.all([import("../domain/scope.mjs"), store]);
+  const [{ studyLesson }, st] = await Promise.all([import("../domain/scope.mjs"), store]);
   const withOwn = st.settings().own !== false;
-  const cl = currentLesson(E.released.filter(r => r.tickets_lesson.length || (withOwn && (r.own_items || []).length)));
+  const prog = st.progress();
+  const cl = studyLesson(E.released, prog, { own: withOwn });
   if (cl) {
-    const sc = cumulativeScope(E.released, cl.id, { own: withOwn }), ss = scopeStatus([...sc.current, ...sc.previous], st.progress()), act = st.activeRun(cl.id);
+    const fresh = !Object.keys(prog).length;
     const c = document.createElement("div"); c.className = "card cumcard"; c.id = "cumstatus";
-    c.innerHTML = `<h3 style="margin-top:0">Текущий урок: выпуск ${cl.num}</h3><p class="small mut">${esc(cl.title)}</p>
-     <p class="small">Накопительно (уроки 1–${cl.num}${withOwn ? ", с нашими вопросами" : ""}): ${nq(ss.inScope)} · решено ${ss.solved} · верно сейчас ${ss.correctNow}${ss.errorRate != null ? ` · доля ошибок ${Math.round(100 * ss.errorRate)}%` : ""}</p>
-     <div class="bar"><i style="width:${ss.inScope ? (100 * ss.solved / ss.inScope).toFixed(1) : 0}%"></i></div>
-     <div class="row" style="margin-top:8px"><a class="btn" href="check.html?lesson=${cl.id}">${act ? "Продолжить проверку" : "Накопительная проверка"}</a><a class="btn ghost" href="errors.html">Типичные ошибки</a></div>`;
+    c.innerHTML = `<h3 style="margin-top:0">${fresh ? "Начать обучение" : "Продолжить обучение"}</h3><p>Выпуск ${cl.num}. ${esc(cl.title)}</p>
+     <p class="small">Прочитать выпуск и ответить на его вопросы.</p>
+     <div class="row" style="margin-top:8px"><a class="btn" href="episode.html?id=${cl.id}">Открыть выпуск</a>${mist ? `<a class="btn ghost" href="errors.html">Повторить ошибки (${mist})</a>` : ""}</div>`;
     $("#quick").prepend(c);
   }
   const rel = new Set(E.released.flatMap(r => r.plan));

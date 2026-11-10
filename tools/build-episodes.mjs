@@ -68,21 +68,23 @@ export function episodesJson() {
     const plain = plainFile || Object.hasOwn(lessonBundle().raw, `${ep.id}-plain`);
     if (plain && kind !== "text") {
       built.set("editions", [
-        edition("dialogue", "Ролик", ep.video),
         edition("plain", "Без персонажей", `lessons/${ep.id}-plain.html`),
+        edition("dialogue", "Ролик", ep.video),
       ]);
     }
     if (kind === "text" && plain) {
       const labels = ep.edition_labels;
-      built.set("editions", Array.isArray(labels) && labels.length === 2
+      const editions = Array.isArray(labels) && labels.length === 2
         ? [
-          edition("full", labels[0], ep.lesson),
           edition("short", labels[1], `lessons/${ep.id}-plain.html`),
+          edition("full", labels[0], ep.lesson),
         ]
         : [
-          edition("dialogue", "С диалогом", ep.lesson),
           edition("plain", "Без персонажей", `lessons/${ep.id}-plain.html`),
-        ]);
+          edition("dialogue", "С диалогом", ep.lesson),
+        ];
+      if (ep.video) editions.push(edition("film", "Ролик", ep.video));
+      built.set("editions", editions);
     }
   }
   return dumps(doc, { indent: 1 });

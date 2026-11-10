@@ -2,7 +2,7 @@
 import { loadEpisodes, loadTickets } from "../app/data.mjs";
 import { $, esc, nq, plural } from "../app/dom.mjs";
 import { header } from "../app/layout.mjs";
-import { progress, resetProgress, summary } from "../app/progress.mjs";
+import { progress, resetProgress, store, summary } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { shuffle } from "../domain/scope.mjs";
 import { parseId, compareIds } from "../domain/items.mjs";
@@ -38,37 +38,58 @@ import { parseId, compareIds } from "../domain/items.mjs";
     if ($("#nountr").checked) L = L.filter(t => !(t.nu || []).includes("ru"));
     return L;
   }
-  const upd = () => { const n = pool().length; $("#cnt").textContent = n ? nq(n) : "в этом наборе нет вопросов"; $("#go").disabled = !n; };
-  ["#set", "#onlynew", "#nountr"].forEach(s => $(s).onchange = upd); upd();
+  const upd = () => {
+    const n = pool().length, cap = $("#len").value === "all" ? n : Math.min(n, Number($("#len").value));
+    $("#cnt").textContent = n ? (cap === n ? nq(n) : `${cap} из ${n}`) : "в этом наборе нет вопросов";
+    $("#go").disabled = !n;
+  };
+  ["#set", "#len", "#onlynew", "#nountr"].forEach(s => $(s).onchange = upd); upd();
 
-  let list = [], i = 0, ok = 0, bad = 0, cur = null;
+  let list = [], i = 0, ok = 0, bad = 0, held = false, cur = null;
+  const lastChoice = id => { const ev = (progress()[id]?.events || []); return ev.length ? ev[ev.length - 1].c : null; };
+  function persist() { store.saveSession({ ids: list.map(t => t.id), i, ok, bad, held }); }
   function show() {
     const t = list[i]; cur = $("#qbox");
-    renderQuestion(cur, t, { mode: "instant", index: i, total: list.length, onAnswer: (_, good) => { good ? ok++ : bad++; stat(); $("#next").disabled = false; $("#next").focus(); },
+    renderQuestion(cur, t, { mode: "instant", index: i, total: list.length, reveal: held, selected: held ? lastChoice(t.id) : null,
+      onAnswer: (_, good) => { good ? ok++ : bad++; held = true; persist(); stat(); $("#next").disabled = false; $("#next").focus(); },
       onUndo: (undone, info) => {
-        if (info.session) { if (undone.ok) ok--; else bad--; }
+        if (info.session) { if (undone.ok) ok--; else bad--; held = false; persist(); }
         stat();
         $("#next").disabled = true;
       } });
-    $("#next").disabled = true; $("#next").textContent = i + 1 < list.length ? "Дальше →" : "Завершить";
+    $("#next").disabled = !held; $("#next").textContent = i + 1 < list.length ? "Дальше →" : "Завершить";
     stat();
   }
   function stat() {
     $("#sess").innerHTML = `<span>Вопрос <b>${Math.min(i + 1, list.length)}</b> из ${list.length}</span><span>Верно <b style="color:var(--ok)">${ok}</b></span><span>Ошибок <b style="color:var(--bad)">${bad}</b></span>`;
     $("#pbar").style.width = (100 * (i + (cur && cur._state && cur._state.answered ? 1 : 0)) / list.length) + "%";
   }
+  function openRun() { $("#setup").style.display = "none"; $("#run").style.display = ""; show(); }
   function finish() {
+    store.clearSession(); paintResume();
     $("#qbox").innerHTML = `<div class="card q"><div class="result">Набор пройден: ${ok} верно, ${bad} ${plural(bad, ["ошибка", "ошибки", "ошибок"])}.</div>
       <div class="row" style="margin-top:12px">${bad ? `<a class="btn" href="practice.html?mode=mistakes">Повторить ошибки</a>` : ""}<a class="btn ghost" href="practice.html">Другой набор</a></div></div>`;
     $("#next").disabled = true; drawTopics();
   }
+  function paintResume() {
+    const s = store.session();
+    $("#resume").hidden = !s;
+    if (s) $("#resume").textContent = `Продолжить занятие (${Math.min(s.i + 1, s.ids.length)} из ${s.ids.length})`;
+  }
   $("#go").onclick = () => {
     list = pool(); if ($("#order").value === "rnd") list = shuffle(list); else list = list.slice().sort((a, b) => compareIds(a.id, b.id));
-    i = ok = bad = 0; $("#setup").style.display = "none"; $("#run").style.display = ""; show();
+    if ($("#len").value !== "all") list = list.slice(0, Number($("#len").value));
+    i = ok = bad = 0; held = false; persist(); openRun();
+  };
+  $("#resume").onclick = () => {
+    const s = store.session(); if (!s) return;
+    const next = s.ids.map(id => D.byId[id]).filter(Boolean);
+    if (next.length !== s.ids.length) { store.clearSession(); paintResume(); return; }
+    list = next; i = s.i; ok = s.ok; bad = s.bad; held = s.held; openRun();
   };
   if (qs.get("start") === "1" && byIds.length) $("#go").click();
-  $("#next").onclick = () => { if (i + 1 < list.length) { i++; show(); scrollTo({ top: 0 }); } else finish(); };
-  $("#stop").onclick = () => { $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
+  $("#next").onclick = () => { if (i + 1 < list.length) { i++; held = false; persist(); show(); scrollTo({ top: 0 }); } else finish(); };
+  $("#stop").onclick = () => { store.clearSession(); paintResume(); $("#run").style.display = "none"; $("#setup").style.display = ""; upd(); drawTopics(); };
   document.addEventListener("keydown", e => {
     if ($("#run").style.display === "none" || e.target.closest("select,input,textarea,[data-undo]")) return;
     const n = parseInt(e.key, 10);
@@ -85,5 +106,6 @@ import { parseId, compareIds } from "../domain/items.mjs";
     $("#topics").innerHTML = h;
   }
   drawTopics();
-  $("#reset").onclick = () => { if (confirm("Удалить весь сохранённый прогресс?")) { resetProgress(); drawTopics(); upd(); } };
+  $("#reset").onclick = () => { if (confirm("Удалить весь сохранённый прогресс?")) { resetProgress(); store.clearSession(); paintResume(); drawTopics(); upd(); } };
+  paintResume();
 })();

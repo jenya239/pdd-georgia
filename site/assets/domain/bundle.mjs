@@ -28,6 +28,17 @@ export function cleanNotes(v) {
     }
     return out;
 }
+/** Unfinished practice: the question list, the index still on screen, counters, and whether that question is already answered. */
+export function cleanSession(v) {
+    if (!isObj(v) || !Array.isArray(v.ids) || !v.ids.length)
+        return undefined;
+    if (typeof v.i !== "number" || !Number.isInteger(v.i) || v.i < 0 || v.i >= v.ids.length)
+        return undefined;
+    if (!v.ids.every(id => typeof id === "number" || (typeof id === "string" && id.length > 0)))
+        return undefined;
+    const count = (n) => (typeof n === "number" && Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0);
+    return { ids: v.ids, i: v.i, ok: count(v.ok), bad: count(v.bad), held: v.held === true };
+}
 /** Per-section validators: return the clean value or undefined (section dropped). */
 const CLEAN = {
     progress: v => migrateProgress(v),
@@ -37,6 +48,7 @@ const CLEAN = {
     exams: v => (Array.isArray(v) ? v.filter(e => isObj(e) && typeof e.d === "number") : undefined),
     theme: v => (typeof v === "string" && THEMES.includes(v) ? v : undefined),
     notes: cleanNotes,
+    session: cleanSession,
 };
 export function cleanState(data) {
     const out = {};
@@ -107,6 +119,9 @@ export function mergeState(current, incoming) {
     const theme = current.theme ?? incoming.theme;
     if (theme != null)
         out.theme = theme;
+    const session = current.session ?? incoming.session;
+    if (session)
+        out.session = session;
     return out;
 }
 export function applyImport(current, incoming, mode) {

@@ -4,7 +4,7 @@
  */
 import { applyAnswer, migrateProgress, undoLast } from "./progress.ts";
 import { forgetLesson } from "./forget.ts";
-import { makeBundle, parseBundle, applyImport, previewImport, cleanState, cleanNotes } from "./bundle.ts";
+import { makeBundle, parseBundle, applyImport, previewImport, cleanState, cleanNotes, cleanSession } from "./bundle.ts";
 import { STORAGE, KEYS, RETIRED, APP_VERSION } from "./registry.ts";
 
 export { KEYS };
@@ -30,6 +30,7 @@ export function createStore(backend: Backend) {
   const actives = () => obj(read(KEYS.active, {}));
   const settings = () => ({ ...DEFAULT_SETTINGS, ...obj(read(KEYS.settings, {})) });
   const notes = () => cleanNotes(read(KEYS.notes, {})) || {};
+  const session = () => cleanSession(read(KEYS.session, null)) ?? null;
   const exams = () => { const r = read(KEYS.exams, []); return Array.isArray(r) ? r : []; };
   /** Raw snapshot of every registered key (json parsed, text as is); absent keys are omitted. */
   const snapshot = () => {
@@ -95,6 +96,9 @@ export function createStore(backend: Backend) {
     saveSettings(s: Record<string, unknown>) { write(KEYS.settings, { ...obj(read(KEYS.settings, {})), ...s }); },
     exams,
     notes,
+    session,
+    saveSession(s: { ids: (string | number)[]; i: number; ok: number; bad: number; held: boolean }) { write(KEYS.session, s); },
+    clearSession() { backend.removeItem(KEYS.session); },
     /** Saves the learner's note on a ticket; blank text deletes it. */
     saveNote(id: string, text: string, now: number) {
       const n = notes(), x = String(text ?? "").trim();

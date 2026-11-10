@@ -220,8 +220,8 @@ def generate():
         if plain and ep["kind"] != "text":
             plains[ep["id"]] = plain
             ep["editions"] = [
-                {"id": "dialogue", "label": "Ролик", "href": ep["video"]},
                 {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
+                {"id": "dialogue", "label": "Ролик", "href": ep["video"]},
             ]
         if ep["kind"] == "text":
             lesson_dir = paths.LESSONS / ep["id"]
@@ -231,14 +231,16 @@ def generate():
                 plains[ep["id"]] = plain
                 if labels:
                     ep["editions"] = [
-                        {"id": "full", "label": labels[0], "href": ep["lesson"]},
                         {"id": "short", "label": labels[1], "href": f"lessons/{ep['id']}-plain.html"},
+                        {"id": "full", "label": labels[0], "href": ep["lesson"]},
                     ]
                 else:
                     ep["editions"] = [
-                        {"id": "dialogue", "label": "С диалогом", "href": ep["lesson"]},
                         {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
+                        {"id": "dialogue", "label": "С диалогом", "href": ep["lesson"]},
                     ]
+                if ep.get("video"):
+                    ep["editions"].append({"id": "film", "label": "Ролик", "href": ep["video"]})
             prefix = f"lessons/{ep['id']}/"
             names = set(lesson_asset_refs(html, prefix))
             if plain:

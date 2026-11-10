@@ -937,14 +937,14 @@
    ],
    "editions": [
     {
-     "id": "dialogue",
-     "label": "Ролик",
-     "href": "media/ep01.mp4"
-    },
-    {
      "id": "plain",
      "label": "Без персонажей",
      "href": "lessons/ep01-plain.html"
+    },
+    {
+     "id": "dialogue",
+     "label": "Ролик",
+     "href": "media/ep01.mp4"
     }
    ]
   },
@@ -1294,14 +1294,14 @@
    ],
    "editions": [
     {
-     "id": "dialogue",
-     "label": "Ролик",
-     "href": "media/ep02.mp4"
-    },
-    {
      "id": "plain",
      "label": "Без персонажей",
      "href": "lessons/ep02-plain.html"
+    },
+    {
+     "id": "dialogue",
+     "label": "Ролик",
+     "href": "media/ep02.mp4"
     }
    ],
    "_r": {
@@ -1657,14 +1657,14 @@
    ],
    "editions": [
     {
-     "id": "dialogue",
-     "label": "Ролик",
-     "href": "media/ep03.mp4"
-    },
-    {
      "id": "plain",
      "label": "Без персонажей",
      "href": "lessons/ep03-plain.html"
+    },
+    {
+     "id": "dialogue",
+     "label": "Ролик",
+     "href": "media/ep03.mp4"
     }
    ]
   },
@@ -1676,7 +1676,7 @@
    ],
    "format": "text",
    "title": "Пешеходный переход, железнодорожный переезд, населённый пункт",
-   "lead": "Три термина статьи 5, от которых отсчитываются запреты: где кончается переход, что считается переездом и когда включается режим населённого пункта. Текст с рисунками, над ним ролик. Перед билетами — разбор каждой ситуации.",
+   "lead": "Три термина статьи 5, от которых отсчитываются запреты: где кончается переход, что считается переездом и когда включается режим населённого пункта. Текст с рисунками. Снятый ролик и прежний диалог открываются отдельными кнопками. Перед билетами — разбор каждой ситуации.",
    "lesson": "lessons/ep04.html",
    "poster": "lessons/ep04/poster.svg",
    "video": "media/ep04.mp4",
@@ -2083,14 +2083,19 @@
    ],
    "editions": [
     {
+     "id": "plain",
+     "label": "Без персонажей",
+     "href": "lessons/ep04-plain.html"
+    },
+    {
      "id": "dialogue",
      "label": "С диалогом",
      "href": "lessons/ep04.html"
     },
     {
-     "id": "plain",
-     "label": "Без персонажей",
-     "href": "lessons/ep04-plain.html"
+     "id": "film",
+     "label": "Ролик",
+     "href": "media/ep04.mp4"
     }
    ],
    "_r": {
@@ -2315,14 +2320,14 @@
    ],
    "editions": [
     {
-     "id": "dialogue",
-     "label": "С диалогом",
-     "href": "lessons/ep05.html"
-    },
-    {
      "id": "plain",
      "label": "Без персонажей",
      "href": "lessons/ep05-plain.html"
+    },
+    {
+     "id": "dialogue",
+     "label": "С диалогом",
+     "href": "lessons/ep05.html"
     }
    ]
   },
@@ -2607,14 +2612,14 @@
    ],
    "editions": [
     {
-     "id": "dialogue",
-     "label": "С диалогом",
-     "href": "lessons/ep06.html"
-    },
-    {
      "id": "plain",
      "label": "Без персонажей",
      "href": "lessons/ep06-plain.html"
+    },
+    {
+     "id": "dialogue",
+     "label": "С диалогом",
+     "href": "lessons/ep06.html"
     }
    ]
   },

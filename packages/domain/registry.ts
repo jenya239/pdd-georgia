@@ -3,7 +3,7 @@
  * Every key the code reads or writes must be listed here (tests/js/registry.test.mjs enforces it),
  * so the progress file (bundle.mjs) always carries the learner's whole state.
  */
-export const SCHEMA_VERSION = 4;   // progress-file schema; bump together with a migration in bundle.mjs
+export const SCHEMA_VERSION = 5;   // progress-file schema; bump together with a migration in bundle.mjs
 export const APP_VERSION = "0.7";  // site version written into exported files (lessons 1–6, norm pages)
 
 export const STORAGE = [
@@ -15,6 +15,7 @@ export const STORAGE = [
   { id: "exams", key: "pddge.exams.v1", kind: "json", what: "история пробных экзаменов" },
   { id: "theme", key: "pddge.theme", kind: "text", what: "светлая или тёмная тема" },
   { id: "notes", key: "pddge.notes.v1", kind: "json", what: "ваши заметки к билетам и нашим вопросам" },
+  { id: "session", key: "pddge.session.v1", kind: "json", what: "незаконченная самопроверка: какие вопросы, на каком остановились, сколько уже верных и ошибок" },
 ];
 
 /** Keys older versions wrote; the store deletes them on open, imports ignore their sections. */
