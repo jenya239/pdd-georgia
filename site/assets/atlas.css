@@ -1,11 +1,11 @@
 /* Three reference screens: home, flow, lesson. Reading column, one material, diagram plate. */
-.atlas{max-width:920px;padding-top:36px}
+.atlas{max-width:900px;padding-top:30px}
 .atlas.lessonpage{max-width:1040px}
 .kicker{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--acc)}
-.deck{max-width:68ch;font-family:var(--serif);font-size:19px;line-height:1.6;margin:0 0 20px}
-.atlas h1,.atlas #now h2,.atlas #stage h2{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;line-height:1.15}
-.atlas h1{font-size:40px;margin:0 0 12px;max-width:18em}
-.atlas #now h2,.atlas #stage h2{font-size:34px;margin:0 0 12px;max-width:18em}
+.deck{max-width:68ch;font-family:var(--sans);font-size:16px;line-height:1.6;margin:0 0 18px}
+.atlas h1,.atlas #now h2,.atlas #stage h2{font-family:var(--sans);font-weight:600;letter-spacing:-.012em;line-height:1.24}
+.atlas h1{font-size:34px;margin:0 0 14px;max-width:20em}
+.atlas #now h2,.atlas #stage h2{font-size:28px;margin:0 0 12px;max-width:22em}
 .atlas #know{max-width:68ch;color:var(--mut);font-size:15px;line-height:1.5}
 .quietlinks{display:flex;gap:18px;margin-top:28px}
 .quietlinks a{color:var(--fg);text-underline-offset:3px}
@@ -14,9 +14,9 @@
 .playmode{font-size:13px;color:var(--mut)}
 .playmode select{margin-left:8px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:2px 2px 3px;color:var(--fg)}
 .playnote{margin:-12px 0 24px;max-width:68ch;color:var(--mut);font-size:14px;line-height:1.45}
-.atlas #stage .reading{font-family:var(--serif);font-size:19px;line-height:1.65}
-.atlas #stage .reading p,.atlas #stage .reading li{max-width:68ch}
-.atlas #stage .reading h2{font-size:30px;margin:0 0 .55em}
+.atlas #stage .reading{font-family:var(--sans);font-size:17px;line-height:1.62}
+.atlas #stage .reading p,.atlas #stage .reading li{max-width:64ch}
+.atlas #stage .reading h2{font-size:24px;line-height:1.3;margin:0 0 .6em}
 .atlas #stage .reading .lq{background:transparent;padding:2px 0 2px 14px}
 .atlas #stage .whole{margin:8px 0 18px;font-size:14px}
 .atlas #stage .whole a{color:var(--mut)}
@@ -25,35 +25,43 @@
 @keyframes atlas-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.atlas #stage.step{animation:none}}
 .atlas #stage .q.card{background:transparent;border:0;box-shadow:none;padding:0 0 8px;border-radius:0}
-.atlas #stage .qtext{font-family:var(--serif);font-size:32px;font-weight:600;letter-spacing:-.02em;line-height:1.2;max-width:22em}
+.atlas #stage .qtext{font-family:var(--sans);font-size:25px;font-weight:600;letter-spacing:-.01em;line-height:1.34;max-width:28em}
 .atlas #stage .qimg{max-height:min(68vh,640px);width:auto;max-width:100%;margin:12px auto 20px;border-radius:2px;background:var(--plate)}
 .atlas #stage .qfig svg.fig{max-width:min(720px,100%);width:100%}
 .atlas #stage .answers{max-width:40em;margin-top:8px}
 .atlas #stage .ans{background:transparent;border-color:#CFC8BC;padding:12px 14px;min-height:48px}
 .atlas #stage .ans:hover:not(:disabled){background:var(--acc2);border-color:var(--acc2)}
 .atlas #stage .qhead{margin-bottom:14px}
-.atlas .note{background:transparent;border-radius:0;padding:0 0 0 14px;font-size:17px;max-width:68ch}
+.atlas .note{background:transparent;border-radius:0;padding:0 0 0 14px;font-size:15px;line-height:1.55;max-width:64ch}
 
-.lessonpage .lesson{font-family:var(--serif);font-size:19px;line-height:1.65}
-.lessonpage .lesson p,.lessonpage .lesson li,.lessonpage .lead,.lessonpage .lq,.lessonpage .points{max-width:68ch}
-.lessonpage .lead{font-size:20px;line-height:1.5}
-.lessonpage .lesson h2{font-family:var(--serif);font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.2;color:var(--fg);text-transform:none;margin:1.35em 0 .4em}
-.lessonpage .lesson h3{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:-.01em;margin:1.2em 0 .35em}
+.lessonpage .lesson{font-family:var(--sans);font-size:17px;line-height:1.62}
+.lessonpage .lesson p,.lessonpage .lesson li,.lessonpage .lead,.lessonpage .lq,.lessonpage .points{max-width:64ch}
+.lessonpage .lesson > p{margin:0 0 .95em}
+.lessonpage .lead{font-size:17px;line-height:1.58}
+.lessonpage .lesson h2{font-family:var(--sans);font-size:24px;font-weight:600;letter-spacing:-.012em;line-height:1.3;color:var(--fg);text-transform:none;margin:1.55em 0 .55em}
+.lessonpage .lesson h3{font-family:var(--sans);font-size:19px;font-weight:600;letter-spacing:0;line-height:1.35;margin:1.4em 0 .5em}
 .lessonpage > h2{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:48px 0 12px}
 .lessonpage .lq{background:transparent;padding:2px 0 2px 14px}
 .lessonpage details.law{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0}
 .lessonpage .cumcard{background:transparent;border:0;box-shadow:none;padding:8px 0 0;border-top:1px solid var(--line);border-radius:0}
 .lessonpage .q.card{background:transparent;border:0;box-shadow:none;padding:8px 0 18px;border-bottom:1px solid var(--line);border-radius:0}
-.lessonpage .qtext{font-family:var(--serif);font-size:22px;line-height:1.3}
+.lessonpage .qtext{font-family:var(--sans);font-size:19px;line-height:1.42}
 .lessonpage .qimg{max-height:min(64vh,560px)}
-.lessonpage .fig{margin:32px 0 12px}
+.lessonpage .fig{margin:26px 0 16px}
 .lessonpage .tdet{border-radius:0;border-left:0;border-right:0;border-top:1px solid var(--line)}
 
 @media (max-width:640px){
   .atlas{padding-top:20px}
-  .atlas h1{font-size:30px}
-  .atlas #now h2,.atlas #stage h2,.atlas #stage .qtext{font-size:26px}
-  .lessonpage .lesson{font-size:18px}
-  .lessonpage .lesson h2{font-size:24px}
-  .deck{font-size:18px}
+  .atlas h1{font-size:28px}
+  .atlas #now h2,.atlas #stage h2,.atlas #stage .qtext{font-size:23px}
+  .lessonpage .lesson{font-size:16px}
+  .lessonpage .lesson h2{font-size:21px}
+  .deck{font-size:16px}
 }
+
+/* Calm editorial rhythm: never compress headings, quotes or long Russian words. */
+.atlas h1,.atlas h2,.atlas h3,.lessonpage .lesson h2,.lessonpage .lesson h3{text-wrap:balance;overflow-wrap:break-word}
+.atlas #stage .reading > p{margin:0 0 .9em}
+.lessonpage .lq{margin:18px 0;padding:7px 0 7px 14px;line-height:1.55}
+.lessonpage .lesson li{margin:0 0 .45em}
+@media (max-width:640px){.atlas{padding-top:18px}.lessonpage .lesson h3{font-size:18px}.atlas #stage .reading{font-size:16px}.atlas #stage .qtext{line-height:1.36}}
