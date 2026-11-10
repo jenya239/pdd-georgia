@@ -148,7 +148,7 @@ def fig_town():
     b += plate(500, 92, "5.24.x", end=True)
     b += f'<line x1="222" y1="64" x2="500" y2="64" class="dim" marker-start="url(#ar)" marker-end="url(#ar)"/>'
     b += f'<text x="361" y="54" class="t" text-anchor="middle">режим н. п.: 60 км/ч</text>'
-    b += f'<text x="12" y="30" class="t small">вне н. п. (B — до 90)</text>'
+    b += f'<text x="12" y="30" class="t small">до знака правила н. п. не действуют</text>'
     b += f'<text x="{W-12}" y="30" class="t small" text-anchor="end">вне н. п.</text>'
     b += f'<text x="12" y="262" class="t small mut">Дома до знака — ещё не населённый пункт.</text>'
     b += f'<text x="12" y="286" class="t small mut">Границу режима задаёт знак (ст. 5, п. 17; ст. 33, п. 6).</text>'

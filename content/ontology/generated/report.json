@@ -21,7 +21,7 @@
   },
   "assumed": 1,
   "untaught": 8,
-  "misconceptions": 54,
+  "misconceptions": 65,
   "annotated_tickets": 84,
   "distractors": 144,
   "distractors_mapped": 135
@@ -332,11 +332,11 @@
   "concept_notes": [
    {
     "id": "theory-exam-format",
-    "gap": "не из закона: источник — сайт Агентства сервисов (sa.gov.ge); в онтологии нет нормы закона"
+    "gap": "не норма закона «О дорожном движении»: приказ МВД № 598 в редакции приказа № 69 от 20.05.2026 (Matsne, документ 6867586). Статья 55 эти числа не задаёт"
    },
    {
     "id": "shoulder",
-    "gap": "Закон не определяет обочину: в ст. 5 такого термина нет, и урок своего определения не даёт. Её смысл виден только из употребления: дорога может включать обочины (ст. 5, п. 12), проезжая часть — без обочин (п. 15); движение механических ТС по обочинам запрещено, кроме случаев ст. 37, п. 1 и ст. 43, п. 2 (ст. 31, п. 18); вне населённых пунктов пешеходы идут по обочине навстречу движению (ст. 24, п. 5); разворот возможен «с правой обочины» (ст. 32, п. 10); линию 1.2.1 на автомагистрали можно пересечь для остановки на обочине (прил. 2, п. 1.2.1)."
+    "gap": "Закон не определяет обочину: в ст. 5 такого термина нет, и урок своего определения не даёт. Она примыкает к проезжей части и в неё не входит (ст. 5, п. 15), но не всё за краем проезжей части — обочина: там же бывают тротуар, газон и другие элементы. Дорога может включать обочины (ст. 5, п. 12). Движение механических ТС по обочинам запрещено (ст. 31, п. 18); изъятия того же пункта — подъезд с грузом к объекту непосредственно у элемента, по кратчайшему пути и с мерами безопасности, машины дорожных и коммунальных служб, а также случаи ст. 37, п. 1 и ст. 43, п. 2. Велосипедист и иной транспорт без двигателя при отсутствии своей полосы или дорожки вправе использовать обочину по ходу движения, если не мешает остальным (ст. 31, п. 4). Вне населённого пункта, на дороге с двусторонним движением без разделительной полосы и тротуара, пешеходы идут по обочине навстречу (ст. 24, п. 5). Край проезжей части могут обозначать разметки 1.1, 1.2.1 (автомагистраль) и 1.2.2 (широкая прерывистая на автомобильной дороге)."
    },
    {
     "id": "settlement-sign-look",
@@ -412,67 +412,74 @@
   }
  },
  "own_items": {
-  "total": 56,
+  "total": 71,
   "by_lesson": {
    "ep01": 5,
    "ep02": 8,
    "ep03": 9,
-   "ep04": 14,
-   "ep05": 7,
-   "ep06": 9,
-   "ep07": 2,
-   "ep08": 2
+   "ep04": 17,
+   "ep05": 9,
+   "ep06": 12,
+   "ep07": 6,
+   "ep08": 5
   },
   "by_type": {
-   "cloze": 8,
+   "cloze": 7,
    "diagram": 6,
-   "flashcard": 9,
-   "max-error": 9,
+   "flashcard": 7,
+   "max-error": 5,
    "priority": 8,
-   "ticket": 16
+   "ticket": 38
   }
  },
  "misconception_use": {
+  "mc-5232-outside": 1,
   "mc-525-is-settlement": 1,
   "mc-adjacent-is-intersection": 5,
-  "mc-age-without-school": 2,
+  "mc-age-without-school": 1,
   "mc-annex-optional": 2,
   "mc-any-track-is-crossing": 1,
-  "mc-barrier": 5,
+  "mc-barrier": 7,
   "mc-boarding-carriageway": 2,
   "mc-boarding-not-passenger": 4,
-  "mc-carriageways-by-lanes": 7,
+  "mc-carriageways-by-lanes": 9,
   "mc-class-thresholds": 8,
   "mc-controller-is-user": 2,
-  "mc-crossing-blocking": 2,
+  "mc-crossing-blocking": 3,
   "mc-crossing-driver-priority": 12,
   "mc-crossing-needs-marking": 1,
   "mc-crossing-stop-place": 2,
   "mc-different-levels": 3,
+  "mc-distance-is-enough": 1,
   "mc-enter-when-blocked": 1,
-  "mc-forced-is-choice": 5,
+  "mc-exam-format-not-in-statute": 2,
+  "mc-fine-in-traffic-law": 1,
+  "mc-forced-is-choice": 8,
   "mc-give-way-is-priority": 2,
   "mc-houses-settlement": 2,
   "mc-lanes-need-marking": 3,
   "mc-law-citizens-only": 2,
+  "mc-left-goes-first": 1,
   "mc-light-off-wait": 2,
-  "mc-main-road-sign": 6,
+  "mc-main-road-sign": 5,
   "mc-mass-confusion": 11,
   "mc-min-speed-ignored": 2,
   "mc-moped-age": 5,
+  "mc-moped-by-speed-only": 2,
   "mc-oncoming-side": 7,
   "mc-overtake-crossing": 4,
-  "mc-parking-is-stop": 2,
+  "mc-parking-is-stop": 5,
   "mc-pedestrian-on-foot-only": 4,
   "mc-pedestrian-side": 2,
+  "mc-priority-must-brake": 1,
   "mc-railway-bypass": 3,
   "mc-railway-overtake": 3,
   "mc-railway-signs": 6,
   "mc-railway-speed": 1,
   "mc-railway-stop-order": 9,
-  "mc-right-rule": 11,
+  "mc-right-rule": 9,
   "mc-right-rule-over-main": 1,
-  "mc-road-elements": 9,
+  "mc-road-elements": 6,
   "mc-scooter-is-mechanical": 1,
   "mc-settlement-speed": 4,
   "mc-shoulder-driving": 6,
@@ -480,12 +487,16 @@
   "mc-sign-zone": 1,
   "mc-stop-is-signal": 3,
   "mc-stop-near-crossing": 5,
+  "mc-tram-arrow-keeps": 2,
   "mc-tram-no-priority": 12,
+  "mc-tram-signal-cancels": 2,
   "mc-unknown-surface-main": 5,
   "mc-unpaved-equal": 4,
-  "mc-walked-bike-driver": 1,
-  "mc-walked-bike-side": 4,
+  "mc-walked-bike-driver": 2,
+  "mc-walked-bike-side": 6,
   "mc-wheelie": 3,
-  "mc-yard-exit-priority": 6
+  "mc-yard-exit-priority": 6,
+  "mc-yield-is-always-stop": 1,
+  "mc-yield-is-private": 1
  }
 }

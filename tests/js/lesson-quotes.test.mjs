@@ -31,7 +31,7 @@ test("published lesson quotes are verbatim, and ep07 has no characters", () => {
   }
   const ep07 = lessonFiles()["lessons/ep07.html"];
   assert.equal((ep07.match(/<aside class="ask"/g) || []).length, 0);
-  assert.equal((ep07.match(/<figure class="fig">/g) || []).length, 3);
+  assert.equal((ep07.match(/<figure class="fig">/g) || []).length, 1);
   assert.equal(ep07.includes("Наш вывод"), false);
   assert.equal(ep07.includes("Остановка — только у обочины"), false);
   assert.ok(ep07.includes("Остановкой считается преднамеренный перерыв, а не ожидание в потоке или по сигналу"));

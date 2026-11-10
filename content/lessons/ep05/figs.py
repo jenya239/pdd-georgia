@@ -43,33 +43,25 @@ def car_side(x, y, w=86):
             f'<circle cx="{x+18}" cy="{y+28}" r="8" class="head"/><circle cx="{x+w-18}" cy="{y+28}" r="8" class="head"/>')
 
 
-def tile(x, y, w, h, cls, title, verdict, vcls, cite):
-    return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" class="box {cls}"/>'
-            f'<text x="{x+12}" y="{y+24}" class="t small">{title}</text>'
-            f'<text x="{x+12}" y="{y+h-30}" class="t {vcls}">{verdict}</text>'
-            f'<text x="{x+12}" y="{y+h-10}" class="t small mut">{cite}</text>')
+def role_row(y, cls, title, verdict, cite, drawing):
+    return (f'<rect x="8" y="{y}" width="624" height="104" rx="10" class="box {cls}"/>'
+            f'<text x="24" y="{y+28}" class="t small">{title}</text>'
+            f'<text x="24" y="{y+56}" class="t">{verdict}</text>'
+            f'<text x="24" y="{y+84}" class="t small mut">{cite}</text>{drawing}')
 
 
 def fig_roles():
-    W, H, w, h = 660, 420, 204, 196
-    xs, ys = (8, 228, 448), (8, 216)
     b = ""
-    b += tile(xs[0], ys[0], w, h, "hl", "Управляет машиной", "водитель", "", "ст. 5, п. 49")
-    b += car_side(xs[0] + 50, ys[0] + 90) + person(xs[0] + 104, ys[0] + 46, .55)
-    b += tile(xs[1], ys[0], w, h, "eq", "Ведёт велосипед рядом", "пешеход", "ok", "ст. 5, п. 87 (приравнен)")
-    b += person(xs[1] + 40, ys[0] + 52) + bike(xs[1] + 80, ys[0] + 98) + f'<path d="M{xs[1]+50},{ys[0]+82} L{xs[1]+110},{ys[0]+76}" class="ppl"/>'
-    b += tile(xs[2], ys[0], w, h, "eq", "В инвалидной коляске", "пешеход", "ok", "ст. 5, п. 87 (приравнен)")
-    b += wheelchair(xs[2] + 80, ys[0] + 112)
-    b += tile(xs[0], ys[1], w, h, "hl", "Входит в автобус", "пассажир", "", "ст. 5, п. 34")
-    b += (f'<rect x="{xs[0]+90}" y="{ys[1]+40}" width="100" height="78" rx="8" class="car"/>'
-          f'<rect x="{xs[0]+100}" y="{ys[1]+52}" width="26" height="60" class="glass"/>') + person(xs[0] + 64, ys[1] + 52)
-    b += f'<line x1="{xs[0]+76}" y1="{ys[1]+80}" x2="{xs[0]+96}" y2="{ys[1]+80}" class="move" marker-end="url(#ar)"/>'
-    b += tile(xs[1], ys[1], w, h, "hl", "Инструктор (учебная езда)", "как водитель", "", "ст. 5, п. 49 (приравнен)")
-    b += car_side(xs[1] + 50, ys[1] + 90) + person(xs[1] + 80, ys[1] + 46, .55) + person(xs[1] + 112, ys[1] + 46, .55)
-    b += f'<text x="{xs[1]+150}" y="{ys[1]+54}" class="t small mut">рядом</text>'
-    b += tile(xs[2], ys[1], w, h, "no", "Регулировщик", "не участник", "bad", "ст. 5, пп. 61 и 32")
-    b += person(xs[2] + 100, ys[1] + 44) + f'<line x1="{xs[2]+110}" y1="{ys[1]+76}" x2="{xs[2]+138}" y2="{ys[1]+54}" class="ppl"/>'
-    return svg(W, H, b, "Шесть случаев: водитель, пешеходы, приравненные к пешеходам, пассажир, инструктор и регулировщик", "ep05-roles")
+    b += role_row(8, "hl", "Управляет машиной", "водитель", "ст. 5, п. 49", car_side(470, 48) + person(524, 8, .5))
+    b += role_row(120, "eq", "Ведёт велосипед рядом", "пешеход", "ст. 5, п. 87", person(470, 128) + bike(510, 176, 11))
+    b += role_row(232, "eq", "В инвалидной коляске", "пешеход", "ст. 5, п. 87", wheelchair(500, 292))
+    b += role_row(344, "hl", "Входит в машину", "пассажир", "ст. 5, п. 34",
+                  f'<rect x="500" y="360" width="90" height="64" rx="8" class="car"/>' + person(470, 352, .7))
+    b += role_row(456, "hl", "Инструктор, идёт учебная езда", "приравнен к водителю", "ст. 5, п. 49",
+                  car_side(470, 496) + person(500, 456, .45) + person(530, 456, .45))
+    b += role_row(568, "hl", "Регулировщик", "управляет движением", "ст. 5, п. 32",
+                  person(520, 576) + '<line x1="530" y1="608" x2="560" y2="586" class="ppl"/>')
+    return svg(640, 680, b, "Роль зависит от действия. Регулировщик управляет движением: это не четвёртая роль участника", "ep05-roles")
 
 
 def fig_outside():

@@ -69,6 +69,11 @@ function section(f) {
     const W = 320;
     let y = 0, body = "";
     for (const s of f.strips) {
+        if (s.k === "line") {
+            body += `<line class="strip k-line" x1="40" y1="${y + 3}" x2="${W}" y2="${y + 3}"/>`;
+            y += 6;
+            continue;
+        }
         const [, h] = STRIP[s.k] || ["", 30];
         body += `<rect class="strip k-${esc(s.k)}" x="40" y="${y}" width="${W - 40}" height="${h}"/>`;
         if (s.label)

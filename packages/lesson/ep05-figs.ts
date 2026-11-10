@@ -27,31 +27,20 @@ function carSide(x: number, y: number, w = 86): string {
   return `<rect x="${x}" y="${y}" width="${w}" height="26" rx="7" class="car"/><rect x="${x + 18}" y="${y - 16}" width="${w - 38}" height="20" rx="6" class="car"/><rect x="${x + 24}" y="${y - 12}" width="${f((w - 50) / 2)}" height="13" rx="3" class="glass"/><circle cx="${x + 18}" cy="${y + 28}" r="8" class="head"/><circle cx="${x + w - 18}" cy="${y + 28}" r="8" class="head"/>`;
 }
 
-function tile(x: number, y: number, w: number, h: number, cls: string, title: string, verdict: string, vcls: string, cite: string): string {
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" class="box ${cls}"/><text x="${x + 12}" y="${y + 24}" class="t small">${title}</text><text x="${x + 12}" y="${y + h - 30}" class="t ${vcls}">${verdict}</text><text x="${x + 12}" y="${y + h - 10}" class="t small mut">${cite}</text>`;
+function roleRow(y: number, cls: string, title: string, verdict: string, cite: string, drawing: string): string {
+  return `<rect x="8" y="${y}" width="624" height="104" rx="10" class="box ${cls}"/><text x="24" y="${y + 28}" class="t small">${title}</text><text x="24" y="${y + 56}" class="t">${verdict}</text><text x="24" y="${y + 84}" class="t small mut">${cite}</text>${drawing}`;
 }
 
 export function figRoles(): string {
-  const w = 204;
-  const h = 196;
-  const xs = [8, 228, 448];
-  const ys = [8, 216];
-  let body = "";
-  body += tile(xs[0], ys[0], w, h, "hl", "Управляет машиной", "водитель", "", "ст. 5, п. 49");
-  body += carSide(xs[0] + 50, ys[0] + 90) + person(xs[0] + 104, ys[0] + 46, 0.55);
-  body += tile(xs[1], ys[0], w, h, "eq", "Ведёт велосипед рядом", "пешеход", "ok", "ст. 5, п. 87 (приравнен)");
-  body += person(xs[1] + 40, ys[0] + 52) + bike(xs[1] + 80, ys[0] + 98) + `<path d="M${xs[1] + 50},${ys[0] + 82} L${xs[1] + 110},${ys[0] + 76}" class="ppl"/>`;
-  body += tile(xs[2], ys[0], w, h, "eq", "В инвалидной коляске", "пешеход", "ok", "ст. 5, п. 87 (приравнен)");
-  body += wheelchair(xs[2] + 80, ys[0] + 112);
-  body += tile(xs[0], ys[1], w, h, "hl", "Входит в автобус", "пассажир", "", "ст. 5, п. 34");
-  body += `<rect x="${xs[0] + 90}" y="${ys[1] + 40}" width="100" height="78" rx="8" class="car"/><rect x="${xs[0] + 100}" y="${ys[1] + 52}" width="26" height="60" class="glass"/>` + person(xs[0] + 64, ys[1] + 52);
-  body += `<line x1="${xs[0] + 76}" y1="${ys[1] + 80}" x2="${xs[0] + 96}" y2="${ys[1] + 80}" class="move" marker-end="url(#ar)"/>`;
-  body += tile(xs[1], ys[1], w, h, "hl", "Инструктор (учебная езда)", "как водитель", "", "ст. 5, п. 49 (приравнен)");
-  body += carSide(xs[1] + 50, ys[1] + 90) + person(xs[1] + 80, ys[1] + 46, 0.55) + person(xs[1] + 112, ys[1] + 46, 0.55);
-  body += `<text x="${xs[1] + 150}" y="${ys[1] + 54}" class="t small mut">рядом</text>`;
-  body += tile(xs[2], ys[1], w, h, "no", "Регулировщик", "не участник", "bad", "ст. 5, пп. 61 и 32");
-  body += person(xs[2] + 100, ys[1] + 44) + `<line x1="${xs[2] + 110}" y1="${ys[1] + 76}" x2="${xs[2] + 138}" y2="${ys[1] + 54}" class="ppl"/>`;
-  return svg(660, 420, body, "Шесть случаев: водитель, пешеходы, приравненные к пешеходам, пассажир, инструктор и регулировщик", "ep05-roles");
+  const rows = [
+    roleRow(8, "hl", "Управляет машиной", "водитель", "ст. 5, п. 49", carSide(470, 48) + person(524, 8, 0.5)),
+    roleRow(120, "eq", "Ведёт велосипед рядом", "пешеход", "ст. 5, п. 87", person(470, 128) + bike(510, 176, 11)),
+    roleRow(232, "eq", "В инвалидной коляске", "пешеход", "ст. 5, п. 87", wheelchair(500, 292)),
+    roleRow(344, "hl", "Входит в машину", "пассажир", "ст. 5, п. 34", `<rect x="500" y="360" width="90" height="64" rx="8" class="car"/>` + person(470, 352, 0.7)),
+    roleRow(456, "hl", "Инструктор, идёт учебная езда", "приравнен к водителю", "ст. 5, п. 49", carSide(470, 496) + person(500, 456, 0.45) + person(530, 456, 0.45)),
+    roleRow(568, "hl", "Регулировщик", "управляет движением", "ст. 5, п. 32", person(520, 576) + `<line x1="530" y1="608" x2="560" y2="586" class="ppl"/>`),
+  ];
+  return svg(640, 680, rows.join(""), "Роль зависит от действия. Регулировщик управляет движением: это не четвёртая роль участника", "ep05-roles");
 }
 
 export function figOutside(): string {

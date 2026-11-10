@@ -283,6 +283,7 @@ svg.fig .dist{font:12px var(--font);fill:var(--fg)}
 svg.fig .k-shoulder{fill:#c8b99a}
 svg.fig .k-lane{fill:#8a929c;stroke:#fff;stroke-dasharray:10 8}
 svg.fig .k-strip{fill:#7fae6a}
+svg.fig .k-line{stroke:#fff;stroke-width:2;stroke-dasharray:8 6;fill:none}
 svg.fig .k-sidewalk{fill:#d9d4cc}
 svg.fig .zebra rect{fill:#fff}
 svg.fig .barrier{stroke:#c62828;stroke-width:6;stroke-dasharray:10 8}
@@ -293,6 +294,39 @@ svg.fig .mark line{stroke:#ffd54f;stroke-width:3}
 .fighint{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--mut);margin:6px 0 0}
 .fighint[hidden]{display:none}
 .fighint button{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--acc);background:var(--acc2);color:var(--fg);cursor:pointer}
+.scene{position:relative;margin:8px 0 16px}
+.scene .figcap{font-size:14px;color:var(--mut);margin:10px 0 0;max-width:68ch}
+.scene>input{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);overflow:hidden}
+.scene-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.scene-tabs label{font:14px/1.3 var(--font);border:1px solid var(--line);background:transparent;color:var(--mut);border-radius:999px;padding:4px 10px;cursor:pointer}
+.scene-frames>div{display:none}
+#ep03-yard:checked~.scene-tabs label[for=ep03-yard],#ep03-road:checked~.scene-tabs label[for=ep03-road],#ep03-eq:checked~.scene-tabs label[for=ep03-eq],#ep03-dirt:checked~.scene-tabs label[for=ep03-dirt],#ep03-sign:checked~.scene-tabs label[for=ep03-sign],#ep03-snow:checked~.scene-tabs label[for=ep03-snow]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep03-yard:focus-visible~.scene-tabs label[for=ep03-yard],#ep03-road:focus-visible~.scene-tabs label[for=ep03-road],#ep03-eq:focus-visible~.scene-tabs label[for=ep03-eq],#ep03-dirt:focus-visible~.scene-tabs label[for=ep03-dirt],#ep03-sign:focus-visible~.scene-tabs label[for=ep03-sign],#ep03-snow:focus-visible~.scene-tabs label[for=ep03-snow]{outline:2px solid var(--acc);outline-offset:2px}
+#ep03-yard:checked~.scene-frames .is-yard,#ep03-road:checked~.scene-frames .is-road,#ep03-eq:checked~.scene-frames .is-eq,#ep03-dirt:checked~.scene-frames .is-dirt,#ep03-sign:checked~.scene-frames .is-sign,#ep03-snow:checked~.scene-frames .is-snow{display:block}
+.scene .layer{display:none}
+#ep04-zebra:checked~.scene-tabs label[for=ep04-zebra],#ep04-signs:checked~.scene-tabs label[for=ep04-signs]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep04-zebra:focus-visible~.scene-tabs label[for=ep04-zebra],#ep04-signs:focus-visible~.scene-tabs label[for=ep04-signs]{outline:2px solid var(--acc);outline-offset:2px}
+#ep04-zebra:checked~.fig .is-zebra,#ep04-signs:checked~.fig .is-signs{display:inline}
+#ep04-zebra:checked~.is-zebra,#ep04-signs:checked~.is-signs{display:block}
+#ep05-foot:checked~.scene-tabs label[for=ep05-foot],#ep05-bike:checked~.scene-tabs label[for=ep05-bike]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep05-foot:focus-visible~.scene-tabs label[for=ep05-foot],#ep05-bike:focus-visible~.scene-tabs label[for=ep05-bike]{outline:2px solid var(--acc);outline-offset:2px}
+#ep05-foot:checked~.fig .is-foot,#ep05-bike:checked~.fig .is-bike{display:inline}
+#ep05-foot:checked~.is-foot,#ep05-bike:checked~.is-bike{display:block}
+#ep06-w08:checked~.scene-tabs label[for=ep06-w08],#ep06-w2:checked~.scene-tabs label[for=ep06-w2],#ep06-empty:checked~.scene-tabs label[for=ep06-empty],#ep06-load:checked~.scene-tabs label[for=ep06-load],#ep06-eq:checked~.scene-tabs label[for=ep06-eq],#ep06-both:checked~.scene-tabs label[for=ep06-both],#ep06-arrow:checked~.scene-tabs label[for=ep06-arrow]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep06-w08:focus-visible~.scene-tabs label[for=ep06-w08],#ep06-w2:focus-visible~.scene-tabs label[for=ep06-w2],#ep06-empty:focus-visible~.scene-tabs label[for=ep06-empty],#ep06-load:focus-visible~.scene-tabs label[for=ep06-load],#ep06-eq:focus-visible~.scene-tabs label[for=ep06-eq],#ep06-both:focus-visible~.scene-tabs label[for=ep06-both],#ep06-arrow:focus-visible~.scene-tabs label[for=ep06-arrow]{outline:2px solid var(--acc);outline-offset:2px}
+#ep06-w08:checked~.fig .is-w08,#ep06-w2:checked~.fig .is-w2,#ep06-empty:checked~.fig .is-empty,#ep06-load:checked~.fig .is-load,#ep06-eq:checked~.fig .is-eq,#ep06-both:checked~.fig .is-both,#ep06-arrow:checked~.fig .is-arrow{display:inline}
+#ep06-w08:checked~.is-w08,#ep06-w2:checked~.is-w2,#ep06-empty:checked~.is-empty,#ep06-load:checked~.is-load,#ep06-eq:checked~.is-eq,#ep06-both:checked~.is-both,#ep06-arrow:checked~.is-arrow{display:block}
+#ep07-unload:checked~.scene-tabs label[for=ep07-unload],#ep07-shop:checked~.scene-tabs label[for=ep07-shop],#ep07-broke:checked~.scene-tabs label[for=ep07-broke],#ep07-jam:checked~.scene-tabs label[for=ep07-jam]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep07-unload:focus-visible~.scene-tabs label[for=ep07-unload],#ep07-shop:focus-visible~.scene-tabs label[for=ep07-shop],#ep07-broke:focus-visible~.scene-tabs label[for=ep07-broke],#ep07-jam:focus-visible~.scene-tabs label[for=ep07-jam]{outline:2px solid var(--acc);outline-offset:2px}
+#ep07-unload:checked~.fig .is-unload,#ep07-shop:checked~.fig .is-shop,#ep07-broke:checked~.fig .is-broke,#ep07-jam:checked~.fig .is-jam{display:inline}
+#ep07-unload:checked~.is-unload,#ep07-shop:checked~.is-shop,#ep07-broke:checked~.is-broke,#ep07-jam:checked~.is-jam{display:block}
+#ep08-near:checked~.scene-tabs label[for=ep08-near],#ep08-far:checked~.scene-tabs label[for=ep08-far],#ep08-fast:checked~.scene-tabs label[for=ep08-fast]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep08-near:focus-visible~.scene-tabs label[for=ep08-near],#ep08-far:focus-visible~.scene-tabs label[for=ep08-far],#ep08-fast:focus-visible~.scene-tabs label[for=ep08-fast]{outline:2px solid var(--acc);outline-offset:2px}
+#ep08-near:checked~.fig .is-near,#ep08-far:checked~.fig .is-far,#ep08-fast:checked~.fig .is-fast{display:inline}
+#ep08-near:checked~.is-near,#ep08-far:checked~.is-far,#ep08-fast:checked~.is-fast{display:block}
+.fig .go{fill:#3DDC84}
+.fig text.ink{fill:#1c1915}
+.fig .snow{fill:#c8c2b6}
 .figmodal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
 .figmodal .figbar{display:flex;justify-content:flex-end;width:100%;height:48px;align-items:flex-start}
 .figmodal .figbar button{font:inherit;padding:6px 14px;border-radius:999px;border:0;background:var(--bg);color:var(--fg);cursor:pointer}

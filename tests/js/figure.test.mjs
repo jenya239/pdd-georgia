@@ -19,6 +19,15 @@ test("crossing: arms, cars with letters, main road and yard marks", () => {
   assert.match(figureSvg({ kind: "crossing", arms: ["n", "e", "s", "w"], unpaved: ["w", "e"], cars: [] }), /грунт/);
 });
 
+test("section: a center line is not a dividing strip", () => {
+  const svg = figureSvg({ kind: "section", strips: [{ k: "lane" }, { k: "line" }, { k: "lane" }] });
+  assert.match(svg, /class="strip k-line"/);
+  assert.match(svg, /<line /);
+  assert.equal(count(svg, /<rect /g), 2);
+  assert.doesNotMatch(svg, /k-strip/);
+  assert.doesNotMatch(svg, /\sid="/);
+});
+
 test("section: one rect per strip and the letters", () => {
   const svg = figureSvg({ kind: "section", strips: [{ k: "shoulder", label: "А" }, { k: "lane" }, { k: "strip", label: "В" }, { k: "lane" }] });
   assert.equal(count(svg, /class="strip /g), 4);
