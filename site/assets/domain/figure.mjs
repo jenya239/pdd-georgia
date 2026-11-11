@@ -19,8 +19,33 @@ const CAR_AT = {
     e: { x: 255, y: C - HW / 2, r: 270 },
 };
 const EXIT = { n: [C + HW / 2, 20], s: [C - HW / 2, 280], w: [20, C - HW / 2], e: [280, C + HW / 2] };
+const SIGN_AT = { n: [C - HW - 24, 48], s: [C - HW - 24, 252], w: [48, C + HW + 24], e: [252, C + HW + 24] };
+function armRails(arm, lane) {
+    return [-6, 6].map((off) => {
+        if (arm === "n" || arm === "s") {
+            const x = lane + off;
+            const y1 = arm === "n" ? 0 : C, y2 = arm === "n" ? C : 300;
+            return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" class="rail"/>`;
+        }
+        const y = lane + off;
+        const x1 = arm === "w" ? 0 : C, x2 = arm === "w" ? C : 300;
+        return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="rail"/>`;
+    }).join("");
+}
+function rails(from, to) {
+    const start = CAR_AT[from];
+    const incoming = from === "n" || from === "s" ? start.x : start.y;
+    let body = armRails(from, incoming);
+    if (to !== from) {
+        const [ex, ey] = EXIT[to];
+        body += armRails(to, to === "n" || to === "s" ? ex : ey);
+    }
+    return body;
+}
 function crossing(f) {
     const arms = f.arms || ["n", "e", "s", "w"];
+    if (f.signal && f.signal !== "flash")
+        throw new Error(`unknown crossing signal ${f.signal}`);
     const main = new Set(f.main || []), unpaved = new Set(f.unpaved || []);
     let body = `<rect width="300" height="300" class="bg"/>`;
     body += `<rect x="${C - HW}" y="${C - HW}" width="${2 * HW}" height="${2 * HW}" class="road"/>`;
@@ -40,28 +65,38 @@ function crossing(f) {
             body += text(tx, ty, tag, "tag");
         }
     }
+    for (const sign of f.signs || []) {
+        const at = SIGN_AT[sign.arm];
+        if (!at || !arms.includes(sign.arm))
+            throw new Error(`sign off the drawn road ${sign.arm}`);
+        body += `<g class="sign" transform="translate(${at[0]},${at[1]})"><polygon points="0,-14 14,0 0,14 -14,0"/>` +
+            `<text x="0" y="3" text-anchor="middle">${esc(sign.code)}</text></g>`;
+    }
+    if (f.signal === "flash") {
+        body += `<g class="light" transform="translate(${C + HW + 16},${C - HW - 16})"><rect x="-6" y="-16" width="12" height="28" rx="2"/>` +
+            `<circle class="lamp" cx="0" cy="-6" r="4"/></g>`;
+    }
     for (const car of f.cars || []) {
         const p = CAR_AT[car.from];
-        if (!p)
-            throw new Error(`car from unknown side ${car.from}`);
-        const [ex, ey] = EXIT[car.to] || [C, C];
+        if (!p || !EXIT[car.to] || !arms.includes(car.from) || !arms.includes(car.to)) {
+            throw new Error(`car ${car.id} leaves the drawn road: ${car.from} → ${car.to}`);
+        }
+        const [ex, ey] = EXIT[car.to];
         // arrowhead without <marker>: several figures may share one page, so the SVG must not define ids
         const dx = ex - C, dy = ey - C, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
         const head = [[ex, ey], [ex - 10 * ux - 5 * uy, ey - 10 * uy + 5 * ux], [ex - 10 * ux + 5 * uy, ey - 10 * uy - 5 * ux]];
         body += `<path d="M${p.x},${p.y} Q${C},${C} ${ex},${ey}" class="route"/>` +
             `<polygon class="arrowhead" points="${head.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ")}"/>`;
-        if (car.rail) {
-            // tram: rails along its whole arm (to the centre), a longer body
-            const vert = car.from === "n" || car.from === "s";
-            const rails = vert ? [p.x - 6, p.x + 6].map(x => `<line x1="${x}" y1="${car.from === "n" ? 0 : 300}" x2="${x}" y2="${C}" class="rail"/>`)
-                : [p.y - 6, p.y + 6].map(y => `<line x1="${car.from === "w" ? 0 : 300}" y1="${y}" x2="${C}" y2="${y}" class="rail"/>`);
-            body += rails.join("");
-        }
+        if (car.rail)
+            body += rails(car.from, car.to);
         const [bw, bh] = car.rail ? [20, 44] : [18, 30];
         body += `<g class="${car.rail ? "car tram" : "car"}" transform="translate(${p.x},${p.y}) rotate(${p.r})"><rect x="${-bw / 2}" y="${-bh / 2}" width="${bw}" height="${bh}" rx="4"/>` +
             `<text x="0" y="5" text-anchor="middle" transform="rotate(${-p.r})">${esc(car.id)}</text></g>`;
     }
-    return svg(300, 300, "Схема перекрёстка (вид сверху, без масштаба)", body);
+    const title = f.signal === "flash"
+        ? "Схема перекрёстка, мигающий жёлтый (вид сверху, без масштаба)"
+        : "Схема перекрёстка (вид сверху, без масштаба)";
+    return svg(300, 300, title, body);
 }
 // ---- section: road cross-strips, top view, strips stacked vertically
 const STRIP = { shoulder: ["обочина", 18], lane: ["", 30], strip: ["", 14], sidewalk: ["тротуар", 18] };

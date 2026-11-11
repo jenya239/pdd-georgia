@@ -6,7 +6,7 @@ const TYPE_LABEL: Record<string, string> = {
   ticket: "в формате билета",
   diagram: "схема",
   priority: "очерёдность проезда",
-  "max-error": "найдите ошибку Макса",
+  "max-error": "найдите ошибку в рассуждении",
   flashcard: "число из закона",
   cloze: "вставьте слово из закона",
 };

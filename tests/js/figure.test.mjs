@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
 import { figureSvg } from "../../packages/domain/figure.ts";
 
 const count = (s, re) => (s.match(re) || []).length;
@@ -58,6 +59,43 @@ test("figures define no element ids (many share one page)", () => {
 test("labels are escaped and unknown kinds fail loudly", () => {
   assert.doesNotMatch(figureSvg({ kind: "section", strips: [{ k: "lane", label: "<b>" }] }), /<b>/);
   assert.throws(() => figureSvg({ kind: "nope" }));
+});
+
+test("a route that leaves the drawn road is rejected", () => {
+  assert.throws(() => figureSvg({ kind: "crossing", arms: ["w", "e", "s"], yard: "s",
+    cars: [{ id: "А", from: "s", to: "n" }] }));
+});
+
+test("published crossing tasks keep every route on a drawn arm", () => {
+  for (const name of readdirSync("content/checkitems").filter((item) => item.endsWith(".json"))) {
+    const items = JSON.parse(readFileSync(`content/checkitems/${name}`, "utf8"));
+    for (const item of items) {
+      if (!item.fig || item.fig.kind !== "crossing") continue;
+      assert.doesNotThrow(() => figureSvg(item.fig), item.id);
+    }
+  }
+});
+
+test("a turning tram has rails on the arm it turns into", () => {
+  const svg = figureSvg({ kind: "crossing", arms: ["n", "e", "s", "w"],
+    cars: [{ id: "Т", from: "w", to: "s", rail: true }] });
+  const rails = svg.match(/<line [^>]*class="rail"[^>]*>/g) || [];
+  assert.ok(rails.some((line) => /y2="300"/.test(line)), rails.join("\n"));
+});
+
+test("a priority sign is drawn as a sign, not as the word that gives the answer", () => {
+  const svg = figureSvg({ kind: "crossing", arms: ["n", "e", "s", "w"], unpaved: ["n", "s"],
+    signs: [{ arm: "s", code: "2.1" }], cars: [{ id: "А", from: "s", to: "n" }] });
+  assert.match(svg, /class="sign"/);
+  assert.match(svg, />2\.1</);
+  assert.match(svg, /грунт/);
+  assert.doesNotMatch(svg, /главная/);
+});
+
+test("a flashing yellow is drawn, not only named", () => {
+  const svg = figureSvg({ kind: "crossing", arms: ["n", "e", "s", "w"], signal: "flash", cars: [] });
+  assert.match(svg, /class="lamp"/);
+  assert.match(svg, /мигающий жёлтый/);
 });
 
 test("crossing: a rail vehicle is drawn as a tram, not as a car", () => {

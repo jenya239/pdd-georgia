@@ -13,7 +13,7 @@ from pdd.paths import CHECKITEMS
 
 TYPES = ("ticket", "diagram", "priority", "max-error", "flashcard", "cloze")
 TYPE_LABEL = {"ticket": "в формате билета", "diagram": "схема", "priority": "очерёдность проезда",
-              "max-error": "найдите ошибку Макса", "flashcard": "число из закона", "cloze": "вставьте слово из закона"}
+              "max-error": "найдите ошибку в рассуждении", "flashcard": "число из закона", "cloze": "вставьте слово из закона"}
 REQUIRED = ("id", "lesson", "type", "q", "options", "answer", "norms", "concepts", "quote", "explain", "distractors")
 FIG_KINDS = ("crossing", "section", "approach")
 _ID = re.compile(r"^o-(ep\d\d)-\d\d$")

@@ -17,11 +17,11 @@ test("a breakdown hole is the assigned ticket with no file", () => {
   assert.deepEqual(missingIds(pairs, "ep01", new Set()), []);
 });
 
-test("done is a comma list and the live queue has no hole on ep07", () => {
+test("done is a comma list and the live queue starts after the published lessons", () => {
   assert.deepEqual(readDone("status: ready\ndone: ep01, ep02\n"), ["ep01", "ep02"]);
   assert.deepEqual(readDone("done:\n"), []);
   const state = readFileSync(new URL("docs/agent/PDD_LESSON_STATE.md", root), "utf8");
   const report = queueReport(new URL("../../", import.meta.url).pathname, state);
-  assert.equal(report.next, "ep01");
+  assert.equal(report.next, "ep09");
   assert.deepEqual(report.missing, []);
 });

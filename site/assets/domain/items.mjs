@@ -2,7 +2,7 @@
 export const OWN_ID = /^o-ep\d\d-\d\d$/;
 export const TYPE_LABEL = {
     ticket: "в формате билета", diagram: "схема", priority: "очерёдность проезда",
-    "max-error": "найдите ошибку Макса", flashcard: "число из закона", cloze: "вставьте слово из закона",
+    "max-error": "найдите ошибку в рассуждении", flashcard: "число из закона", cloze: "вставьте слово из закона",
 };
 export const isOwnId = (id) => typeof id === "string" && OWN_ID.test(id);
 /** Progress keys are strings: bank ids become numbers again, own ids stay as they are. */

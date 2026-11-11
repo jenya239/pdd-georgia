@@ -288,6 +288,9 @@ svg.fig .k-sidewalk{fill:#d9d4cc}
 svg.fig .zebra rect{fill:#fff}
 svg.fig .barrier{stroke:#c62828;stroke-width:6;stroke-dasharray:10 8}
 svg.fig .rail{stroke:#444;stroke-width:3}
+svg.fig .sign polygon{fill:#F2C14E;stroke:#F4F1EA;stroke-width:2}
+svg.fig .sign text{font:9px var(--font);fill:#1c1915}
+svg.fig .lamp{fill:#F2C14E}
 svg.fig .light rect{fill:#1b1f24}
 svg.fig .mark line{stroke:#ffd54f;stroke-width:3}
 /* wide lesson figures on small screens: scroll hint + fullscreen view */
