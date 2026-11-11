@@ -25,7 +25,7 @@ let part = saved.part;
 let partLesson = saved.partLesson;
 let repeat = saved.repeat;
 let served = saved.served;
-let just, held;
+let just, held, direct = false;
 let bank = null;
 let token = 0;
 const partsCache = new Map();
@@ -38,7 +38,8 @@ function persist() {
 
 function stepNow() {
   const own = st.settings().own !== false;
-  const opts = { mode: modeEl.value, own, last, anchor, avoid, just, served, repeat };
+  const opts = { mode: modeEl.value, own, last, anchor, avoid, just, served, repeat, now: Date.now(), tutor: !direct };
+  direct = false;
   if (repeat && !nextFlowItem(E.released, st.progress(), { ...opts, repeat: false })?.done) {
     repeat = false;
     persist();
@@ -152,21 +153,26 @@ async function showQuestion(step, mine) {
     $("#skip").onclick = () => forward(step, true);
     return;
   }
-  const kicker = step.kind === "review" ? "Повтор ошибки" : (step.again ? "Повторение" : "Дорожная ситуация");
+  const clarify = step.reason === "misconception-check";
+  const kicker = clarify ? "Уточнение" : (step.kind === "review" ? "Повтор ошибки" : (step.again ? "Повторение" : "Дорожная ситуация"));
+  const why = step.reason === "spaced-review" ? `<p class="mut">Этот вопрос давно не проверялся.</p>` : "";
+  const leave = () => {
+    const extra = clarify ? `<button type="button" class="btn ghost" id="explain">Показать объяснение</button>` : "";
+    $("#act").innerHTML = `${extra}<button type="button" class="btn ghost" id="skip">Пропустить</button>`;
+    if ($("#explain")) $("#explain").onclick = () => { direct = true; forward(step, false); };
+    $("#skip").onclick = () => forward(step, true);
+  };
   stage.innerHTML = `<p class="kicker">${kicker}</p>
-    <p class="mut">${esc(step.title)}</p><div id="q"></div>
-    <div class="row" id="act"><button type="button" class="btn ghost" id="skip">Пропустить</button></div>`;
-  $("#skip").onclick = () => forward(step, true);
+    <p class="mut">${esc(step.title)}</p>${why}<div id="q"></div>
+    <div class="row" id="act"></div>`;
+  leave();
   renderQuestion($("#q"), ticket, {
     where: "flow",
     onAnswer() {
       $("#act").innerHTML = `<button type="button" class="btn" id="next">Дальше</button>`;
       $("#next").onclick = () => forward(step, false);
     },
-    onUndo() {
-      $("#act").innerHTML = `<button type="button" class="btn ghost" id="skip">Пропустить</button>`;
-      $("#skip").onclick = () => forward(step, true);
-    },
+    onUndo: leave,
   });
 }
 

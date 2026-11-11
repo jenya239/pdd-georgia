@@ -6,14 +6,16 @@
  * - mix with no answers opens on the first lesson's text
  * - mix opens on the text of the next lesson when its questions are still untouched and earlier ones are answered
  * - situations prefers a question, explain prefers text, review prefers a wrong answer
- * - after a wrong answer, mix offers that lesson's text before another of its questions
+ * - after a wrong answer on a mapped pilot item, mix offers one unanswered clarifying question before that lesson's text; any other miss offers the text first
  * - pause is set only when this session steps into a later lesson whose earlier questions are all answered
  * - done is set only on a text step, and only when every question in scope was last answered correctly
  * - repeat, once that stop is passed, serves answered questions again and does not open new ones
  * - a repetition pass walks every currently correct question before it starts over
  * - review never opens a question that has not been answered
  */
+import { orderReview, reviewDue } from "./review.mjs";
 import { releasedLessons, studyLesson } from "./scope.mjs";
+import { followUp } from "./skills.mjs";
 /** The flow's place in the browser. Unknown fields are dropped; `just` is only for the open page. */
 export function cleanFlowRun(value) {
     const raw = value && typeof value === "object" ? value : {};
@@ -82,11 +84,17 @@ export function nextFlowItem(released, progress = {}, opts = {}) {
     const just = opts.just ? new Set([opts.just]) : new Set();
     const blocked = new Set([...avoid, ...just]);
     const served = new Set((opts.served || []).map(String));
-    return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, served, opts.repeat === true)
-        ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, served, opts.repeat === true)
-        ?? pick(list, progress, own, mode, opts.last, opts.anchor, new Set(), served, opts.repeat === true);
+    const ctx = {
+        justId: opts.just && !opts.just.startsWith("theory:") ? opts.just : undefined,
+        now: typeof opts.now === "number" ? opts.now : undefined,
+        tutor: opts.tutor !== false,
+        skipped: avoid,
+    };
+    return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, served, opts.repeat === true, ctx)
+        ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, served, opts.repeat === true, ctx)
+        ?? pick(list, progress, own, mode, opts.last, opts.anchor, new Set(), served, opts.repeat === true, ctx);
 }
-function pick(list, progress, own, mode, last, anchor, blocked, served, repeat) {
+function pick(list, progress, own, mode, last, anchor, blocked, served, repeat, ctx) {
     const unanswered = (lesson) => work(lesson, own).filter(id => !progress[id]);
     const wrong = (lesson) => work(lesson, own).filter(id => progress[id]?.l === 0);
     const hasWork = list.some(lesson => work(lesson, own).length);
@@ -136,7 +144,7 @@ function pick(list, progress, own, mode, last, anchor, blocked, served, repeat) 
                     ids.push(id);
         const waiting = ids.filter(id => !served.has(String(id)) && !blocked.has(String(id)));
         const pool = waiting.length ? waiting : ids.filter(id => !blocked.has(String(id)));
-        const id = pool[0];
+        const id = orderReview(pool, progress, ctx.now)[0];
         if (id == null)
             return null;
         const lesson = list.find(item => work(item, own).some(itemId => String(itemId) === String(id)));
@@ -146,6 +154,8 @@ function pick(list, progress, own, mode, last, anchor, blocked, served, repeat) 
         step.again = true;
         if (!waiting.length)
             step.fresh = true;
+        if (reviewDue(id, progress, ctx.now))
+            step.reason = "spaced-review";
         return step;
     };
     const studiedText = () => {
@@ -190,7 +200,12 @@ function pick(list, progress, own, mode, last, anchor, blocked, served, repeat) 
     if (last === "theory" && anchorLesson)
         return inLesson(anchorLesson, "question") || badQ() || tail();
     if (last === "question" && anchorLesson && wrong(anchorLesson).length) {
-        return asTheory(anchorLesson) || inLesson(anchorLesson, "question") || badQ() || tail();
+        const follow = ctx.tutor ? followUp(ctx.justId, progress, new Set([...blocked, ...ctx.skipped]), own) : null;
+        const lesson = follow ? list.find(item => item.id === follow.lessonId) : undefined;
+        const probe = follow && lesson ? asQuestion(lesson, follow.probe, "question") : null;
+        if (probe && follow)
+            probe.reason = follow.reason;
+        return probe || asTheory(anchorLesson) || inLesson(anchorLesson, "question") || badQ() || tail();
     }
     if ((last === "question" || last === "review") && anchorLesson)
         return inLesson(anchorLesson, "question") || badQ() || tail();
