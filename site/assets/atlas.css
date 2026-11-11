@@ -39,6 +39,10 @@
 .lessonpage .lesson > p{margin:0 0 .95em}
 .lessonpage .lead{font-size:17px;line-height:1.58}
 .lessonpage .lesson h2{font-family:var(--sans);font-size:24px;font-weight:600;letter-spacing:-.012em;line-height:1.3;color:var(--fg);text-transform:none;margin:1.55em 0 .55em}
+.lessonpage table.pairs{width:auto;max-width:40rem;border-collapse:collapse;margin:0 0 1.1em;font-size:16px}
+.lessonpage table.pairs caption{caption-side:bottom;text-align:left;color:var(--mut);font-size:13px;line-height:1.45;padding-top:8px;max-width:64ch}
+.lessonpage table.pairs th,.lessonpage table.pairs td{border-bottom:1px solid var(--line);padding:8px 18px 8px 0;text-align:left;vertical-align:baseline}
+.lessonpage table.pairs th{font-weight:600;font-size:13px;color:var(--mut)}
 .lessonpage .lesson h3{font-family:var(--sans);font-size:19px;font-weight:600;letter-spacing:0;line-height:1.35;margin:1.4em 0 .5em}
 .lessonpage > h2{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:48px 0 12px}
 .lessonpage .lq{background:transparent;padding:2px 0 2px 14px}
