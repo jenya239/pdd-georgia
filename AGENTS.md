@@ -81,7 +81,7 @@
 ### Структура
 ```
 content/   архив уроков ep01–ep06 (lessons/epNN/{lesson.py,figs.py}), episodes.json, checkitems/, critiques/,
-           breakdowns/, ontology/, translations/, plan/ (structure.md, PLAN_*.md), media/ (видео ep01–03), assets/signs/
+           breakdowns/, ontology/, translations/, plan/ (structure.md, PLAN_*.md, composition-blocks-0-1.md), media/ (видео ep01–03), assets/signs/
 data/      sources/ (закон, приложения, КоАП ст.116–135, формат экзамена; README — происхождение), tickets/ (921 билет, 524 картинки)
 packages/lesson/  текст урока (epNN.ts); с ep07 это источник
 packages/domain/  чистая логика сайта (TypeScript; на сайт — собранный ESM)
