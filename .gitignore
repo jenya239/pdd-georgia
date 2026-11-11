@@ -27,3 +27,5 @@ tests/e2e/shots/
 .venv/
 .videovenv/
 __pycache__/
+# TypeScript incremental cache
+*.tsbuildinfo
