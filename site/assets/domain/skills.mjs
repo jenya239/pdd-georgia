@@ -15,11 +15,12 @@ export const PILOT_SKILLS = [
         lessonId: "ep03",
         title: "Чем задана главная дорога",
         norms: ["36.4", "36.6", "36.8"],
+        facets: ["sign", "surface"],
         items: [
             { id: "o-ep03-02", role: "apply" },
-            { id: "o-ep03-03", role: "contrast", decisive: true },
-            { id: "o-ep03-04", role: "contrast", decisive: true },
-            { id: "o-ep03-05", role: "transfer", decisive: true },
+            { id: "o-ep03-03", role: "contrast", decisive: true, facet: "surface" },
+            { id: "o-ep03-04", role: "contrast", decisive: true, facet: "sign" },
+            { id: "o-ep03-05", role: "transfer", decisive: true, facet: "surface" },
             { id: "o-ep03-06", role: "transfer" },
         ],
     },
@@ -85,12 +86,9 @@ export function lessonFocus(id, progress = {}) {
     const row = FOLLOW_UPS.find(item => item.after === id && item.choice === choiceOf(progress[id]));
     return row?.heading || ITEM_HEADING[id];
 }
-function shownAsProbe(justId, progress) {
-    return FOLLOW_UPS.some(item => item.probe === justId && progress[item.after]?.l === 0);
-}
-/** One unanswered probe for this wrong option. The probe itself is not followed by another probe. */
-export function followUp(justId, progress, blocked, own) {
-    if (!own || !justId || shownAsProbe(justId, progress))
+/** One unanswered probe for this wrong option. `fromProbe` is the step just shown, not a guess from another miss. */
+export function followUp(justId, progress, blocked, own, fromProbe = false) {
+    if (!own || !justId || fromProbe)
         return null;
     const choice = choiceOf(progress[justId]);
     if (choice == null)

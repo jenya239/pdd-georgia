@@ -25,7 +25,7 @@ let part = saved.part;
 let partLesson = saved.partLesson;
 let repeat = saved.repeat;
 let served = saved.served;
-let just, held, direct = false, appliedFocus = "";
+let just, held, direct = false, appliedFocus = "", fromProbe = false;
 let bank = null;
 let token = 0;
 const partsCache = new Map();
@@ -38,7 +38,7 @@ function persist() {
 
 function stepNow() {
   const own = st.settings().own !== false;
-  const opts = { mode: modeEl.value, own, last, anchor, avoid, just, served, repeat, now: Date.now(), tutor: !direct };
+  const opts = { mode: modeEl.value, own, last, anchor, avoid, just, served, repeat, now: Date.now(), tutor: !direct, fromProbe };
   direct = false;
   if (repeat && !nextFlowItem(E.released, st.progress(), { ...opts, repeat: false })?.done) {
     repeat = false;
@@ -58,6 +58,7 @@ function forward(step, skip) {
     const id = String(step.ticketId);
     if (!served.includes(id)) served.push(id);
   }
+  fromProbe = step.reason === "misconception-check";
   just = key;
   last = step.kind;
   anchor = step.lessonId;
@@ -205,6 +206,7 @@ modeEl.onchange = () => {
   last = undefined;
   anchor = undefined;
   just = undefined;
+  fromProbe = false;
   held = null;
   part = 0;
   partLesson = undefined;

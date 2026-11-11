@@ -4,13 +4,15 @@
  */
 export type SkillRole = "recognize" | "apply" | "contrast" | "transfer";
 
-export type PilotItem = { id: string; role: SkillRole; decisive?: boolean };
+export type PilotItem = { id: string; role: SkillRole; decisive?: boolean; facet?: string };
 
 export type PilotSkill = {
   id: string;
   lessonId: string;
   title: string;
   norms: string[];
+  /** Every named facet must appear among the independent answers before the skill is confirmed. */
+  facets?: string[];
   items: PilotItem[];
 };
 
@@ -41,11 +43,12 @@ export const PILOT_SKILLS: PilotSkill[] = [
     lessonId: "ep03",
     title: "Чем задана главная дорога",
     norms: ["36.4", "36.6", "36.8"],
+    facets: ["sign", "surface"],
     items: [
       { id: "o-ep03-02", role: "apply" },
-      { id: "o-ep03-03", role: "contrast", decisive: true },
-      { id: "o-ep03-04", role: "contrast", decisive: true },
-      { id: "o-ep03-05", role: "transfer", decisive: true },
+      { id: "o-ep03-03", role: "contrast", decisive: true, facet: "surface" },
+      { id: "o-ep03-04", role: "contrast", decisive: true, facet: "sign" },
+      { id: "o-ep03-05", role: "transfer", decisive: true, facet: "surface" },
       { id: "o-ep03-06", role: "transfer" },
     ],
   },
@@ -115,18 +118,15 @@ export function lessonFocus(id: string | undefined, progress: Record<string, Fol
   return row?.heading || ITEM_HEADING[id];
 }
 
-function shownAsProbe(justId: string, progress: Record<string, FollowAttempt | undefined>) {
-  return FOLLOW_UPS.some(item => item.probe === justId && progress[item.after]?.l === 0);
-}
-
-/** One unanswered probe for this wrong option. The probe itself is not followed by another probe. */
+/** One unanswered probe for this wrong option. `fromProbe` is the step just shown, not a guess from another miss. */
 export function followUp(
   justId: string | undefined,
   progress: Record<string, FollowAttempt | undefined>,
   blocked: Set<string>,
   own: boolean,
+  fromProbe = false,
 ): FollowUp | null {
-  if (!own || !justId || shownAsProbe(justId, progress)) return null;
+  if (!own || !justId || fromProbe) return null;
   const choice = choiceOf(progress[justId]);
   if (choice == null) return null;
   const row = FOLLOW_UPS.find(item => item.after === justId && item.choice === choice);

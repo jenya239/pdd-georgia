@@ -3,7 +3,7 @@
  * Invariants:
  * - two correct attempts on one item are one observation
  * - a correct attempt within PROMPT_MS after a miss on the same item, or on another item of the skill, does not count
- * - confirmed needs two independent items and one of them decisive for this skill
+ * - confirmed needs two independent items, and either one decisive item or every named facet of the skill
  * - no independent item means the skill is not due, even if `now` is far ahead
  * - a current miss on any item of the skill blocks confirmed and due
  * - a stored hash that differs from the current item text drops that observation
@@ -24,7 +24,7 @@ export const SKILL_LABEL: Record<SkillStatus, string> = {
 
 type EvidenceEvent = { t: number; ok: 0 | 1; hash?: string };
 type EvidenceAttempt = { l?: number; t?: number; lw?: number; events?: EvidenceEvent[] };
-type EvidenceSkill = { items: { id: string; decisive?: boolean }[] };
+type EvidenceSkill = { facets?: string[]; items: { id: string; decisive?: boolean; facet?: string }[] };
 
 export type SkillState = { status: SkillStatus; label: string; independent: string[] };
 
@@ -63,7 +63,10 @@ export function skillState(
     const rec = progress[item.id]!;
     return rec.l === 1 && !prompted(item.id, rec, skill, progress);
   }).map(item => item.id);
-  const decisive = independent.some(id => skill.items.some(item => item.id === id && item.decisive));
+  const rows = independent.map(id => skill.items.find(item => item.id === id));
+  const decisive = skill.facets?.length
+    ? skill.facets.every(name => rows.some(item => item?.facet === name))
+    : rows.some(item => item?.decisive);
   let status: SkillStatus = "unknown";
   if (seen.length) {
     const missed = seen.some(item => progress[item.id]?.l === 0);

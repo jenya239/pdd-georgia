@@ -66,7 +66,8 @@ test("one shared situation does not confirm both skills", () => {
   assert.equal(skillState(main, only).status, "practiced");
   const transferred = { ...only, "o-ep03-03": { l: 1, t: 2 } };
   assert.equal(skillState(yard, transferred).status, "practiced");
-  assert.equal(skillState(main, transferred).status, "confirmed");
+  assert.equal(skillState(main, transferred).status, "practiced");
+  assert.equal(skillState(main, { ...transferred, "o-ep03-04": { l: 1, t: 3 } }).status, "confirmed");
 });
 
 test("a correct answer immediately after a miss is not an independent check", () => {
@@ -100,7 +101,10 @@ test("two equal-road answers do not confirm how a main road is recognised", () =
   const equal = { "o-ep03-02": { l: 1, t: 1 }, "o-ep03-06": { l: 1, t: 2 } };
   assert.equal(skillState(main, equal).status, "practiced");
   const surface = { ...equal, "o-ep03-03": { l: 1, t: 3 } };
-  assert.equal(skillState(main, surface).status, "confirmed");
+  assert.equal(skillState(main, surface).status, "practiced");
+  assert.equal(skillState(main, { "o-ep03-03": { l: 1, t: 1 }, "o-ep03-04": { l: 1, t: 2 } }).status, "confirmed");
+  assert.equal(skillState(main, { "o-ep03-04": { l: 1, t: 1 }, "o-ep03-05": { l: 1, t: 2 } }).status, "confirmed");
+  assert.equal(skillState(main, { "o-ep03-03": { l: 1, t: 1 }, "o-ep03-05": { l: 1, t: 2 } }).status, "practiced");
   assert.equal(skillState(yard, { "o-ep03-07": { l: 1, t: 1 }, "o-ep03-02": { l: 1, t: 2 } }).status, "practiced");
   assert.equal(skillState(stop, { "o-ep07-01": { l: 1, t: 1 }, "o-ep07-03": { l: 1, t: 2 } }).status, "practiced");
 });

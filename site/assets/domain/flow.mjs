@@ -89,6 +89,7 @@ export function nextFlowItem(released, progress = {}, opts = {}) {
         now: typeof opts.now === "number" ? opts.now : undefined,
         tutor: opts.tutor !== false,
         skipped: avoid,
+        fromProbe: opts.fromProbe === true,
     };
     return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, served, opts.repeat === true, ctx)
         ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, served, opts.repeat === true, ctx)
@@ -200,7 +201,7 @@ function pick(list, progress, own, mode, last, anchor, blocked, served, repeat, 
     if (last === "theory" && anchorLesson)
         return inLesson(anchorLesson, "question") || badQ() || tail();
     if (last === "question" && anchorLesson && wrong(anchorLesson).length) {
-        const follow = ctx.tutor ? followUp(ctx.justId, progress, new Set([...blocked, ...ctx.skipped]), own) : null;
+        const follow = ctx.tutor ? followUp(ctx.justId, progress, new Set([...blocked, ...ctx.skipped]), own, ctx.fromProbe) : null;
         const lesson = follow ? list.find(item => item.id === follow.lessonId) : undefined;
         const probe = follow && lesson ? asQuestion(lesson, follow.probe, "question") : null;
         if (probe && follow)

@@ -41,8 +41,8 @@ type FlowLesson = {
   own_items?: (string | number)[];
 };
 type Attempt = { l?: number; t?: number; lc?: number; events?: { ok: 0 | 1; c?: number | null }[] };
-type FlowOpts = { mode?: string; own?: boolean; last?: FlowKind; anchor?: string; avoid?: string[]; just?: string; served?: string[]; repeat?: boolean; now?: number; tutor?: boolean };
-type PickCtx = { justId?: string; now?: number; tutor: boolean; skipped: Set<string> };
+type FlowOpts = { mode?: string; own?: boolean; last?: FlowKind; anchor?: string; avoid?: string[]; just?: string; served?: string[]; repeat?: boolean; now?: number; tutor?: boolean; fromProbe?: boolean };
+type PickCtx = { justId?: string; now?: number; tutor: boolean; skipped: Set<string>; fromProbe: boolean };
 
 export type FlowRun = { last?: FlowKind; anchor?: string; avoid: string[]; served: string[]; part: number; partLesson?: string; repeat: boolean };
 
@@ -116,6 +116,7 @@ export function nextFlowItem(released: FlowLesson[], progress: Record<string, At
     now: typeof opts.now === "number" ? opts.now : undefined,
     tutor: opts.tutor !== false,
     skipped: avoid,
+    fromProbe: opts.fromProbe === true,
   };
   return pick(list, progress, own, mode, opts.last, opts.anchor, blocked, served, opts.repeat === true, ctx)
     ?? pick(list, progress, own, mode, opts.last, opts.anchor, just, served, opts.repeat === true, ctx)
@@ -208,7 +209,7 @@ function pick(list: FlowLesson[], progress: Record<string, Attempt>, own: boolea
   }
   if (last === "theory" && anchorLesson) return inLesson(anchorLesson, "question") || badQ() || tail();
   if (last === "question" && anchorLesson && wrong(anchorLesson).length) {
-    const follow = ctx.tutor ? followUp(ctx.justId, progress, new Set([...blocked, ...ctx.skipped]), own) : null;
+    const follow = ctx.tutor ? followUp(ctx.justId, progress, new Set([...blocked, ...ctx.skipped]), own, ctx.fromProbe) : null;
     const lesson = follow ? list.find(item => item.id === follow.lessonId) : undefined;
     const probe = follow && lesson ? asQuestion(lesson, follow.probe, "question") : null;
     if (probe && follow) probe.reason = follow.reason;

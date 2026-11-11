@@ -22,14 +22,16 @@ function walk(tutor, answers) {
   let last;
   let anchor;
   let just;
+  let fromProbe = false;
   const seen = [];
   for (let n = 0; n < 8; n++) {
-    const step = nextFlowItem([ep03], progress, { mode: "mix", own: true, last, anchor, just, tutor, now: 1_000 + n });
+    const step = nextFlowItem([ep03], progress, { mode: "mix", own: true, last, anchor, just, fromProbe, tutor, now: 1_000 + n });
     seen.push({ kind: step.kind, id: step.ticketId ?? null, reason: step.reason ?? null });
     if (step.kind === "theory") {
       last = "theory";
       anchor = step.lessonId;
       just = flowKey(step);
+      fromProbe = false;
       continue;
     }
     const mark = answers[String(step.ticketId)] ?? 0;
@@ -37,6 +39,7 @@ function walk(tutor, answers) {
     last = "question";
     anchor = step.lessonId;
     just = String(step.ticketId);
+    fromProbe = step.reason === "misconception-check";
   }
   return { seen, progress };
 }
@@ -98,6 +101,13 @@ test("a partial miss on the stop is one contrast, then the text", () => {
   const again = nextFlowItem(lesson, { ...progress, "o-ep07-04": { l: 0, t: 2, lc: 0 } }, { ...opts, just: "o-ep07-04" });
   assert.equal(again.kind, "theory");
   assert.equal(again.focus, "ostanovka");
+  const later = {
+    "o-ep07-03": { l: 0, t: 1, lc: 1 },
+    "o-ep07-02": { l: 0, t: 2, lc: 0 },
+  };
+  const ownMiss = { mode: "mix", own: true, last: "question", anchor: "ep07", just: "o-ep07-02" };
+  assert.equal(nextFlowItem(lesson, later, ownMiss).ticketId, "o-ep07-06");
+  assert.equal(nextFlowItem(lesson, later, { ...ownMiss, fromProbe: true }).kind, "theory");
   const fact = nextFlowItem(lesson, { "o-ep07-01": { l: 0, t: 1 } }, { ...opts, just: "o-ep07-01" });
   assert.equal(fact.kind, "theory");
   assert.equal(nextFlowItem(lesson, progress, { ...opts, mode: "explain" }).kind, "theory");
