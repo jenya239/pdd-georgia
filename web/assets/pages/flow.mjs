@@ -25,7 +25,7 @@ let part = saved.part;
 let partLesson = saved.partLesson;
 let repeat = saved.repeat;
 let served = saved.served;
-let just, held, direct = false;
+let just, held, direct = false, appliedFocus = "";
 let bank = null;
 let token = 0;
 const partsCache = new Map();
@@ -49,6 +49,7 @@ function stepNow() {
 }
 
 function forward(step, skip) {
+  appliedFocus = "";
   if ($("#next")) $("#next").disabled = true;
   const key = flowKey(step);
   if (skip && !avoid.includes(key)) avoid.push(key);
@@ -106,6 +107,16 @@ function paintTheory(step, parts) {
   const stage = $("#stage");
   if (!parts.length) parts = [{ heading: "", html: `<p>${esc(step.lead || "Короткое объяснение этого выпуска.")}</p>` }];
   if (partLesson !== step.lessonId) { part = 0; partLesson = step.lessonId; }
+  const focusMark = step.focus ? `${step.lessonId}:${step.focus}` : "";
+  if (focusMark && appliedFocus !== focusMark) {
+    const found = parts.findIndex(piece => piece.html.includes(`id="${step.focus}"`));
+    if (found >= 0) {
+      part = found;
+      partLesson = step.lessonId;
+      appliedFocus = focusMark;
+      persist();
+    }
+  }
   let index = fragmentAt(parts, step.lessonId, part);
   if (index < 0) {
     if (!avoid.includes(flowKey(step))) { forward(step, true); return; }

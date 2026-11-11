@@ -27,10 +27,13 @@ test("pilot items are checked questions, and a follow-up is not the same questio
     }
   }
   for (const row of FOLLOW_UPS) {
+    const source = byId.get(row.after);
     assert.notEqual(row.after, row.probe);
-    assert.ok(byId.get(row.after));
+    assert.ok(source);
     assert.ok(byId.get(row.probe));
-    assert.ok(row.hypothesis.length > 0);
+    assert.notEqual(row.choice, source.answer);
+    assert.equal(source.distractors[String(row.choice)], row.hypothesis[0]);
+    assert.ok(row.heading);
     for (const id of row.hypothesis) assert.ok(misconceptions.has(id), id);
     const skill = PILOT_SKILLS.find(item => item.lessonId === row.lessonId);
     assert.ok(skill.items.some(item => item.id === row.probe));
@@ -69,8 +72,9 @@ test("one shared situation does not confirm both skills", () => {
 test("a correct answer immediately after a miss is not an independent check", () => {
   const told = { l: 1, t: 70_000, lw: 70_000 - PROMPT_MS + 1 };
   const later = { l: 1, t: 70_000 + PROMPT_MS, lw: 70_000 };
+  const apart = { l: 1, t: 70_000 + PROMPT_MS };
   assert.equal(skillState(yard, { "o-ep03-01": told, "o-ep03-02": { l: 1, t: 80_000 } }).status, "practiced");
-  assert.equal(skillState(yard, { "o-ep03-01": later, "o-ep03-02": { l: 1, t: 80_000 } }).status, "confirmed");
+  assert.equal(skillState(yard, { "o-ep03-01": later, "o-ep03-02": apart }).status, "confirmed");
 });
 
 test("undoing the confirming answer drops the skill", () => {
@@ -90,6 +94,33 @@ test("a changed question text does not keep the old confirmation", () => {
   const stale = skillState(yard, progress, { hashes: { "o-ep03-01": "new", "o-ep03-02": "new" } });
   assert.equal(stale.status, "practiced");
   assert.deepEqual(stale.independent, ["o-ep03-02"]);
+});
+
+test("two equal-road answers do not confirm how a main road is recognised", () => {
+  const equal = { "o-ep03-02": { l: 1, t: 1 }, "o-ep03-06": { l: 1, t: 2 } };
+  assert.equal(skillState(main, equal).status, "practiced");
+  const surface = { ...equal, "o-ep03-03": { l: 1, t: 3 } };
+  assert.equal(skillState(main, surface).status, "confirmed");
+  assert.equal(skillState(yard, { "o-ep03-07": { l: 1, t: 1 }, "o-ep03-02": { l: 1, t: 2 } }).status, "practiced");
+  assert.equal(skillState(stop, { "o-ep07-01": { l: 1, t: 1 }, "o-ep07-03": { l: 1, t: 2 } }).status, "practiced");
+});
+
+test("a correct answer just after a related miss is not an independent check", () => {
+  const progress = {
+    "o-ep03-01": { l: 1, t: PROMPT_MS + 5_000, lw: 1_000 },
+    "o-ep03-02": { l: 1, t: 6_000 },
+  };
+  const state = skillState(yard, progress);
+  assert.equal(state.status, "practiced");
+  assert.deepEqual(state.independent, ["o-ep03-01"]);
+});
+
+test("prompted answers alone do not become due", () => {
+  const prompted = { l: 1, t: 1_000, lw: 500 };
+  const state = skillState(yard, { "o-ep03-01": prompted }, { now: 1_000 + DUE_MS });
+  assert.deepEqual(state.independent, []);
+  assert.equal(state.status, "gap");
+  assert.notEqual(state.status, "due");
 });
 
 test("a gap stays a gap after time, and a clean skill becomes due", () => {

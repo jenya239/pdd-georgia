@@ -6,7 +6,7 @@
  * - mix with no answers opens on the first lesson's text
  * - mix opens on the text of the next lesson when its questions are still untouched and earlier ones are answered
  * - situations prefers a question, explain prefers text, review prefers a wrong answer
- * - after a wrong answer on a mapped pilot item, mix offers one unanswered clarifying question before that lesson's text; any other miss offers the text first
+ * - after a wrong answer on a mapped pilot item, mix offers one unanswered clarifying question for that wrong option before the lesson text, and the text names that option's fragment; any other miss offers the text first
  * - pause is set only when this session steps into a later lesson whose earlier questions are all answered
  * - done is set only on a text step, and only when every question in scope was last answered correctly
  * - repeat, once that stop is passed, serves answered questions again and does not open new ones
@@ -15,7 +15,7 @@
  */
 import { orderReview, reviewDue } from "./review.mjs";
 import { releasedLessons, studyLesson } from "./scope.mjs";
-import { followUp } from "./skills.mjs";
+import { followUp, lessonFocus } from "./skills.mjs";
 /** The flow's place in the browser. Unknown fields are dropped; `just` is only for the open page. */
 export function cleanFlowRun(value) {
     const raw = value && typeof value === "object" ? value : {};
@@ -205,7 +205,11 @@ function pick(list, progress, own, mode, last, anchor, blocked, served, repeat, 
         const probe = follow && lesson ? asQuestion(lesson, follow.probe, "question") : null;
         if (probe && follow)
             probe.reason = follow.reason;
-        return probe || asTheory(anchorLesson) || inLesson(anchorLesson, "question") || badQ() || tail();
+        const theory = asTheory(anchorLesson);
+        const focus = lessonFocus(ctx.justId, progress);
+        if (theory && focus)
+            theory.focus = focus;
+        return probe || theory || inLesson(anchorLesson, "question") || badQ() || tail();
     }
     if ((last === "question" || last === "review") && anchorLesson)
         return inLesson(anchorLesson, "question") || badQ() || tail();

@@ -6,7 +6,7 @@
  * - mix with no answers opens on the first lesson's text
  * - mix opens on the text of the next lesson when its questions are still untouched and earlier ones are answered
  * - situations prefers a question, explain prefers text, review prefers a wrong answer
- * - after a wrong answer on a mapped pilot item, mix offers one unanswered clarifying question before that lesson's text; any other miss offers the text first
+ * - after a wrong answer on a mapped pilot item, mix offers one unanswered clarifying question for that wrong option before the lesson text, and the text names that option's fragment; any other miss offers the text first
  * - pause is set only when this session steps into a later lesson whose earlier questions are all answered
  * - done is set only on a text step, and only when every question in scope was last answered correctly
  * - repeat, once that stop is passed, serves answered questions again and does not open new ones
@@ -15,7 +15,7 @@
  */
 import { orderReview, reviewDue } from "./review.ts";
 import { releasedLessons, studyLesson } from "./scope.ts";
-import { followUp } from "./skills.ts";
+import { followUp, lessonFocus } from "./skills.ts";
 
 export type FlowKind = "theory" | "question" | "review";
 export type FlowMode = "mix" | "situations" | "explain" | "review";
@@ -30,6 +30,7 @@ export type FlowStep = {
   again?: boolean;
   fresh?: boolean;
   reason?: "misconception-check" | "spaced-review";
+  focus?: string;
 };
 type FlowLesson = {
   id: string;
@@ -39,7 +40,7 @@ type FlowLesson = {
   tickets_lesson?: (string | number)[];
   own_items?: (string | number)[];
 };
-type Attempt = { l?: number; t?: number };
+type Attempt = { l?: number; t?: number; lc?: number; events?: { ok: 0 | 1; c?: number | null }[] };
 type FlowOpts = { mode?: string; own?: boolean; last?: FlowKind; anchor?: string; avoid?: string[]; just?: string; served?: string[]; repeat?: boolean; now?: number; tutor?: boolean };
 type PickCtx = { justId?: string; now?: number; tutor: boolean; skipped: Set<string> };
 
@@ -133,7 +134,7 @@ function pick(list: FlowLesson[], progress: Record<string, Attempt>, own: boolea
     const earlier = to > 0 && list.slice(0, to).every(item => work(item, own).every(id => progress[id]));
     return !!last && from >= 0 && to > from && earlier;
   };
-  const asTheory = (lesson?: FlowLesson) => {
+  const asTheory = (lesson?: FlowLesson): FlowStep | null => {
     if (!lesson || blocked.has(`theory:${lesson.id}`)) return null;
     return { kind: "theory" as const, lessonId: lesson.id, title: lesson.title, lead: lesson.lead ?? "", pause: entering(lesson), done: doneAll };
   };
@@ -211,7 +212,10 @@ function pick(list: FlowLesson[], progress: Record<string, Attempt>, own: boolea
     const lesson = follow ? list.find(item => item.id === follow.lessonId) : undefined;
     const probe = follow && lesson ? asQuestion(lesson, follow.probe, "question") : null;
     if (probe && follow) probe.reason = follow.reason;
-    return probe || asTheory(anchorLesson) || inLesson(anchorLesson, "question") || badQ() || tail();
+    const theory = asTheory(anchorLesson);
+    const focus = lessonFocus(ctx.justId, progress);
+    if (theory && focus) theory.focus = focus;
+    return probe || theory || inLesson(anchorLesson, "question") || badQ() || tail();
   }
   if ((last === "question" || last === "review") && anchorLesson) return inLesson(anchorLesson, "question") || badQ() || tail();
   return badQ() || openQ() || asTheory(list[0]);

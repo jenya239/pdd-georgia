@@ -32,7 +32,8 @@ function walk(tutor, answers) {
       just = flowKey(step);
       continue;
     }
-    progress = { ...progress, [step.ticketId]: { l: answers[String(step.ticketId)] ?? 0, t: 1_000 + n } };
+    const mark = answers[String(step.ticketId)] ?? 0;
+    progress = { ...progress, [step.ticketId]: mark === 0 ? { l: 0, t: 1_000 + n, lc: 2 } : { l: mark, t: 1_000 + n } };
     last = "question";
     anchor = step.lessonId;
     just = String(step.ticketId);
@@ -48,7 +49,7 @@ test("a new learner gets the lesson text and no diagnostic", () => {
 });
 
 test("after a mapped miss the new flow asks one probe and the old flow returns to the text", () => {
-  const wrong = { "o-ep03-01": { l: 0, t: 1 } };
+  const wrong = { "o-ep03-01": { l: 0, t: 1, lc: 2 } };
   const opts = { last: "question", anchor: "ep03", just: "o-ep03-01" };
   const probe = ask(wrong, opts);
   const text = ask(wrong, { ...opts, tutor: false });
@@ -57,7 +58,9 @@ test("after a mapped miss the new flow asks one probe and the old flow returns t
   assert.equal(text.kind, "theory");
   assert.equal(ask({ ...wrong, "o-ep03-07": { l: 0, t: 2 } }, { ...opts, just: "o-ep03-07" }).kind, "theory");
   assert.equal(ask({ ...wrong, "o-ep03-07": { l: 1, t: 2 } }, { ...opts, just: "o-ep03-07" }).kind, "theory");
-  assert.equal(ask(wrong, { ...opts, avoid: ["o-ep03-07"] }).kind, "theory");
+  assert.equal(ask(wrong, { ...opts, avoid: ["o-ep03-07"] }).focus, "yard");
+  assert.equal(ask({ "o-ep03-01": { l: 0, t: 1, lc: 0 } }, opts).ticketId, "o-ep03-07");
+  assert.equal(ask({ "o-ep03-01": { l: 0, t: 1 } }, opts).kind, "theory");
   assert.equal(ask({ "o-ep03-08": { l: 0, t: 1 } }, { ...opts, just: "o-ep03-08" }).kind, "theory");
   assert.equal(ask({ 1: { l: 0 }, "o-ep03-01": { l: 0 } }, { ...opts, own: false, just: "1" }).kind, "theory");
   assert.deepEqual(ask(wrong, opts), ask(wrong, opts));
@@ -80,13 +83,21 @@ test("the same wrong answers reach the probe once, then the text", () => {
 
 test("a partial miss on the stop is one contrast, then the text", () => {
   const lesson = [ep07];
-  const progress = { "o-ep07-03": { l: 0, t: 1 } };
+  const progress = { "o-ep07-03": { l: 0, t: 1, lc: 1 } };
   const opts = { mode: "mix", own: true, last: "question", anchor: "ep07", just: "o-ep07-03" };
   const probe = nextFlowItem(lesson, progress, opts);
   assert.equal(probe.ticketId, "o-ep07-04");
   assert.equal(probe.reason, "misconception-check");
-  const again = nextFlowItem(lesson, { ...progress, "o-ep07-04": { l: 0, t: 2 } }, { ...opts, just: "o-ep07-04" });
+  const forced = { "o-ep07-03": { l: 0, t: 1, lc: 2 } };
+  assert.equal(nextFlowItem(lesson, forced, opts).ticketId, "o-ep07-02");
+  const seen = { ...forced, "o-ep07-02": { l: 1, t: 2 } };
+  const fragment = nextFlowItem(lesson, seen, opts);
+  assert.equal(fragment.kind, "theory");
+  assert.equal(fragment.focus, "vynuzhdennaya");
+  assert.equal(nextFlowItem(lesson, forced, { ...opts, avoid: ["o-ep07-02"] }).focus, "vynuzhdennaya");
+  const again = nextFlowItem(lesson, { ...progress, "o-ep07-04": { l: 0, t: 2, lc: 0 } }, { ...opts, just: "o-ep07-04" });
   assert.equal(again.kind, "theory");
+  assert.equal(again.focus, "ostanovka");
   const fact = nextFlowItem(lesson, { "o-ep07-01": { l: 0, t: 1 } }, { ...opts, just: "o-ep07-01" });
   assert.equal(fact.kind, "theory");
   assert.equal(nextFlowItem(lesson, progress, { ...opts, mode: "explain" }).kind, "theory");
