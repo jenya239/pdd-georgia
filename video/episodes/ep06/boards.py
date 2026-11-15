@@ -31,7 +31,7 @@ def b_age(img, d, t, B, D):
         chip(d, 40, 230, "грузовой — разрешённая масса больше 3500 кг", GREEN, appear(t, B.S(2)), 18)
 
 def b_tram(img, d, t, B, D):
-    txt(d, (30, 12), "Перекрёсток: рельсы и автомобиль", 22, WHITE, 1, "la", DJB)
+    txt(d, (30, 14), "Рельсы и автомобиль", 22, WHITE, 1, "la", DJB)
     d.rectangle([40 * SS, 78 * SS, 1240 * SS, 198 * SS], fill=(58, 62, 68, 255))
     d.rectangle([500 * SS, 40 * SS, 760 * SS, 236 * SS], fill=(58, 62, 68, 255))
     for y in range(48, 228, 16):
