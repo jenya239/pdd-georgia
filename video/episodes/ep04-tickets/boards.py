@@ -19,27 +19,23 @@ def shot(tid):
     if not rel:
         _IM[tid] = None
         return None
-    im = Image.open(TK + rel).convert("RGBA")
-    w, h = im.size
-    if h > int(w * 0.72):
-        im = im.crop((0, 0, w, int(h * 0.72)))
-    _IM[tid] = im
-    return im
+    _IM[tid] = Image.open(TK + rel).convert("RGBA")
+    return _IM[tid]
 
-def draw_pic(img, d, tid, x, y, w=300):
+def draw_pic(img, d, tid, x, y, w=260, max_h=200):
     im = shot(tid)
     if im is None:
         return
-    s = w / im.size[0]
-    r = im.resize((int(w * SS), int(im.size[1] * s * SS)), Image.LANCZOS)
-    put(img, r, (x * SS, y * SS))
-    txt(d, (x + w, y + im.size[1] * s + 4), "рисунок из базы билетов", 11, GREY, 1, "ra")
+    s = min(w / im.size[0], max_h / im.size[1])
+    r = im.resize((max(1, int(im.size[0] * s * SS)), max(1, int(im.size[1] * s * SS))), Image.LANCZOS)
+    put(img, r, (int(x * SS), int(y * SS)))
+    txt(d, (x + int(im.size[0] * s), y + im.size[1] * s + 4), "рисунок из базы билетов", 11, GREY, 1, "ra")
 
 def ticket(img, d, t, B, tid, accent):
     q, opts, correct, raw = tk(tid)
     has = bool(raw.get("image"))
     picture = (lambda img, d, t, x, y, tid=tid: draw_pic(img, d, tid, x, y)) if has else None
-    y = exam(img, d, t, q, opts, correct, B.S(1), f"№ {tid}", picture=picture, pic_w=300 if has else 0,
+    y = exam(img, d, t, q, opts, correct, B.S(1), f"№ {tid}", picture=picture, pic_w=260 if has else 0,
              t_opts=[0.25 + i * 0.15 for i in range(len(opts))], tag="Билет урока")
     if t > B.S(1) - 0.2:
         chip(d, 24, min(max(y + 6, 500), 532), accent, GOLD, appear(t, B.S(1)), 14)

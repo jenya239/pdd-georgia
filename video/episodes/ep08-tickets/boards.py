@@ -7,24 +7,48 @@ _T = {x["id"]: x for x in _json.load(open(TK + "tickets_ru.json", encoding="utf-
 def _clean(s):
     return _re.sub(r"\s+", " ", s).strip()
 
+_IM = {}
+
+def shot(tid):
+    if tid in _IM:
+        return _IM[tid]
+    rel = _T[tid].get("image")
+    if not rel:
+        _IM[tid] = None
+        return None
+    _IM[tid] = Image.open(TK + rel).convert("RGBA")
+    return _IM[tid]
+
+def draw_pic(img, d, tid, x, y, w=260, max_h=200):
+    im = shot(tid)
+    if im is None:
+        return
+    s = min(w / im.size[0], max_h / im.size[1])
+    r = im.resize((max(1, int(im.size[0] * s * SS)), max(1, int(im.size[1] * s * SS))), Image.LANCZOS)
+    put(img, r, (int(x * SS), int(y * SS)))
+    txt(d, (x + int(im.size[0] * s), y + im.size[1] * s + 4), "рисунок из базы билетов", 11, GREY, 1, "ra")
+
+
 def ticket(img, d, t, B, tid, accent):
     raw = _T[tid]
     q = _clean(raw["question"])
     opts = [_clean(a["text"]) for a in raw["answers"]]
     correct = raw["correct"] - 1
-    y = exam(img, d, t, q, opts, correct, B.S(1), f"№ {tid}", tag="Билет урока")
+    has = bool(raw.get("image"))
+    picture = (lambda img, d, t, x, y, tid=tid: draw_pic(img, d, tid, x, y)) if has else None
+    y = exam(img, d, t, q, opts, correct, B.S(1), f"№ {tid}", picture=picture, pic_w=260 if has else 0, tag="Билет урока")
     if t > B.S(1) - 0.2:
         chip(d, 24, min(max(y + 6, 500), 640), accent, GOLD, appear(t, B.S(1)), 14)
 
 def b_intro(img, d, t, B, D):
     txt(d, (30, 40), "Выпуск 8 · билеты про уступить и преимущество", 26, WHITE, 1, "la", DJB)
-    txt(d, (30, 100), "Вопрос и варианты — из базы. Снятого ролика нет.", 18, WHITE, appear(t, 0.3), "la")
+    txt(d, (30, 100), "Сначала вопрос. Ответ откроется после паузы.", 18, WHITE, appear(t, 0.3), "la")
 
 def b_t879(img, d, t, B, D):
-    ticket(img, d, t, B, 879, "Вопрос просит назвать, что такое преимущество. Ст. 5, п. 84 называет им право первым двигаться в намеченном направлен…")
+    ticket(img, d, t, B, 879, "Преимущество — право первым ехать в намеченном направлении.")
 
 def b_t889(img, d, t, B, D):
-    ticket(img, d, t, B, 889, "Вопрос просит назвать, что значит уступить дорогу. Ст. 5, п. 14 требует не продолжать движение, не возобновлять его и…")
+    ticket(img, d, t, B, 889, "Уступить — не начинать и не продолжать, если другой вынужден резко менять ход.")
 
 def b_outro(img, d, t, B, D):
     txt(d, (30, 40), "Условие, не номер", 26, WHITE, 1, "la", DJB)
