@@ -172,8 +172,10 @@ def exam(img,d,t,q,opts,correct,t_rev,note,picture=None,pic_w=0,t_opts=None,tag=
         x=24+i*16; d.ellipse([x*SS,62*SS,(x+10)*SS,72*SS],fill=((40,90,200,255) if i==0 else (200,206,216,255)))
     x0=24; qw=W_-48-(pic_w+24 if picture else 0)
     y=para(d,x0,96,q,23,qw,WHITE,1,DJB)
-    if picture: picture(img,d,t,W_-24-pic_w,92)
-    y=max(y+14,0); y0=y
+    pic_bottom=picture(img,d,t,W_-24-pic_w,92) if picture else None
+    y=y+14
+    if isinstance(pic_bottom,(int,float)): y=max(y,pic_bottom+8)
+    y0=y
     for i,o in enumerate(opts):
         a=appear(t,(t_opts[i] if t_opts else 0.3+i*0.3))
         if a<=0: continue
