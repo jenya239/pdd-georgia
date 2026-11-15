@@ -2,7 +2,8 @@
 name: pages
 on:
   push:
-    branches: [main]
+    # Вторая ветка — чтение собранного site/ без слияния в main. Следующий пуш в main снова выкладывает main.
+    branches: [main, cursor/editorial-blocks-0-1-1610]
 permissions:
   contents: read
   pages: write
