@@ -307,6 +307,10 @@ svg.fig .mark line{stroke:#ffd54f;stroke-width:3}
 #ep03-yard:focus-visible~.scene-tabs label[for=ep03-yard],#ep03-road:focus-visible~.scene-tabs label[for=ep03-road],#ep03-eq:focus-visible~.scene-tabs label[for=ep03-eq],#ep03-dirt:focus-visible~.scene-tabs label[for=ep03-dirt],#ep03-sign:focus-visible~.scene-tabs label[for=ep03-sign],#ep03-snow:focus-visible~.scene-tabs label[for=ep03-snow]{outline:2px solid var(--acc);outline-offset:2px}
 #ep03-yard:checked~.scene-frames .is-yard,#ep03-road:checked~.scene-frames .is-road,#ep03-eq:checked~.scene-frames .is-eq,#ep03-dirt:checked~.scene-frames .is-dirt,#ep03-sign:checked~.scene-frames .is-sign,#ep03-snow:checked~.scene-frames .is-snow{display:block}
 .scene .layer{display:none}
+#ep02-road:checked~.scene-tabs label[for=ep02-road],#ep02-one:checked~.scene-tabs label[for=ep02-one],#ep02-two:checked~.scene-tabs label[for=ep02-two],#ep02-bare:checked~.scene-tabs label[for=ep02-bare],#ep02-who:checked~.scene-tabs label[for=ep02-who]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
+#ep02-road:focus-visible~.scene-tabs label[for=ep02-road],#ep02-one:focus-visible~.scene-tabs label[for=ep02-one],#ep02-two:focus-visible~.scene-tabs label[for=ep02-two],#ep02-bare:focus-visible~.scene-tabs label[for=ep02-bare],#ep02-who:focus-visible~.scene-tabs label[for=ep02-who]{outline:2px solid var(--acc);outline-offset:2px}
+#ep02-road:checked~.fig .is-road,#ep02-one:checked~.fig .is-one,#ep02-two:checked~.fig .is-two,#ep02-bare:checked~.fig .is-bare,#ep02-who:checked~.fig .is-who{display:inline}
+#ep02-road:checked~.is-road,#ep02-one:checked~.is-one,#ep02-two:checked~.is-two,#ep02-bare:checked~.is-bare,#ep02-who:checked~.is-who{display:block}
 #ep04-zebra:checked~.scene-tabs label[for=ep04-zebra],#ep04-signs:checked~.scene-tabs label[for=ep04-signs]{background:var(--acc2);color:var(--fg);border-color:var(--acc)}
 #ep04-zebra:focus-visible~.scene-tabs label[for=ep04-zebra],#ep04-signs:focus-visible~.scene-tabs label[for=ep04-signs]{outline:2px solid var(--acc);outline-offset:2px}
 #ep04-zebra:checked~.fig .is-zebra,#ep04-signs:checked~.fig .is-signs{display:inline}

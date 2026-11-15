@@ -1,0 +1,21 @@
+{
+  "accessed": "2026-11-15",
+  "law": {
+    "url": "https://matsne.gov.ge/ka/document/view/2169396",
+    "title": "საგზაო მოძრაობის შესახებ",
+    "consolidatedPublicationsHead": "25/06/2026",
+    "local": "data/sources/law_ka_matsne_pub36_2026-06-25.txt",
+    "localRu": "data/sources/law_ru_matsne_pub36_2026-06-25.txt",
+    "sha256_16": { "ka": "329b9f1971021fc0", "ru": "6e3abdf8a8a1546d", "annexRu": "fe3b8c83dec03198", "annexKa": "73ad615f399e8296" },
+    "spotChecksPresent": ["არ ვრცელდება ავტომაგისტრალზე", "შლაგბაუმებით, ნახევარშლაგბაუმებით ან", "უეტლო მოტოციკლ"]
+  },
+  "exam": {
+    "url": "https://matsne.gov.ge/ka/document/view/6867586",
+    "instrument": "Приказ МВД №598 от 01.08.2012, изменение приказом №69",
+    "adopted": "20/05/2026",
+    "published": "21/05/2026",
+    "categoryB": "30 билетов, 30 минут, не меньше 25 баллов"
+  },
+  "currency": "pass",
+  "note": "Живая страница закона показывает ту же голову консолидированных публикаций, что и локальный снимок pub36 от 25.06.2026. Новой редакции после этой даты в списке публикаций нет."
+}
