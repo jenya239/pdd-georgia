@@ -1,0 +1,20 @@
+{
+  "alazani": {
+    "id": "A",
+    "file": "editorial-runs/ep04/refinement-2/blind/east.md",
+    "sha256": "71a461de01e0cc2770830874da2054e0ff29c44c334342d58c6e3d25c17569ac",
+    "note": "Читательский текст действующей редакции до переноса глав B1. В нём остаётся фраза, что рельсы в асфальте под определение переезда не подходят. Позже в опубликованном уроке её заменили молчанием пункта 58. Для этого сравнения текст не подчищался."
+  },
+  "rioni": {
+    "id": "B1",
+    "file": "editorial-runs/ep04/refinement-2/candidates/b1.md",
+    "sha256": "e0889910dcec4bffe535fe76318ff2f528d86727db1f923bc689f11bb6e9dab0"
+  },
+  "kura": {
+    "id": "C1",
+    "file": "editorial-runs/ep04/refinement-2/candidates/c1.md",
+    "sha256": "d43d8152237494d6a335b1f58379166356dbb3156ab4f605cf448cd1e7365730",
+    "note": "После аудита b26f8642… внесены подтверждённые поправки. Это не статус accepted."
+  },
+  "readerMustNotOpen": ["key.json", "candidates", "audit-c1.md", "audit-c1.json", "blind/key.json", "composition.md"]
+}
