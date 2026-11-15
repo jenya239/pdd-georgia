@@ -1,0 +1,320 @@
+{
+  "note": "Покрытие назначенных билетов сценариями. ep01 билетов нет. ep04-tickets уже был. Снятых mp4 у новых каталогов нет.",
+  "generated": [
+    {
+      "episode": "ep02",
+      "ticket": 265,
+      "correct": 2,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t265"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 351,
+      "correct": 2,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t351"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 386,
+      "correct": 1,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t386"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 390,
+      "correct": 1,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t390"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 391,
+      "correct": 2,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t391"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 884,
+      "correct": 3,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t884"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 902,
+      "correct": 3,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t902"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 948,
+      "correct": 1,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t948"
+    },
+    {
+      "episode": "ep02",
+      "ticket": 949,
+      "correct": 1,
+      "script": "video/episodes/ep02-tickets/scenes.py",
+      "key": "t949"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 1,
+      "correct": 2,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t1"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 2,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t2"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 54,
+      "correct": 2,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t54"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 81,
+      "correct": 2,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t81"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 99,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t99"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 121,
+      "correct": 2,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t121"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 503,
+      "correct": 4,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t503"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 653,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t653"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 654,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t654"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 888,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t888"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 900,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t900"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 961,
+      "correct": 1,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t961"
+    },
+    {
+      "episode": "ep03",
+      "ticket": 1275,
+      "correct": 2,
+      "script": "video/episodes/ep03-tickets/scenes.py",
+      "key": "t1275"
+    },
+    {
+      "episode": "ep05",
+      "ticket": 811,
+      "correct": 2,
+      "script": "video/episodes/ep05-tickets/scenes.py",
+      "key": "t811"
+    },
+    {
+      "episode": "ep05",
+      "ticket": 941,
+      "correct": 2,
+      "script": "video/episodes/ep05-tickets/scenes.py",
+      "key": "t941"
+    },
+    {
+      "episode": "ep05",
+      "ticket": 942,
+      "correct": 3,
+      "script": "video/episodes/ep05-tickets/scenes.py",
+      "key": "t942"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 47,
+      "correct": 2,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t47"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 53,
+      "correct": 2,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t53"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 69,
+      "correct": 3,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t69"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 75,
+      "correct": 2,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t75"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 521,
+      "correct": 3,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t521"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 537,
+      "correct": 1,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t537"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 826,
+      "correct": 1,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t826"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 892,
+      "correct": 3,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t892"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 893,
+      "correct": 1,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t893"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 905,
+      "correct": 3,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t905"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 906,
+      "correct": 2,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t906"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 921,
+      "correct": 3,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t921"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 922,
+      "correct": 1,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t922"
+    },
+    {
+      "episode": "ep06",
+      "ticket": 925,
+      "correct": 3,
+      "script": "video/episodes/ep06-tickets/scenes.py",
+      "key": "t925"
+    },
+    {
+      "episode": "ep07",
+      "ticket": 356,
+      "correct": 1,
+      "script": "video/episodes/ep07-tickets/scenes.py",
+      "key": "t356"
+    },
+    {
+      "episode": "ep07",
+      "ticket": 357,
+      "correct": 1,
+      "script": "video/episodes/ep07-tickets/scenes.py",
+      "key": "t357"
+    },
+    {
+      "episode": "ep07",
+      "ticket": 886,
+      "correct": 3,
+      "script": "video/episodes/ep07-tickets/scenes.py",
+      "key": "t886"
+    },
+    {
+      "episode": "ep07",
+      "ticket": 894,
+      "correct": 2,
+      "script": "video/episodes/ep07-tickets/scenes.py",
+      "key": "t894"
+    },
+    {
+      "episode": "ep08",
+      "ticket": 879,
+      "correct": 2,
+      "script": "video/episodes/ep08-tickets/scenes.py",
+      "key": "t879"
+    },
+    {
+      "episode": "ep08",
+      "ticket": 889,
+      "correct": 2,
+      "script": "video/episodes/ep08-tickets/scenes.py",
+      "key": "t889"
+    }
+  ]
+}

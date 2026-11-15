@@ -1,0 +1,126 @@
+{
+  "note": "Якорь глоссария в субтитре, доска на такт, один голос n. Кадры не снимались: pillow нет.",
+  "fail": 0,
+  "episodes": [
+    {
+      "episode": "ep01",
+      "beats": 8,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep02",
+      "beats": 6,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep02-tickets",
+      "beats": 11,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep03",
+      "beats": 10,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep03-tickets",
+      "beats": 15,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep04",
+      "beats": 12,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep04-tickets",
+      "beats": 30,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep05",
+      "beats": 5,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep05-tickets",
+      "beats": 5,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep06",
+      "beats": 5,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep06-tickets",
+      "beats": 16,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep07",
+      "beats": 6,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep07-tickets",
+      "beats": 6,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep08",
+      "beats": 5,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    },
+    {
+      "episode": "ep08-tickets",
+      "beats": 4,
+      "missing_gloss": [],
+      "missing_boards": [],
+      "bad_who": [],
+      "characters": []
+    }
+  ]
+}
