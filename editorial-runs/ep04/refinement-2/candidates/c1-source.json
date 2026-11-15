@@ -1,0 +1,14 @@
+{
+  "id": "C1",
+  "source": "editorial-runs/ep04/refinement-2/blind/west.md",
+  "sourceSha256": "94e3d081dd06104fc751be058bef153dcba7418f1755869356e8321d70bf4052",
+  "sourceNote": "West — читательское представление текста коммита 7957cad2, ветка editorial/ep04-coherent-lesson-20261111. Это редакция C до предметных правок.",
+  "candidate": "editorial-runs/ep04/refinement-2/candidates/c1.md",
+  "candidateSha256": "b26f8642516c9caf93bb3d8d6a513e57a99e23483041cf393fb0c5b0fd2bf89c",
+  "changes": "editorial-runs/ep04/refinement-2/candidates/c1-changes.md",
+  "changesSha256": "44feb149beefb55c0b9e2754ac22366794f56683f423b6ca010e274d97341f59",
+  "editor": "bc-a335922a-488b-596b-bcde-61c930c6bf70",
+  "editorTitle": "Редактор C1 выпуска 4",
+  "accepted": false,
+  "note": "Перечень правок — самопроверка редактора. Независимому аудитору его не передают."
+}
