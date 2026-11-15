@@ -1,0 +1,11 @@
+{
+  "id": "review-ee3ef2fae7bc3c088ef9",
+  "episode": "ep04",
+  "role": "review",
+  "files": {
+    "input.md": "1ac91208d8b708bc24b20eddba8a4ed6c5be4541450085bf0ea7f2f1be6657dc",
+    "role.md": "90eea4f3f9fcedabdf3e78380cec39cd0d667f5d2a38a6f4e415062f466d4707",
+    "prompt.md": "988b45c70ceac2b8f248797090841d53c0ff78e558256099710250710a241d61"
+  },
+  "createdAt": "2026-11-15T06:21:43.517Z"
+}

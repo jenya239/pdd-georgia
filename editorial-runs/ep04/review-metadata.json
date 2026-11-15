@@ -1,0 +1,6 @@
+{
+  "model": "Grok",
+  "execution": "manual-independent",
+  "costUsd": null,
+  "notes": "Отдельный субагент Cursor читал только prompt.md подготовленной работы review-ee3ef2fae7bc3c088ef9 и файлы закона. Стоимость не измерялась. Это не вызов API и не mock."
+}

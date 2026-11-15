@@ -116,7 +116,7 @@ export function figLevels(): string {
   body += `<rect x="185" y="100" width="70" height="80" class="road"/>`;
   body += `<line x1="205" y1="0" x2="205" y2="${h}" class="rail"/><line x1="235" y1="0" x2="235" y2="${h}" class="rail"/>`;
   body += car(40, 124, 64, 32);
-  body += `<text x="12" y="30" class="t">Одном уровне</text><text x="12" y="52" class="t small">трамвай на своём полотне</text>`;
+  body += `<text x="12" y="30" class="t">На одном уровне</text><text x="12" y="52" class="t small">трамвай на своём полотне</text>`;
   body += `<text x="12" y="215" class="t small ok">= переезд (ст. 5, п. 58)</text>`;
   body += `<text x="12" y="238" class="t small mut">действуют правила ст. 39</text>`;
   body += `<rect x="${x}" y="0" width="310" height="${h}" class="verge"/>`;
