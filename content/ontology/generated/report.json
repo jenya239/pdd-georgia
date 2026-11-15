@@ -412,10 +412,10 @@
   }
  },
  "own_items": {
-  "total": 71,
+  "total": 73,
   "by_lesson": {
    "ep01": 5,
-   "ep02": 8,
+   "ep02": 10,
    "ep03": 9,
    "ep04": 17,
    "ep05": 9,
@@ -424,12 +424,12 @@
    "ep08": 5
   },
   "by_type": {
-   "cloze": 7,
-   "diagram": 6,
+   "cloze": 6,
+   "diagram": 7,
    "flashcard": 7,
    "max-error": 5,
    "priority": 8,
-   "ticket": 38
+   "ticket": 40
   }
  },
  "misconception_use": {
@@ -442,7 +442,7 @@
   "mc-barrier": 7,
   "mc-boarding-carriageway": 2,
   "mc-boarding-not-passenger": 4,
-  "mc-carriageways-by-lanes": 9,
+  "mc-carriageways-by-lanes": 10,
   "mc-class-thresholds": 8,
   "mc-controller-is-user": 2,
   "mc-crossing-blocking": 3,
@@ -479,10 +479,10 @@
   "mc-railway-stop-order": 9,
   "mc-right-rule": 9,
   "mc-right-rule-over-main": 1,
-  "mc-road-elements": 6,
+  "mc-road-elements": 8,
   "mc-scooter-is-mechanical": 1,
   "mc-settlement-speed": 4,
-  "mc-shoulder-driving": 6,
+  "mc-shoulder-driving": 8,
   "mc-sign-distance": 11,
   "mc-sign-zone": 1,
   "mc-stop-is-signal": 3,
