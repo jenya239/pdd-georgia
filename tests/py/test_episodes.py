@@ -78,7 +78,13 @@ def test_ep04_film_separates_a_jam_from_a_stop():
     assert "стояние в потоке остановкой не считается" in script
     episodes = json.loads((root / "content/episodes.json").read_text(encoding="utf-8"))
     ep04 = next(ep for ep in episodes if ep["id"] == "ep04")
-    assert "video_note" not in ep04
+    note = ep04["video_note"]
+    assert "в случае необходимости" in note and "ст. 25, п. 2" in note
+    assert "нарушает запрет остановки" not in note
+    assert "без остановки безопасный проход не сохранить" in script
+    assert "останавливаются, если человек на переходе или выходит из-за неё." not in script
+    dialogue = (root / "packages/lesson/ep04.ts").read_text(encoding="utf-8")
+    assert "Главная обязанность водителя у перехода — пропустить пешехода" not in dialogue
     cues = "\n".join(
         cue[2]
         for beat in json.loads((root / "video/episodes/ep04/timeline.json").read_text(encoding="utf-8"))["beats"]
@@ -88,6 +94,7 @@ def test_ep04_film_separates_a_jam_from_a_stop():
     assert "стояние в потоке остановкой не считается" in cues
     assert "не без прицепа" in cues
     assert "Знак 100 на другой дороге не поднимает потолок 90." in cues
+    assert "останавливаются, если человек на переходе или выходит из-за неё." in cues
     page = (root / "web/assets/pages/episode.mjs").read_text(encoding="utf-8")
     assert 'lk(r, "video_note")' in page
 
