@@ -77,7 +77,28 @@ def test_ep04_film_separates_a_jam_from_a_stop():
     assert "нарушает запрет остановки на самом переходе" not in script
     assert "стояние в потоке остановкой не считается" in script
     episodes = json.loads((root / "content/episodes.json").read_text(encoding="utf-8"))
-    note = next(ep["video_note"] for ep in episodes if ep["id"] == "ep04")
-    assert "ст. 5, п. 11" in note and "ст. 25, п. 6" in note
+    ep04 = next(ep for ep in episodes if ep["id"] == "ep04")
+    assert "video_note" not in ep04
+    cues = "\n".join(
+        cue[2]
+        for beat in json.loads((root / "video/episodes/ep04/timeline.json").read_text(encoding="utf-8"))["beats"]
+        for cue in beat["cues"]
+    )
+    assert "нарушает запрет остановки" not in cues
+    assert "стояние в потоке остановкой не считается" in cues
+    assert "не без прицепа" in cues
+    assert "Знак 100 на другой дороге не поднимает потолок 90." in cues
     page = (root / "web/assets/pages/episode.mjs").read_text(encoding="utf-8")
     assert 'lk(r, "video_note")' in page
+
+
+def test_ep03_film_does_not_limit_the_right_hand_rule_to_a_slogan():
+    root = pathlib.Path(__file__).resolve().parents[2]
+    cues = "\n".join(
+        cue[2]
+        for beat in json.loads((root / "video/episodes/ep03/timeline.json").read_text(encoding="utf-8"))["beats"]
+        for cue in beat["cues"]
+    )
+    assert "только на равнозначном" not in cues
+    assert "Помеха справа — правило равнозначного перекрёстка. Двор им не является." in cues
+    assert "Если главная меняет направление, водители на ней между собой едут как на равнозначных." in cues
