@@ -11,7 +11,10 @@ const attributes = (html, name) =>
 export function inspectVisualHtml(html, { id = "visual", siteRoot, rewritten = false } = {}) {
   const problems = [];
   const tagCount = (tag) => (html.match(new RegExp('<' + tag + '\\b', 'g')) || []).length;
-  const figures = tagCount("figure"), captions = tagCount("figcaption");
+  // The lesson renderer places captions in <p class="figcap"> after each figure.
+  const figures = tagCount("figure");
+  const externalCaptions = (html.match(/<p\\b[^>]*class=["'][^"']*\\bfigcap\\b[^"']*["']/g) || []).length;
+  const captions = tagCount("figcaption") + externalCaptions;
   const svgs = [...html.matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map(match => match[0]);
 
   if (figures && captions < figures) {
