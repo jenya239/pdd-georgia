@@ -1,11 +1,17 @@
 /** Выпуск 6, редакция без персонажей. Цитаты — дословно из закона. */
 import { MARKER, figure, lesson, lq } from "../html.mjs";
 
-function scene(name, tabs, figureHtml, captions) {
-  const inputs = tabs.map(([id, on], i) => `<input type="radio" name="${name}" id="${id}"${on || i === 0 ? " checked" : ""}>`).join("");
-  const labels = tabs.map(([id, , title]) => `<label for="${id}">${title}</label>`).join(" ");
-  const notes = captions.map(([cls, text]) => `<p class="figcap layer ${cls}">${text}</p>`).join("");
-  return `<div class="scene">${inputs}<div class="scene-tabs">${labels}</div>${figureHtml}${notes}</div>`;
+function scene(_name, tabs, figureHtml, captions) {
+  // Все варианты видны в ходе чтения, без переключателей или скрытых слоёв.
+  const variants = tabs.map((_, i) => {
+    const [active, caption] = captions[i];
+    const html = figureHtml
+      .replace(/<g class="layer ([^"]+)">/g, (_full, cls) =>
+        `<g class="layer ${cls}" style="display:${cls.split(" ").includes(active) ? "inline" : "none"}">`)
+      .replaceAll("ep06-xing-ar", `ep06-xing-ar-${i}`);
+    return `<div class="visual-slice">${html}<p class="figcap">${caption}</p></div>`;
+  });
+  return `<div class="visual-story">${variants.join("")}</div>`;
 }
 
 function powerScene() {
