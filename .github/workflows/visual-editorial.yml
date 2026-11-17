@@ -1,0 +1,45 @@
+name: visual-editorial
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/lessons/**'
+      - 'content/ontology/**'
+      - 'content/plan/visual-editorial-review.json'
+      - 'packages/lesson/**'
+      - 'site/lessons/**'
+      - 'site/norm/**'
+      - 'site/visual.html'
+      - 'site/index.html'
+      - 'site/course.html'
+      - 'web/**'
+      - 'tools/visual-editorial-audit.mjs'
+      - 'tests/js/visual-editorial.test.mjs'
+      - '.github/workflows/visual-editorial.yml'
+  pull_request:
+    paths:
+      - 'content/lessons/**'
+      - 'content/ontology/**'
+      - 'content/plan/visual-editorial-review.json'
+      - 'packages/lesson/**'
+      - 'site/lessons/**'
+      - 'site/norm/**'
+      - 'site/visual.html'
+      - 'site/index.html'
+      - 'site/course.html'
+      - 'web/**'
+      - 'tools/visual-editorial-audit.mjs'
+      - 'tests/js/visual-editorial.test.mjs'
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify visual lesson law links, accessibility, and ticket ontology
+        run: node tools/visual-editorial-audit.mjs
+      - name: Run visual editorial test
+        run: node --test tests/js/visual-editorial.test.mjs
