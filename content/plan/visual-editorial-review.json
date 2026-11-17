@@ -8,13 +8,15 @@
       "id": "ep01",
       "status": "rewritten",
       "published": "site/lessons/ep01-plain.html",
-      "minFigures": 1,
+      "minFigures": 5,
       "requiredNormLinks": [
         "norm/st2-p1.html",
         "norm/st2-p2.html"
       ],
       "integratedTickets": [],
-      "candidateTickets": []
+      "candidateTickets": [],
+      "formatMigrated": true,
+      "reviewNote": "Five concise diagrams explain the legal source of signs, annexes, penalties, languages and exam regulations."
     },
     {
       "id": "ep02",
