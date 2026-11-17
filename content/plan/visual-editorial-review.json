@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "standard": "docs/visual-course-editorial-standard.md",
+  "source_of_truth": "content/ontology/",
+  "notes": "A curated, not exhaustive, ticket review plan. Assignment always comes from World.deriveAssignment(), never this file.",
+  "episodes": [
+    {
+      "id": "ep01",
+      "status": "rewritten",
+      "published": "site/lessons/ep01-plain.html",
+      "minFigures": 1,
+      "requiredNormLinks": [
+        "norm/st2-p1.html",
+        "norm/st2-p2.html"
+      ],
+      "integratedTickets": [],
+      "candidateTickets": []
+    },
+    {
+      "id": "ep02",
+      "status": "rewritten",
+      "published": "site/lessons/ep02-plain.html",
+      "minFigures": 5,
+      "requiredNormLinks": [
+        "norm/st5-p12.html",
+        "norm/st5-p9.html",
+        "norm/st5-p45.html"
+      ],
+      "integratedTickets": [
+        390,
+        391
+      ],
+      "candidateTickets": []
+    },
+    {
+      "id": "ep03",
+      "status": "rewritten",
+      "published": "site/lessons/ep03-plain.html",
+      "minFigures": 6,
+      "requiredNormLinks": [
+        "norm/st5-p13.html",
+        "norm/st5-p37.html",
+        "norm/st36-p4-v.html",
+        "norm/st36-p8.html"
+      ],
+      "integratedTickets": [
+        54,
+        81,
+        503
+      ],
+      "candidateTickets": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "ep04",
+      "status": "planned",
+      "published": "site/lessons/ep04-plain.html",
+      "minFigures": 7,
+      "requiredNormLinks": [
+        "norm/st5-p86.html",
+        "norm/st39-p3.html"
+      ],
+      "integratedTickets": [],
+      "candidateTickets": [
+        20,
+        422,
+        515
+      ]
+    },
+    {
+      "id": "ep05",
+      "status": "planned",
+      "published": "site/lessons/ep05-plain.html",
+      "minFigures": 3,
+      "requiredNormLinks": [
+        "norm/st5-p61.html",
+        "norm/st24-p5.html"
+      ],
+      "integratedTickets": [],
+      "candidateTickets": []
+    },
+    {
+      "id": "ep06",
+      "status": "planned",
+      "published": "site/lessons/ep06-plain.html",
+      "minFigures": 5,
+      "requiredNormLinks": [
+        "norm/st5-p73.html",
+        "norm/st5-p42.html"
+      ],
+      "integratedTickets": [],
+      "candidateTickets": [
+        47,
+        53
+      ]
+    },
+    {
+      "id": "ep07",
+      "status": "planned",
+      "published": "site/lessons/ep07.html",
+      "minFigures": 1,
+      "requiredNormLinks": [
+        "norm/st5-p11.html",
+        "norm/st5-p26.html"
+      ],
+      "integratedTickets": [],
+      "candidateTickets": [
+        886,
+        356
+      ]
+    },
+    {
+      "id": "ep08",
+      "status": "planned",
+      "published": "site/lessons/ep08.html",
+      "minFigures": 1,
+      "requiredNormLinks": [
+        "norm/st5-p14.html",
+        "norm/st5-p84.html"
+      ],
+      "integratedTickets": [],
+      "candidateTickets": [
+        879,
+        889
+      ]
+    }
+  ]
+}
