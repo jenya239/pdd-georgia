@@ -32,6 +32,7 @@ echo "== tsc: domain";               node node_modules/typescript/bin/tsc -p pac
 echo "== tsc: course";               node node_modules/typescript/bin/tsc -p packages/course --noEmit
 echo "== node: domain modules";      node --test tests/js/*.test.mjs
 echo "== pytest: build, ontology, lessons, video"; "$PY" -m pytest -q tests/py tests/video
+echo "== visual editorial: links and ontology"; node tools/visual-editorial-audit.mjs
 echo "== build: node tools/build.mjs --check"; node tools/build.mjs --check
 if [ "${E2E:-1}" != 0 ]; then
   echo "== e2e: headless browser on site/"; "${E2E_PYTHON:-$PY}" tests/e2e/site_e2e.py
