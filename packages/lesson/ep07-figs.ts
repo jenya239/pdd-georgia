@@ -6,27 +6,30 @@ function plate(reason: string, name: string): string {
   return `<text x="240" y="78" class="t small">${reason}</text><text x="240" y="114" class="t small">${name}</text>`;
 }
 
-export function pauseScene(): string {
-  const layers = [
-    ["is-unload", plate("10 мин, разгрузка", "остановка")],
-    ["is-shop", plate("10 мин, покупки", "стоянка")],
-    ["is-broke", plate("поломка", "вынужденная остановка")],
-    ["is-jam", plate("стоит в потоке", "не остановка")],
-  ].map(([cls, body]) => `<g class="layer ${cls}">${body}</g>`).join("");
-  const tabs = [
-    ["ep07-unload", true, "Разгрузка"],
-    ["ep07-shop", false, "Магазин"],
-    ["ep07-broke", false, "Поломка"],
-    ["ep07-jam", false, "Пробка"],
-  ];
-  const inputs = tabs.map(([id, on]) => `<input type="radio" name="ep07-pause" id="${id}"${on ? " checked" : ""}>`).join("");
-  const labels = tabs.map(([id, , title]) => `<label for="${id}">${title}</label>`).join("");
-  const captions = [
-    ["is-unload", "Десять минут уходят на разгрузку. Это остановка."],
-    ["is-shop", "Десять минут, и водитель ушёл за покупками. Это стоянка."],
-    ["is-broke", "Поломка прерывает поездку. Срок здесь не решает: и короткая, и долгая остановка по этой причине остаётся вынужденной."],
-    ["is-jam", "Ожидание в потоке — не остановка по пункту 11. Место на дороге от этого не становится любым."],
-  ].map(([cls, text]) => `<p class="figcap layer ${cls}">${text}</p>`).join("");
-  const svg = `<figure class="fig"><svg viewBox="0 0 640 180" role="img" aria-label="Автомобиль у обочины: разгрузка, покупки, поломка или поток" xmlns="http://www.w3.org/2000/svg">${car()}${layers}</svg></figure>`;
-  return `<div class="scene">${inputs}<div class="scene-tabs">${labels}</div>${svg}${captions}</div>`;
+export function pauseScene(kind: "unload" | "shop" | "jam" | "broke" = "unload"): string {
+  const variants = {
+  "unload": [
+    "10 мин, разгрузка",
+    "остановка",
+    "Разгрузка длится десять минут, но это по-прежнему остановка."
+  ],
+  "shop": [
+    "10 мин, покупки",
+    "стоянка",
+    "Те же десять минут водитель потратил на покупки: теперь это стоянка."
+  ],
+  "jam": [
+    "стоит в потоке",
+    "не остановка",
+    "Ожидание в пробке не считается остановкой по определению закона."
+  ],
+  "broke": [
+    "поломка",
+    "вынужденная остановка",
+    "Поломка прерывает движение независимо от продолжительности паузы."
+  ]
+} as const;
+  const [reason, name, caption] = variants[kind];
+  const svg = `<figure class="fig"><svg viewBox="0 0 640 180" role="img" aria-label="Автомобиль у обочины: ${caption}" xmlns="http://www.w3.org/2000/svg">${car()}${plate(reason, name)}</svg></figure>`;
+  return `${svg}<p class="figcap">${caption}</p>`;
 }
