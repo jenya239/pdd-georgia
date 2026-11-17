@@ -23,7 +23,7 @@ test("episode 3 is a continuous illustrated explanation, not a legacy lesson", (
   for (const norm of ["st5-p13", "st5-p37", "st36-p4-v", "st36-p8"])
     assert.ok(html.includes(`norm/${norm}.html`));
   const script = readFileSync("site/assets/pages/episode.mjs", "utf8");
-  assert.ok(script.includes('["ep01", "ep02", "ep03"].includes(id) && !showFilm && chosen?.id === "plain"'));
+  assert.ok(script.includes('!showFilm && (chosen?.id === "plain" || (isText && !editions.length))'));
   assert.ok(script.includes("lesson-appendix"));
 });
 
