@@ -397,3 +397,10 @@ select{max-width:100%}
 .lessonpage .lesson,.atlas #stage .reading{hyphens:auto}
 .lessonpage .lesson .fig,.atlas #stage .qfig{hyphens:none}
 @media (max-width:640px){.fig figcaption{font-size:13px}.sg{width:104px}}
+
+/* Noninteractive visual-story sequences: all scenes follow one another in normal reading order. */
+.lessonpage .visual-story, .lessonpage .visual-series { margin: 22px 0 28px; }
+.lessonpage .visual-story > div { margin: 0 0 24px; }
+.lessonpage .visual-story .fig, .lessonpage .visual-series .fig { margin: 8px 0 7px; }
+.lessonpage .visual-story .figcap, .lessonpage .figcap { color:var(--mut); font-size:14px; line-height:1.5; max-width:68ch; margin:6px 0 14px; }
+.lessonpage .visual-story .fig svg { display:block; width:100%; height:auto; }
