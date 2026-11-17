@@ -10,7 +10,6 @@ import { loadWorld } from "./load-ontology.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (root, rel) => readFileSync(path.join(root, rel), "utf8");
-const escaped = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const links = (html) => [...html.matchAll(/\bhref=["']([^"']+)["']/g)].map((match) => match[1]);
 const figures = (html) => (html.match(/<figure\b/g) || []).length;
 const svgBlocks = (html) => [...html.matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map((match) => match[0]);
