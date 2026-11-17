@@ -45,7 +45,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
     : "";
   // The illustrated editorial edition is a continuous article. Testing and the
   // reference dossier stay accessible, but no longer interrupt the narrative.
-  const visualArticle = id === "ep03" && !showFilm && chosen?.id === "plain";
+  const visualArticle = ["ep02", "ep03"].includes(id) && !showFilm && chosen?.id === "plain";
   const visualMarkup = visualArticle ? `${kindLine}<h1>${esc(r.title)}</h1>
    ${editionBar}
    <article class="lesson visuallesson" id="lb">${lesson.before}${lesson.after}</article>
