@@ -43,7 +43,18 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
     ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>
    <p class="small mut">Ролик по билетам выпуска: ситуация, признак, верный вариант. Под каждым билетом тот же разбор остаётся текстом.</p>`
     : "";
-  m.innerHTML = showFilm
+  // The illustrated editorial edition is a continuous article. Testing and the
+  // reference dossier stay accessible, but no longer interrupt the narrative.
+  const visualArticle = id === "ep03" && !showFilm && chosen?.id === "plain";
+  const visualMarkup = visualArticle ? `${kindLine}<h1>${esc(r.title)}</h1>
+   ${editionBar}
+   <article class="lesson visuallesson" id="lb">${lesson.before}${lesson.after}</article>
+   <details class="lesson-appendix"><summary>Нормы, билеты и самопроверка</summary>
+     ${lawPart}${ticketsFilm}
+     <h2>Билеты к выпуску</h2><div id="tk"></div><div id="own-items"></div>
+     <div id="cum"></div>
+   </details>${nav}` : "";
+  m.innerHTML = visualArticle ? visualMarkup : showFilm
     ? `${kindLine}<h1>${esc(r.title)}</h1>
    ${editionBar}
    <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
