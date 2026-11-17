@@ -53,3 +53,5 @@ jobs:
           node node_modules/typescript/bin/tsc -p packages/course --noEmit
       - name: Check statutory quotations and literary lesson regressions
         run: node --test tests/js/lesson-quotes.test.mjs
+      - name: Verify committed site matches regenerated release
+        run: node tools/build.mjs --check
