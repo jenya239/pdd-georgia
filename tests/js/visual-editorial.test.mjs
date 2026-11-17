@@ -5,7 +5,7 @@ import { auditVisualEditorial } from "../../tools/visual-editorial-audit.mjs";
 test("published visual lessons preserve normative links and ontology-assigned ticket examples", () => {
   const { problems, covered, rewritten } = auditVisualEditorial();
   assert.equal(covered, 8);
-  assert.ok(rewritten >= 3);
+  assert.equal(rewritten, 8);
   assert.deepEqual(problems, []);
 });
 
@@ -47,4 +47,20 @@ test("first episode follows the illustrated legal-source narrative", () => {
   const index = steps.map(s => html.indexOf(s));
   assert.ok(index.every((x, i) => x >= 0 && (i === 0 || x > index[i - 1])));
   assert.ok(html.includes("norm/st2-p1.html") && html.includes("norm/st2-p2.html"));
+});
+
+test("every released episode has a continuous visual-reading edition", () => {
+  const manifest = JSON.parse(readFileSync("content/plan/visual-editorial-review.json", "utf8"));
+  assert.equal(manifest.episodes.length, 8);
+  for (const episode of manifest.episodes) {
+    assert.equal(episode.formatMigrated, true, episode.id);
+    const page = readFileSync(episode.published, "utf8");
+    assert.ok(page.includes("<!--AFTER-TICKETS-->"), episode.id);
+    assert.ok((page.match(/<figure\b/g) || []).length >= episode.minFigures, episode.id);
+    assert.ok(episode.integratedTickets.every(ticket => page.includes(`№${ticket}`)), episode.id);
+  }
+  const renderer = readFileSync("site/assets/pages/episode.mjs", "utf8");
+  assert.ok(renderer.includes('!showFilm && (chosen?.id === "plain" || (isText && !editions.length))'));
+  assert.ok(renderer.includes('${lesson.before}${lesson.after}'));
+  assert.ok(renderer.includes('class="lesson-appendix"'));
 });
