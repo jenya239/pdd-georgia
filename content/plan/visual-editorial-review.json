@@ -2,7 +2,7 @@
   "schema_version": 1,
   "standard": "docs/visual-course-editorial-standard.md",
   "source_of_truth": "content/ontology/",
-  "notes": "A curated, not exhaustive, ticket review plan. Assignment always comes from World.deriveAssignment(), never this file.",
+  "notes": "A curated, not exhaustive, ticket review plan. Assignment always comes from World.deriveAssignment(), never this file. The episodes with status narrative_revised have natural prose and official case analysis, but some older switchable figures remain and full build/e2e validation is pending.",
   "episodes": [
     {
       "id": "ep01",
@@ -55,76 +55,82 @@
     },
     {
       "id": "ep04",
-      "status": "planned",
+      "status": "narrative_revised",
       "published": "site/lessons/ep04-plain.html",
       "minFigures": 7,
       "requiredNormLinks": [
         "norm/st5-p86.html",
         "norm/st39-p3.html"
       ],
-      "integratedTickets": [],
-      "candidateTickets": [
+      "integratedTickets": [
         20,
         422,
         515
-      ]
+      ],
+      "candidateTickets": []
     },
     {
       "id": "ep05",
-      "status": "planned",
+      "status": "narrative_revised",
       "published": "site/lessons/ep05-plain.html",
       "minFigures": 3,
       "requiredNormLinks": [
         "norm/st5-p61.html",
         "norm/st24-p5.html"
       ],
-      "integratedTickets": [],
+      "integratedTickets": [
+        811,
+        941,
+        942
+      ],
       "candidateTickets": []
     },
     {
       "id": "ep06",
-      "status": "planned",
+      "status": "narrative_revised",
       "published": "site/lessons/ep06-plain.html",
       "minFigures": 5,
       "requiredNormLinks": [
         "norm/st5-p73.html",
         "norm/st5-p42.html"
       ],
-      "integratedTickets": [],
-      "candidateTickets": [
+      "integratedTickets": [
         47,
-        53
-      ]
+        53,
+        921,
+        922
+      ],
+      "candidateTickets": []
     },
     {
       "id": "ep07",
-      "status": "planned",
+      "status": "narrative_revised",
       "published": "site/lessons/ep07.html",
       "minFigures": 1,
       "requiredNormLinks": [
         "norm/st5-p11.html",
         "norm/st5-p26.html"
       ],
-      "integratedTickets": [],
-      "candidateTickets": [
+      "integratedTickets": [
         886,
         356
-      ]
+      ],
+      "candidateTickets": []
     },
     {
       "id": "ep08",
-      "status": "planned",
+      "status": "narrative_revised",
       "published": "site/lessons/ep08.html",
       "minFigures": 1,
       "requiredNormLinks": [
         "norm/st5-p14.html",
         "norm/st5-p84.html"
       ],
-      "integratedTickets": [],
-      "candidateTickets": [
+      "integratedTickets": [
         879,
         889
-      ]
+      ],
+      "candidateTickets": []
     }
   ]
 }
