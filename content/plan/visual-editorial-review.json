@@ -36,7 +36,7 @@
       "id": "ep03",
       "status": "rewritten",
       "published": "site/lessons/ep03-plain.html",
-      "minFigures": 6,
+      "minFigures": 9,
       "requiredNormLinks": [
         "norm/st5-p13.html",
         "norm/st5-p37.html",
@@ -51,7 +51,8 @@
       "candidateTickets": [
         1,
         2
-      ]
+      ],
+      "reviewNote": "Integrated main-road story with visual treatment of bend and adjacent territory; 9 illustrated situations; featured official tickets 54, 81 and 503."
     },
     {
       "id": "ep04",
