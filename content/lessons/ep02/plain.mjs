@@ -25,7 +25,8 @@ function roadScene(state = "road") {
   const kind = state in captions ? state : "road";
   const selected = svg.replace(/<g class="layer (is-[a-z]+)">/g, (_match, key) =>
     `<g class="layer ${key}" style="display:${key === "is-" + kind ? "inline" : "none"}">`);
-  return `${selected}<p class="figcap">${captions[kind]}</p>`;
+  const scoped = selected.replaceAll("ep02-hatch", `ep02-hatch-${kind}`).replaceAll("ep02-go", `ep02-go-${kind}`);
+  return `${scoped}<p class="figcap">${captions[kind]}</p>`;
 }
 
 export function render() {
