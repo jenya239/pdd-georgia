@@ -20,7 +20,7 @@
       "id": "ep02",
       "status": "rewritten",
       "published": "site/lessons/ep02-plain.html",
-      "minFigures": 5,
+      "minFigures": 7,
       "requiredNormLinks": [
         "norm/st5-p12.html",
         "norm/st5-p9.html",
@@ -30,7 +30,8 @@
         390,
         391
       ],
-      "candidateTickets": []
+      "candidateTickets": [],
+      "formatMigrated": true
     },
     {
       "id": "ep03",
