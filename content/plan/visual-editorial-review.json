@@ -72,7 +72,8 @@
         422,
         515
       ],
-      "candidateTickets": []
+      "candidateTickets": [],
+      "formatMigrated": true
     },
     {
       "id": "ep05",
