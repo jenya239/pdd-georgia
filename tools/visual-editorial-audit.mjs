@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadWorld } from "./load-ontology.mjs";
+import { inspectVisualHtml } from "./editorial/visual-html-check.mjs";
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (root, rel) => readFileSync(path.join(root, rel), "utf8");
@@ -34,6 +35,8 @@ export function auditVisualEditorial(root = defaultRoot, world = loadWorld(root)
       continue;
     }
     const html = read(root, item.published);
+    const structural = inspectVisualHtml(html, { id: item.id, siteRoot: path.join(root, "site"), rewritten: item.status === "rewritten" });
+    problems.push(...structural.problems);
     if (figures(html) < item.minFigures) {
       problems.push(`${item.id}: ${figures(html)} figures, expected at least ${item.minFigures}`);
     }
@@ -49,6 +52,7 @@ export function auditVisualEditorial(root = defaultRoot, world = loadWorld(root)
       if (!hrefs.includes(required)) problems.push(`${item.id}: norm citation not shown ${required}`);
     }
     for (const ticket of [...item.integratedTickets, ...item.candidateTickets]) {
+      if (!world.questions.has(ticket)) problems.push(`${item.id}: unknown official ticket ${ticket}`);
       if (assigned[ticket] !== item.id) {
         problems.push(`${item.id}: ticket ${ticket} derived assignment is ${assigned[ticket] ?? "blocked/unassigned"}`);
       }
