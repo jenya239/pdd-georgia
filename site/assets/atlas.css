@@ -69,3 +69,13 @@
 .lessonpage .lq{margin:18px 0;padding:7px 0 7px 14px;line-height:1.55}
 .lessonpage .lesson li{margin:0 0 .45em}
 @media (max-width:640px){.atlas{padding-top:18px}.lessonpage .lesson h3{font-size:18px}.atlas #stage .reading{font-size:16px}.atlas #stage .qtext{line-height:1.36}}
+
+/* Illustrated longform: reading first, reference material and exercises only on request. */
+.lessonpage .visuallesson figure svg{display:block;width:100%;max-width:100%;height:auto}
+.lessonpage .visuallesson figure{margin:24px 0 20px}
+.lessonpage .visuallesson figcaption{font-size:13px;line-height:1.5;color:var(--mut);margin-top:8px}
+.lessonpage .visuallesson >p{max-width:66ch}
+.lessonpage details.lesson-appendix{border-top:1px solid var(--line);margin:44px 0 18px;padding:10px 0 0}
+.lessonpage details.lesson-appendix >summary{cursor:pointer;list-style:revert;padding:8px 0 14px;font-size:15px;font-weight:600}
+.lessonpage details.lesson-appendix[open] >summary{margin-bottom:20px}
+@media(max-width:640px){.lessonpage .visuallesson figure{margin:18px -4px}.lessonpage .visuallesson figcaption{padding:0 4px}}
