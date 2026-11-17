@@ -15,6 +15,7 @@ on:
       - 'web/**'
       - 'tools/visual-editorial-audit.mjs'
       - 'tests/js/visual-editorial.test.mjs'
+      - 'tests/js/lesson-quotes.test.mjs'
       - '.github/workflows/visual-editorial.yml'
   pull_request:
     paths:
@@ -30,6 +31,7 @@ on:
       - 'web/**'
       - 'tools/visual-editorial-audit.mjs'
       - 'tests/js/visual-editorial.test.mjs'
+      - 'tests/js/lesson-quotes.test.mjs'
 jobs:
   editorial:
     runs-on: ubuntu-latest
