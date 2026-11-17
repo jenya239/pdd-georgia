@@ -13,7 +13,7 @@ export function inspectVisualHtml(html, { id = "visual", siteRoot, rewritten = f
   const tagCount = (tag) => (html.match(new RegExp('<' + tag + '\\b', 'g')) || []).length;
   // The lesson renderer places captions in <p class="figcap"> after each figure.
   const figures = tagCount("figure");
-  const externalCaptions = (html.match(/<p\\b[^>]*class=["'][^"']*\\bfigcap\\b[^"']*["']/g) || []).length;
+  const externalCaptions = (html.match(/<p\b[^>]*class=["'][^"']*\bfigcap\b[^"']*["']/g) || []).length;
   const captions = tagCount("figcaption") + externalCaptions;
   const svgs = [...html.matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map(match => match[0]);
 
