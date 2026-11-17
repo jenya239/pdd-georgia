@@ -57,13 +57,14 @@ export function auditVisualEditorial(root = defaultRoot, world = loadWorld(root)
         problems.push(`${item.id}: ticket ${ticket} derived assignment is ${assigned[ticket] ?? "blocked/unassigned"}`);
       }
     }
-    if (item.status !== "rewritten") continue;
-    for (const ticket of item.integratedTickets) {
-      if (!html.includes(`№${ticket}`)) {
-        problems.push(`${item.id}: integrated ticket ${ticket} missing from published narrative`);
+    if (item.status !== "planned") {
+      for (const ticket of item.integratedTickets) {
+        if (!html.includes(`№${ticket}`)) {
+          problems.push(`${item.id}: integrated ticket ${ticket} missing from published narrative`);
+        }
       }
     }
-    if (/<div class="scene">|class="scene-tabs"|type="radio"/.test(html)) {
+    if (item.status === "rewritten" && /<div class="scene">|class="scene-tabs"|type="radio"/.test(html)) {
       problems.push(`${item.id}: interactive scene controls remain in visual article`);
     }
     for (const svg of svgBlocks(html)) {
