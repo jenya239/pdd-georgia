@@ -2,7 +2,7 @@
   "schema_version": 1,
   "standard": "docs/visual-course-editorial-standard.md",
   "source_of_truth": "content/ontology/",
-  "notes": "A curated, not exhaustive, ticket review plan. Assignment always comes from World.deriveAssignment(), never this file. The episodes with status narrative_revised have natural prose and official case analysis, but some older switchable figures remain and full build/e2e validation is pending.",
+  "notes": "All eight episodes have connected narrative prose and static sequential diagrams. The curated official ticket analyses are ontology-assigned; automated structural/citation checks and law quote tests supplement, but do not replace, independent visual and legal review. Last full build validation is checked separately.",
   "episodes": [
     {
       "id": "ep01",
@@ -55,9 +55,9 @@
     },
     {
       "id": "ep04",
-      "status": "narrative_revised",
+      "status": "rewritten",
       "published": "site/lessons/ep04-plain.html",
-      "minFigures": 7,
+      "minFigures": 8,
       "requiredNormLinks": [
         "norm/st5-p86.html",
         "norm/st39-p3.html"
@@ -71,9 +71,9 @@
     },
     {
       "id": "ep05",
-      "status": "narrative_revised",
+      "status": "rewritten",
       "published": "site/lessons/ep05-plain.html",
-      "minFigures": 3,
+      "minFigures": 4,
       "requiredNormLinks": [
         "norm/st5-p61.html",
         "norm/st24-p5.html"
@@ -87,9 +87,9 @@
     },
     {
       "id": "ep06",
-      "status": "narrative_revised",
+      "status": "rewritten",
       "published": "site/lessons/ep06-plain.html",
-      "minFigures": 5,
+      "minFigures": 9,
       "requiredNormLinks": [
         "norm/st5-p73.html",
         "norm/st5-p42.html"
@@ -104,9 +104,9 @@
     },
     {
       "id": "ep07",
-      "status": "narrative_revised",
+      "status": "rewritten",
       "published": "site/lessons/ep07.html",
-      "minFigures": 1,
+      "minFigures": 4,
       "requiredNormLinks": [
         "norm/st5-p11.html",
         "norm/st5-p26.html"
@@ -119,9 +119,9 @@
     },
     {
       "id": "ep08",
-      "status": "narrative_revised",
+      "status": "rewritten",
       "published": "site/lessons/ep08.html",
-      "minFigures": 1,
+      "minFigures": 3,
       "requiredNormLinks": [
         "norm/st5-p14.html",
         "norm/st5-p84.html"
