@@ -6,7 +6,7 @@ import { existsSync } from "node:fs";
 import nodePath from "node:path";
 
 const attributes = (html, name) =>
-  [...html.matchAll(new RegExp('\\b' + name + '=["\\\']([^"\\\']+)["\\\']', 'g'))].map(match => match[1]);
+  [...html.matchAll(new RegExp('(?:^|\\s)' + name + '=["\\\']([^"\\\']+)["\\\']', 'g'))].map(match => match[1]);
 
 export function inspectVisualHtml(html, { id = "visual", siteRoot, rewritten = false } = {}) {
   const problems = [];
@@ -55,10 +55,11 @@ export function inspectVisualHtml(html, { id = "visual", siteRoot, rewritten = f
   if (siteRoot) {
     // Lesson pictures (including <source srcset>) are served relative to the
     // site root, not to the physical directory of the raw lesson fragment.
-    const media = [
-      ...attributes(html, "src"),
-      ...attributes(html, "srcset").flatMap(list => list.split(",").map(item => item.trim().split(/\s+/, 1)[0])),
-    ];
+    const mediaTags = html.match(/<(?:img|source|video|audio)\b[^>]*>/g) ?? [];
+    const media = mediaTags.flatMap(tag => [
+      ...attributes(tag, "src"),
+      ...attributes(tag, "srcset").flatMap(list => list.split(",").map(item => item.trim().split(/\s+/, 1)[0])),
+    ]);
     for (const url of media) {
       if (!url || /^(?:https?:|data:|blob:|\/\/|#)/i.test(url)) continue;
       const target = url.split(/[?#]/, 1)[0];
