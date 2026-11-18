@@ -79,3 +79,9 @@
 .lessonpage details.lesson-appendix >summary{cursor:pointer;list-style:revert;padding:8px 0 14px;font-size:15px;font-weight:600}
 .lessonpage details.lesson-appendix[open] >summary{margin-bottom:20px}
 @media(max-width:640px){.lessonpage .visuallesson figure{margin:18px -4px}.lessonpage .visuallesson figcaption{padding:0 4px}}
+
+/* The end-of-lesson recap is deliberately the *only* compact rule overview. */
+.lessonpage .visuallesson .recap-figure{margin:36px 0 22px;max-width:760px}
+.lessonpage .visuallesson .recap-figure picture,.lessonpage .visuallesson .recap-figure img{display:block;width:100%;height:auto;max-width:760px}
+.lessonpage .visuallesson .recap-figure figcaption{font-size:13px;line-height:1.5;max-width:68ch}
+@media(max-width:640px){.lessonpage .visuallesson .recap-figure{margin:28px 0 20px}}
