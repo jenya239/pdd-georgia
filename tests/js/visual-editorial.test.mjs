@@ -65,19 +65,19 @@ test("every released episode has a continuous visual-reading edition", () => {
   assert.ok(renderer.includes('class="lesson-appendix"'));
 });
 
-test("episode 3 ends with a legible responsive synthesis of the seven rule decisions", () => {
+test("episode 3 ends with a legible responsive synthesis of the eight rule decisions", () => {
   const html = readFileSync("site/lessons/ep03-plain.html", "utf8");
   const tail = html.slice(html.indexOf("<!--AFTER-TICKETS-->"));
   assert.ok(tail.includes('data-editorial-role="recap"'));
   assert.match(tail, /<picture>[\s\S]*?<source[^>]+ep03-recap-mobile\.svg[\s\S]*?<img[^>]+ep03-recap\.svg/);
   assert.ok(tail.indexOf('data-editorial-role="recap"') > tail.indexOf("Перед перекрёстком легко"));
   for (const [path, width, phrases] of [
-    ["site/assets/ep03-recap.svg", 760, ["Сначала определи место", "Если дороги равнозначны"]],
-    ["site/assets/ep03-recap-mobile.svg", 374, ["Если покрытие не видно", "Если главная поворачивает"]],
+    ["site/assets/ep03-recap.svg", 760, ["Сначала определи место", "Если дороги равнозначны", "Остановка и стоянка"]],
+    ["site/assets/ep03-recap-mobile.svg", 374, ["Если покрытие не видно", "Если главная поворачивает", "Остановка и стоянка"]],
   ]) {
     const svg = readFileSync(path, "utf8");
     assert.ok(svg.includes(`viewBox="0 0 ${width} `), path);
-    assert.equal((svg.match(/<g>\s*<rect /g) || []).length, 7, path);
+    assert.equal((svg.match(/<g>\s*<rect /g) || []).length, 8, path);
     for (const phrase of phrases) assert.ok(svg.includes(phrase), path);
     const fonts = [...svg.matchAll(/font-size="([\d.]+)"/g)].map(x => Number(x[1]));
     assert.ok(fonts.every(n => n >= 13), path);
