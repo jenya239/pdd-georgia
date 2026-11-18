@@ -53,6 +53,28 @@ export function inspectVisualHtml(html, { id = "visual", siteRoot, rewritten = f
   // The generated pages treat links to norm/ and practice.html as site-root-relative.
   // Relative links are checked against site/, not against site/lessons/.
   if (siteRoot) {
+    // Lesson pictures (including <source srcset>) are served relative to the
+    // site root, not to the physical directory of the raw lesson fragment.
+    const media = [
+      ...attributes(html, "src"),
+      ...attributes(html, "srcset").flatMap(list => list.split(",").map(item => item.trim().split(/\s+/, 1)[0])),
+    ];
+    for (const url of media) {
+      if (!url || /^(?:https?:|data:|blob:|\/\/|#)/i.test(url)) continue;
+      const target = url.split(/[?#]/, 1)[0];
+      if (!target || target.startsWith("/") || target.startsWith("../")) {
+        problems.push(`${id}: unsafe media path ${url}`);
+        continue;
+      }
+      if (!existsSync(nodePath.join(siteRoot, target))) {
+        problems.push(`${id}: missing media asset ${url}`);
+      }
+    }
+    for (const img of html.match(/<img\b[^>]*>/g) ?? []) {
+      if (!/\balt=["'][^"']+["']/.test(img)) {
+        problems.push(`${id}: instructional img lacks meaningful alt text`);
+      }
+    }
     for (const url of attributes(html, "href")) {
       if (/^(?:https?:|mailto:|tel:|\/\/|#)/i.test(url)) continue;
       const target = url.split(/[?#]/, 1)[0];
