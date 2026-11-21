@@ -38,6 +38,9 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
   const kindLine = `<div class="small mut"><a href="course.html">Курс</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
+  const trainer = r.id === "ep03"
+    ? `<p class="small"><a href="intersection.html?topic=ep03">Тренажёр: два автомобиля на перекрёстке</a>. Отдельное упражнение, не часть текста выпуска.</p>`
+    : "";
   const filmNote = r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : "";
   const ticketsFilm = r.tickets_video
     ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>
@@ -48,6 +51,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   const visualArticle = !showFilm && (chosen?.id === "plain" || (isText && !editions.length));
   const visualMarkup = visualArticle ? `${kindLine}<h1>${esc(r.title)}</h1>
    ${editionBar}
+   ${trainer}
    <article class="lesson visuallesson" id="lb">${lesson.before}${lesson.after}</article>
    <details class="lesson-appendix"><summary>Нормы, билеты и самопроверка</summary>
      ${lawPart}${ticketsFilm}
@@ -57,6 +61,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   m.innerHTML = visualArticle ? visualMarkup : showFilm
     ? `${kindLine}<h1>${esc(r.title)}</h1>
    ${editionBar}
+   ${trainer}
    <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
    ${filmNote}
    <p class="small mut">Снятый ролик.</p>

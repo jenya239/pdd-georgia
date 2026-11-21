@@ -21,6 +21,7 @@ const SAMPLES = {
   theme: "dark",
   notes: { 5: { x: "Помеха справа — только на равнозначных", t: 31 }, "o-ep05-01": { x: "своя", t: 4 } },
   session: { ids: [5, 7], i: 1, ok: 1, bad: 0, held: false },
+  intersection: { version: 1, answered: 2, firstTry: 1, concepts: { right: { seen: 1, firstTry: 0, missed: 1 } } },
 };
 
 function files(dir, out = []) {

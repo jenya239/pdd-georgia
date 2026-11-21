@@ -24,6 +24,7 @@ export type LearnerState = {
   theme?: string;
   notes?: Record<string, Note>;
   session?: { ids: (string | number)[]; i: number; ok: number; bad: number; held: boolean };
+  intersection?: { version: 1; answered: number; firstTry: number; concepts: Record<string, unknown> };
 };
 
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
@@ -60,7 +61,15 @@ const CLEAN: Record<string, (v: unknown) => unknown> = {
   theme: v => (typeof v === "string" && THEMES.includes(v) ? v : undefined),
   notes: cleanNotes,
   session: cleanSession,
+  intersection: cleanIntersection,
 };
+
+/** Trainer counts stay out of the ticket journal. A bad or foreign shape is dropped, not repaired. */
+function cleanIntersection(v: unknown) {
+  if (!isObj(v) || v.version !== 1) return undefined;
+  if (typeof v.answered !== "number" || typeof v.firstTry !== "number" || !isObj(v.concepts)) return undefined;
+  return { version: 1 as const, answered: v.answered, firstTry: v.firstTry, concepts: v.concepts };
+}
 
 export function cleanState(data: Record<string, unknown>) {
   const out: Record<string, unknown> = {};
@@ -123,6 +132,8 @@ export function mergeState(current: LearnerState, incoming: LearnerState): Learn
   if (theme != null) out.theme = theme;
   const session = current.session ?? incoming.session;
   if (session) out.session = session;
+  const intersection = current.intersection ?? incoming.intersection;
+  if (intersection) out.intersection = intersection;
   return out;
 }
 

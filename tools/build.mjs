@@ -115,6 +115,9 @@ export function buildSite() {
   for (const [name, text] of Object.entries(domainFiles()).sort(([left], [right]) => left < right ? -1 : 1)) {
     files.set(`assets/domain/${name}`, text);
   }
+  for (const [name, text] of Object.entries(intersectionFiles()).sort(([left], [right]) => left < right ? -1 : 1)) {
+    files.set(`assets/intersection/${name}`, text);
+  }
   files.set(".nojekyll", "");
   return { files, copies: copyMap(episodes, records, bundle.raw, normList) };
 }
@@ -274,6 +277,14 @@ function domainFiles() {
   const run = spawnSync(process.execPath, ["tools/emit-domain.mjs"], { cwd: root, encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
   if (run.status !== 0) throw new Error(run.stderr || "emit-domain failed");
   return JSON.parse(run.stdout);
+}
+
+function intersectionFiles() {
+  const run = spawnSync(process.execPath, ["tools/emit-intersection.mjs"], { cwd: root, encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
+  if (run.status !== 0) throw new Error(run.stderr || "emit-intersection failed");
+  const files = JSON.parse(run.stdout);
+  if (!files["solver.mjs"]) throw new Error("intersection emit did not produce solver.mjs");
+  return files;
 }
 
 function loadBreakdowns() {
