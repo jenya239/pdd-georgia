@@ -278,7 +278,7 @@
       "expected": {
         "kind": "legal-review-required",
         "winner": null,
-        "note": "Sign directions, main-road group and turning maneuvers must be checked before a vehicle moves"
+        "note": "Solver intersection-0.1.0 returns unsupported/unverified-priority for a west-north main. The picture shows «Не определено» and does not move a car."
       },
       "legalIds": [
         "st36-p4-b",

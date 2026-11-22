@@ -1,0 +1,19 @@
+{
+  "picture": {
+    "renderer": "svg",
+    "library": "@resvg/resvg-js 2.6.2",
+    "fonts": "Noto Sans Regular and Bold, /usr/share/fonts/truetype/noto",
+    "license": "geometry and drawings are original project code"
+  },
+  "voice": {
+    "engine": "edge-tts",
+    "version": "7.3.1",
+    "voice": "ru-RU-SvetlanaNeural",
+    "rate": "+10%",
+    "pitch": "-4Hz",
+    "key": null,
+    "listen": "2026-11-23 owner, no remarks"
+  },
+  "music": null,
+  "publishedEp03": "content/media/ep03.mp4 is not an input and is not replaced"
+}

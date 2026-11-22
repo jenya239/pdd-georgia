@@ -1,0 +1,310 @@
+{
+  "edgeTts": "7.3.1",
+  "presets": [
+    {
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz"
+    },
+    {
+      "voice": "ru-RU-DmitryNeural",
+      "rate": "+0%",
+      "pitch": "-4Hz"
+    }
+  ],
+  "minBytes": 1000,
+  "attempts": 20,
+  "note": "ru-RU-DmitryNeural at +10% returned NoAudioReceived on edge-tts 7.3.1; Svetlana keeps the course rate and pitch.",
+  "phrases": [
+    {
+      "id": "S00.1",
+      "name": "05e066914ed725f8166ae0d6aeabe4d81c58906b59c3ad2b5749b60930a2bf6e.mp3",
+      "bytes": 93888,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S00.2",
+      "name": "3fec7dcb063488cc0e13b1bf2c71bef7ae7940d8ae4b392a6fd71618baa7ee22.mp3",
+      "bytes": 84672,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S01.1",
+      "name": "1782bb4d3753879be271188480b665f365a37d0fc71da2aabef1094bec55872e.mp3",
+      "bytes": 97776,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S01.2",
+      "name": "94e3f420757f0713580236b16544f3acfcb5fa6a65e6a77967d3e7f1871bb778.mp3",
+      "bytes": 88704,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S02.1",
+      "name": "77e0f6e9c5120927c4e74e0b764cf0367331d4ce49bdabad8b7ceb2cc5b8baef.mp3",
+      "bytes": 94176,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S02.2",
+      "name": "1fda39d31a0cb857c32febc4e7ff4dbf900c73276981513836c280881c254935.mp3",
+      "bytes": 124128,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S03.1",
+      "name": "01ad0a25f62ba6d3403c8a3fe37cf43cce191d219500a907d009558efc82a27c.mp3",
+      "bytes": 83376,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S03.2",
+      "name": "17bc6112cd5e89d25062f76102fbb8eda85394ab3e36bd8f42cdda2c2a17499f.mp3",
+      "bytes": 117936,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S04.1",
+      "name": "32ddf4735ff4a298b1272a0db6a8f717c8c9284bb124f5becba39a9880e42180.mp3",
+      "bytes": 92304,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S04.2",
+      "name": "1210d382ece7d255e3fa40fda4b74688a5c648452f23e87268f514b6fda0716c.mp3",
+      "bytes": 126144,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S05.1",
+      "name": "3787ebe39ff6ed0014342fe2e7d2eb22bda06542a0c8aef9f846e4bbfa418bdd.mp3",
+      "bytes": 101376,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S05.2",
+      "name": "d76c26d3298997f7a39963b47e500738af3ca4d3fc2f857df717d6953866e38d.mp3",
+      "bytes": 96480,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S05.3",
+      "name": "451124f67cd9fc8d1e402b58be6fa201f7797f4422bcef3763aac3f6b76457a4.mp3",
+      "bytes": 88704,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S06.1",
+      "name": "d48f7dd1ba967d83a472f994824765f88c5b49b0ebc8e4cc456cf6938e6e1354.mp3",
+      "bytes": 112464,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S06.2",
+      "name": "7586fa13c1557e8dc9bc2c303987d2fe906504c9825ca246cb252ab806efbeb3.mp3",
+      "bytes": 73872,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S06.3",
+      "name": "22d212277c1c1332633ac46870a27d876c11f5fec8e35696fe42b5a3dbd5c435.mp3",
+      "bytes": 80064,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S07.1",
+      "name": "271eabd56097aa918a2a055e91e3312a3c5d734b3a2e08c92b0187ab3ce9ac22.mp3",
+      "bytes": 86112,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S07.2",
+      "name": "7c294e31c581f0b2e845e1286d0a6e45f4660860e4dfadb2a01e1f3d70164ebd.mp3",
+      "bytes": 109728,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S07.3",
+      "name": "67394bbd80226e778dd539cad9039a24e461d64e20ce800cbd1f5522faf9d047.mp3",
+      "bytes": 90720,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S08.1",
+      "name": "26cea2178ee0be8f42158e6b49fc4cb6d21eebebcf0cf02edbbb5009ff29e894.mp3",
+      "bytes": 86688,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S08.2",
+      "name": "dea473311737a52cba81bcd894c408e66fd3db2a8b8bc6fe916dbb3804e7b856.mp3",
+      "bytes": 105408,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S09.1",
+      "name": "71e7b3f0d066e0f38b91376e05ebe81e079b6587168a2d0d26db300ec7bfce84.mp3",
+      "bytes": 72288,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S09.2",
+      "name": "ad72dee6b6ab9e0ee57b4276255db2b99096b879943dc161ce70a741924780ad.mp3",
+      "bytes": 132048,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S10.1",
+      "name": "57c647a06a24c4edc248cd54787152ea6f5cdc71ce3eb1b46cfaad32672467bf.mp3",
+      "bytes": 103824,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S10.2",
+      "name": "2a051af5651f8b2e7a1e12db13bea01eae0629a382ae3d21b4f626aa6f6a0409.mp3",
+      "bytes": 122688,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S10.3",
+      "name": "f85ae070a7a04607022ad1d32ab940bdca2c8e5b1b76c40a8e77343833c101a2.mp3",
+      "bytes": 102384,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S11.1",
+      "name": "bc072058ca20b9ad5c7bf3722edc86077a687b32586d09c38071832f67c8f7a0.mp3",
+      "bytes": 108576,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S11.2",
+      "name": "d004ef6e864c35c50d0ce8064bd2d16948ba15fc1ceaffbbc9549c42214b9823.mp3",
+      "bytes": 109584,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    },
+    {
+      "id": "S11.3",
+      "name": "c4501e246b13e829be47179bde89e1538bf0e7128d0228557bb3481c6f60c920.mp3",
+      "bytes": 100080,
+      "cached": false,
+      "voice": "ru-RU-SvetlanaNeural",
+      "rate": "+10%",
+      "pitch": "-4Hz",
+      "version": "7.3.1"
+    }
+  ]
+}

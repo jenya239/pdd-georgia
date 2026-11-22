@@ -39,7 +39,9 @@ function assertData(d) {
   const words = d.scenes.flatMap(s=>s.voice).join(" ").trim().split(/\s+/).length;
   assert.ok(words>=700 && words<=1400,`Unexpected narration length ${words}`);
   const snow = d.scenes.find(x=>x.world==="A5");
-  assert.ok(snow && /не будем рисовать победителя/.test(snow.voice.join(" ")));
+  const snowVoice = snow?.voice.join(" ") ?? "";
+  assert.ok(/нельзя назвать того, кто проедет первым/.test(snowVoice));
+  assert.ok(!/рисовать победителя|стрелкой на экране/.test(snowVoice));
   const incident = d.scenes.find(x=>x.mode==="documented-case");
   assert.ok(incident?.source_url?.includes("ntsb.gov/"));
   assert.ok(!d.scenes.some(s=>s.voice.some(t=>/мы сейчас рассмотрим|переходим к следующему слайду|давайте разберём пункт/.test(t))));

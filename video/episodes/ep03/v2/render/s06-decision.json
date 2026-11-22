@@ -1,0 +1,21 @@
+{
+  "solver": "intersection-0.1.0",
+  "scene": "S06",
+  "world": "B1",
+  "asked": "west and north are main, east and south yield; blue from W, red from N, gray from E",
+  "straight": {
+    "status": "unsupported",
+    "reason": "unverified-priority",
+    "admissible": [],
+    "relations": [],
+    "conflicts": []
+  },
+  "blueLeft": {
+    "status": "unsupported",
+    "reason": "unverified-priority",
+    "admissible": []
+  },
+  "shown": "Не определено",
+  "motion": "none",
+  "note": "Прямой проезд и левый поворот синей заданы только как вопрос. На рисунке стрелок манёвра нет. Отказ происходит на схеме приоритета, до разбора манёвра. Очередь не назначается."
+}
