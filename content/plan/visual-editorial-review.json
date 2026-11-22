@@ -22,7 +22,7 @@
       "id": "ep02",
       "status": "rewritten",
       "published": "site/lessons/ep02-plain.html",
-      "minFigures": 7,
+      "minFigures": 8,
       "requiredNormLinks": [
         "norm/st5-p12.html",
         "norm/st5-p9.html",
@@ -33,7 +33,8 @@
         391
       ],
       "candidateTickets": [],
-      "formatMigrated": true
+      "formatMigrated": true,
+      "reviewNote": "Rebuilt continuous road-space narrative: road vs carriageway, painted line vs constructed median, unmarked lanes, shoulder and cycle facilities, rural walking and bicycle-leading exceptions; 7 preserved educational scenes plus a responsive final source map (desktop/mobile). Tickets #390 and #391 and all law quotations retained. Georgia 2025 pedestrian fatalities: 164 (35% of total), sourced to approved 2026–2030 strategy, explicitly not attributed to shoulder use or errors under this rule."
     },
     {
       "id": "ep03",
