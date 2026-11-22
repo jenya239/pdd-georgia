@@ -1,0 +1,21 @@
+<svg viewBox="0 0 700 265" role="img" aria-label="Пять приложений к закону: знаки, разметка, опознавательные обозначения, светофоры и баллы" xmlns="http://www.w3.org/2000/svg">
+<rect width="700" height="265" rx="14" fill="#e4ebe4"/>
+<text x="30" y="37" fill="#314d47" font-size="21" font-weight="650">Пять частей одного закона</text>
+<g font-size="15" text-anchor="middle" fill="#28443d">
+<rect x="25" y="60" width="204" height="86" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="2"/>
+<path d="M63 81l21 38H42Z" fill="#fff" stroke="#c83e36" stroke-width="5" stroke-linejoin="round"/>
+<text x="153" y="95" font-weight="650">Приложение 1</text><text x="153" y="119">Знаки</text>
+<rect x="248" y="60" width="204" height="86" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="2"/>
+<path d="M273 86h64" stroke="#44575a" stroke-width="8" stroke-dasharray="13 10"/>
+<text x="377" y="95" font-weight="650">Приложение 2</text><text x="377" y="119">Разметка</text>
+<rect x="471" y="60" width="204" height="86" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="2"/>
+<rect x="495" y="91" width="50" height="24" rx="6" fill="#6f9fb2"/><circle cx="505" cy="118" r="5" fill="#344e54"/><circle cx="534" cy="118" r="5" fill="#344e54"/>
+<text x="607" y="95" font-weight="650">Приложение 3</text><text x="607" y="119" font-size="13">Обозначения ТС</text>
+<rect x="136" y="160" width="204" height="84" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="2"/>
+<rect x="167" y="172" width="25" height="60" rx="5" fill="#3e5359"/>
+<circle cx="179" cy="184" r="7" fill="#c9574d"/><circle cx="179" cy="202" r="7" fill="#e9be59"/><circle cx="179" cy="220" r="7" fill="#5ea47b"/>
+<text x="258" y="198" font-weight="650">Приложение 4</text><text x="258" y="222">Светофоры</text>
+<rect x="360" y="160" width="204" height="84" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="2"/>
+<rect x="382" y="180" width="40" height="42" rx="7" fill="#dfebd7"/><text x="402" y="207" font-size="21" font-weight="750">−</text>
+<text x="483" y="198" font-weight="650">Приложение 5</text><text x="483" y="222">Баллы</text>
+</g></svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374 556" role="img" aria-label="Пять приложений дорожного закона, отдельной строкой каждое: знаки, разметка, опознавательные обозначения, светофоры, баллы">
+<rect width="374" height="556" rx="14" fill="#e4ebe4"/>
+<text x="20" y="36" fill="#314d47" font-size="22" font-family="sans-serif" font-weight="700">Пять частей одного закона</text>
+<g font-family="sans-serif">
+<rect x="14" y="54" width="346" height="88" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="1.5"/>
+<rect x="29" y="71" width="55" height="55" rx="10" fill="#f0f6ed"/><path d="M47 83 67 118H27Z" fill="#fff" stroke="#c83e36" stroke-width="4" transform="translate(8 0)"/>
+<text x="102" y="89" fill="#3c5c4a" font-size="15">Приложение 1</text><text x="102" y="117" fill="#233f34" font-size="21" font-weight="700">Дорожные знаки</text>
+<rect x="14" y="151" width="346" height="88" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="1.5"/>
+<rect x="29" y="168" width="55" height="55" rx="10" fill="#f0f6ed"/><path d="M41 195h32" stroke="#49575b" stroke-width="7" stroke-dasharray="12 7"/>
+<text x="102" y="186" fill="#3c5c4a" font-size="15">Приложение 2</text><text x="102" y="214" fill="#233f34" font-size="21" font-weight="700">Разметка</text>
+<rect x="14" y="248" width="346" height="88" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="1.5"/>
+<rect x="29" y="265" width="55" height="55" rx="10" fill="#f0f6ed"/><rect x="37" y="282" width="41" height="22" rx="5" fill="#78a9bc"/><circle cx="45" cy="306" r="5" fill="#345158"/><circle cx="68" cy="306" r="5" fill="#345158"/>
+<text x="102" y="283" fill="#3c5c4a" font-size="15">Приложение 3</text><text x="102" y="307" fill="#233f34" font-size="19" font-weight="700">Опознавательные</text><text x="102" y="327" fill="#233f34" font-size="16">обозначения ТС</text>
+<rect x="14" y="345" width="346" height="88" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="1.5"/>
+<rect x="29" y="362" width="55" height="55" rx="10" fill="#f0f6ed"/><rect x="45" y="368" width="24" height="46" rx="5" fill="#3e5359"/><circle cx="57" cy="379" r="6" fill="#d65a4d"/><circle cx="57" cy="390" r="6" fill="#edbf50"/><circle cx="57" cy="402" r="6" fill="#5fa77d"/>
+<text x="102" y="380" fill="#3c5c4a" font-size="15">Приложение 4</text><text x="102" y="408" fill="#233f34" font-size="21" font-weight="700">Светофоры</text>
+<rect x="14" y="442" width="346" height="88" rx="12" fill="#fff" stroke="#b8cec2" stroke-width="1.5"/>
+<rect x="29" y="459" width="55" height="55" rx="10" fill="#f0f6ed"/><text x="56" y="497" font-size="31" font-weight="700" text-anchor="middle" fill="#397154">−</text>
+<text x="102" y="477" fill="#3c5c4a" font-size="15">Приложение 5</text><text x="102" y="505" fill="#233f34" font-size="21" font-weight="700">Баллы</text>
+</g></svg>

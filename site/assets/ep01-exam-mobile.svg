@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374 494" role="img" aria-label="Экзамен B/B1: в старой редакции 27 правильных из 30, после поправки 20 мая 2026 года — 25 из 30; длительность 30 минут">
+<rect width="374" height="494" rx="14" fill="#e5ece6"/>
+<text x="20" y="36" fill="#304d43" font-family="sans-serif" font-size="22" font-weight="700">Теория: категория B/B1</text>
+<rect x="14" y="53" width="346" height="150" rx="13" fill="#fff" stroke="#c4d1cb" stroke-width="2"/>
+<text x="35" y="87" font-family="sans-serif" fill="#6d777a" font-size="19">Раньше</text>
+<text x="35" y="163" font-family="sans-serif" fill="#59636b" font-size="64" font-weight="700">27</text>
+<text x="149" y="158" font-family="sans-serif" fill="#68777a" font-size="31">из 30</text>
+<path d="M187 218v34m-10 -11 10 11 10 -11" fill="none" stroke="#728d7e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="187" y="269" font-family="sans-serif" text-anchor="middle" fill="#546a5b" font-size="17">Поправка от 20 мая 2026 года</text>
+<rect x="14" y="286" width="346" height="150" rx="13" fill="#f8fff8" stroke="#7ea58a" stroke-width="2"/>
+<text x="35" y="322" font-family="sans-serif" fill="#3f6c4e" font-size="19">По действующей редакции</text>
+<text x="35" y="394" font-family="sans-serif" fill="#2d8050" font-size="64" font-weight="700">25</text>
+<text x="149" y="389" font-family="sans-serif" fill="#4c6c55" font-size="31">из 30</text>
+<text x="187" y="469" font-family="sans-serif" text-anchor="middle" fill="#4b6157" font-size="18">Время экзамена: 30 минут</text>
+</svg>

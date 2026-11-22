@@ -21,6 +21,7 @@ on:
       - 'tools/visual-editorial-audit.mjs'
       - 'tools/editorial/**'
       - 'tests/js/visual-editorial.test.mjs'
+      - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
       - '.github/workflows/visual-editorial.yml'
   pull_request:
@@ -43,6 +44,7 @@ on:
       - 'tools/visual-editorial-audit.mjs'
       - 'tools/editorial/**'
       - 'tests/js/visual-editorial.test.mjs'
+      - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
 jobs:
   editorial:
@@ -55,6 +57,8 @@ jobs:
           node-version: '24'
       - name: Verify visual lesson law links, accessibility, and ticket ontology
         run: node tools/visual-editorial-audit.mjs
+      - name: Check episode 1 narrative and evidence
+        run: node --test tests/js/ep01-editorial.test.mjs
       - name: Run visual editorial test
         run: node --test tests/js/visual-editorial.test.mjs
       - name: Syntax check browser entrypoints

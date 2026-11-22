@@ -39,14 +39,16 @@ test("episode 2 has a narrative sequence with verified illustrated ticket exampl
     assert.ok(html.includes(`norm/${norm}.html`));
 });
 
-test("first episode follows the illustrated legal-source narrative", () => {
+test("first episode develops one source-checking argument with contextual crash data", () => {
   const html = readFileSync("site/lessons/ep01-plain.html", "utf8");
-  assert.equal((html.match(/<figure\b/g) || []).length, 5);
-  const steps = ["От дорожного знака к закону", "Почему штраф ищут в другом документе",
-    "Как убедиться, что правило ещё действует", "Где установлены правила экзамена"];
+  assert.equal((html.match(/<figure/g) || []).length, 7);
+  const steps = ["Один знак — несколько вопросов", "Правило и наказание — разные сведения",
+    "Правильный источник тоже может устареть", "Почему в старом пособии может быть неверный ответ",
+    "Карта источников"];
   const index = steps.map(s => html.indexOf(s));
   assert.ok(index.every((x, i) => x >= 0 && (i === 0 || x > index[i - 1])));
   assert.ok(html.includes("norm/st2-p1.html") && html.includes("norm/st2-p2.html"));
+  assert.ok(html.includes("890 ДТП") && html.includes("82 человека"));
 });
 
 test("every released episode has a continuous visual-reading edition", () => {
