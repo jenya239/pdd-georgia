@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate_scene_geometry_not_a_verified_legal_solver",
+  "units": "abstract_world_units",
+  "coordinateSystem": {
+    "x": "west_to_east",
+    "y": "south_to_north",
+    "intersection": [
+      0,
+      0
+    ],
+    "axes": {
+      "horizontal": "W-E",
+      "vertical": "S-N"
+    },
+    "camera": "orthographic_top_down_fixed_per_counterfactual",
+    "visibleExtent": [
+      -100,
+      -75,
+      100,
+      75
+    ],
+    "unitsPerRoadHalfWidth": 7
+  },
+  "vehicleTemplates": {
+    "blue": {
+      "id": "blue",
+      "color": "#277fb5",
+      "shape": "compact",
+      "start": {
+        "x": -38,
+        "y": 0,
+        "headingDeg": 0
+      },
+      "maneuver": "straight_east"
+    },
+    "red": {
+      "id": "red",
+      "color": "#ce6356",
+      "shape": "compact",
+      "start": {
+        "x": 0,
+        "y": -38,
+        "headingDeg": 90
+      },
+      "maneuver": "straight_north"
+    }
+  },
+  "geometry": {
+    "cross": {
+      "roads": [
+        {
+          "id": "h",
+          "axis": "x",
+          "extent": [
+            -100,
+            100
+          ],
+          "halfWidth": 7
+        },
+        {
+          "id": "v",
+          "axis": "y",
+          "extent": [
+            -100,
+            100
+          ],
+          "halfWidth": 7
+        }
+      ],
+      "vehicles": [
+        "blue",
+        "red"
+      ],
+      "signalization": "uncontrolled",
+      "separateCarriageways": false
+    },
+    "yard": {
+      "roads": [
+        {
+          "id": "h",
+          "axis": "x",
+          "extent": [
+            -100,
+            100
+          ],
+          "halfWidth": 7
+        },
+        {
+          "id": "v",
+          "axis": "y",
+          "extent": [
+            -100,
+            0
+          ],
+          "halfWidth": 7,
+          "legalType": "adjacent-territory-exit",
+          "context": "court-parking-not-through"
+        }
+      ],
+      "vehicles": [
+        "blue",
+        "red"
+      ],
+      "signalization": "uncontrolled"
+    },
+    "publicT": {
+      "roads": [
+        {
+          "id": "h",
+          "axis": "x",
+          "extent": [
+            -100,
+            100
+          ],
+          "halfWidth": 7
+        },
+        {
+          "id": "v",
+          "axis": "y",
+          "extent": [
+            -100,
+            100
+          ],
+          "halfWidth": 7,
+          "legalType": "public-through-road",
+          "context": "street-continuing-to-residential-network"
+        }
+      ],
+      "vehicles": [
+        "blue",
+        "red"
+      ],
+      "signalization": "uncontrolled"
+    }
+  },
+  "worlds": {
+    "A0": {
+      "geometry": "cross",
+      "surface": {
+        "h": "paved",
+        "v": "dirt",
+        "emphasis": "neutral"
+      },
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "question",
+        "winner": null
+      },
+      "legalIds": [
+        "st5-p37"
+      ]
+    },
+    "A1": {
+      "geometry": "cross",
+      "surface": {
+        "h": "paved",
+        "v": "dirt"
+      },
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "yield-obligation",
+        "yielder": "red",
+        "to": "blue",
+        "basis": "road_surface_priority"
+      },
+      "legalIds": [
+        "st5-p37"
+      ]
+    },
+    "A2": {
+      "geometry": "cross",
+      "surface": {
+        "h": "paved",
+        "v": "dirt",
+        "localPatch": {
+          "target": "v",
+          "immediatelyBeforeIntersection": true,
+          "lengthApprox": 12,
+          "direction": "south_approach"
+        }
+      },
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "yield-obligation",
+        "yielder": "red",
+        "to": "blue",
+        "basis": "unpaved_exit_short_patch_exception"
+      },
+      "legalIds": [
+        "st5-p37"
+      ]
+    },
+    "A3": {
+      "geometry": "cross",
+      "surface": {
+        "h": "paved",
+        "v": "paved"
+      },
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "yield-obligation",
+        "yielder": "blue",
+        "to": "red",
+        "basis": "equal_road_approaching_from_right"
+      },
+      "legalIds": [
+        "st36-p4-v"
+      ]
+    },
+    "A4": {
+      "geometry": "cross",
+      "surface": {
+        "h": "paved",
+        "v": "dirt"
+      },
+      "signs": [
+        {
+          "code": "2.1",
+          "driver": "red",
+          "side": "right",
+          "approxWorldPosition": [
+            8,
+            -18
+          ],
+          "orientation": "verified-facing-red-required"
+        },
+        {
+          "code": "2.3",
+          "driver": "blue",
+          "side": "right",
+          "approxWorldPosition": [
+            -18,
+            -8
+          ],
+          "orientation": "verified-facing-blue-required"
+        }
+      ],
+      "visibility": "normal",
+      "expected": {
+        "kind": "yield-obligation",
+        "yielder": "blue",
+        "to": "red",
+        "basis": "priority_signs_override_surface"
+      },
+      "legalIds": [
+        "sign-2.1",
+        "sign-2.3",
+        "st5-p37"
+      ]
+    },
+    "A5": {
+      "geometry": "cross",
+      "surface": {
+        "h": "unknown",
+        "v": "unknown"
+      },
+      "signs": [],
+      "visibility": "snow-obscures-surface",
+      "expected": {
+        "kind": "underdetermined",
+        "winner": null,
+        "individualDuty": "assume_own_road_secondary_when_surface_indeterminable_without_priority_signs"
+      },
+      "legalIds": [
+        "st36-p8"
+      ]
+    },
+    "B1": {
+      "geometry": "must_be_independently_constructed",
+      "surface": {},
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "legal-review-required",
+        "winner": null,
+        "note": "Sign directions, main-road group and turning maneuvers must be checked before a vehicle moves"
+      },
+      "legalIds": [
+        "st36-p4-b",
+        "st36-p4-g",
+        "st36-p4-v"
+      ]
+    },
+    "C1": {
+      "geometry": "yard",
+      "surface": {
+        "h": "paved",
+        "v": "paved"
+      },
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "yield-obligation",
+        "yielder": "red",
+        "to": "blue",
+        "basis": "exiting_adjacent_territory"
+      },
+      "legalIds": [
+        "st5-p13",
+        "st5-p38",
+        "st36-p7",
+        "st32-p3",
+        "st25-p7"
+      ]
+    },
+    "C2": {
+      "geometry": "publicT",
+      "surface": {
+        "h": "paved",
+        "v": "paved"
+      },
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "yield-obligation",
+        "yielder": "blue",
+        "to": "red",
+        "basis": "equal_public_roads_right_hand"
+      },
+      "legalIds": [
+        "st5-p13",
+        "st36-p4-v"
+      ]
+    },
+    "C3": {
+      "geometry": "separate_static_vignettes",
+      "surface": {},
+      "signs": [],
+      "visibility": "normal",
+      "expected": {
+        "kind": "distinct_stopping_and_parking_restrictions",
+        "winner": null
+      },
+      "legalIds": [
+        "st37-p6-a-v",
+        "st37-p7-g"
+      ]
+    },
+    "D1": {
+      "geometry": "symbolic_abstract_not_crash_reconstruction",
+      "surface": {},
+      "signs": [
+        {
+          "code": "STOP",
+          "jurisdiction": "USA",
+          "note": "Documentary representation, not Georgian sign/legal rule"
+        }
+      ],
+      "visibility": "normal",
+      "expected": {
+        "kind": "documented_incident",
+        "winner": null,
+        "source": "https://www.ntsb.gov/investigations/pages/hwy12mh007.aspx"
+      },
+      "legalIds": []
+    },
+    "OUTRO": {
+      "geometry": "editorial_recaps_only",
+      "surface": {},
+      "signs": [],
+      "visibility": "all",
+      "expected": {
+        "kind": "synthesis_not_new_rule",
+        "winner": null
+      },
+      "legalIds": []
+    }
+  },
+  "transitions": [
+    {
+      "from": "A1",
+      "to": "A2",
+      "singleFactor": "surface.v.localPatch",
+      "unchanged": [
+        "vehicleTemplates",
+        "geometry",
+        "camera",
+        "signs"
+      ],
+      "expectedLegalChange": false
+    },
+    {
+      "from": "A2",
+      "to": "A3",
+      "singleFactor": "surface.v.fullBranchPaved",
+      "unchanged": [
+        "vehicleTemplates",
+        "geometry",
+        "camera",
+        "signs"
+      ],
+      "expectedLegalChange": true
+    },
+    {
+      "from": "A3",
+      "to": "A4",
+      "singleFactor": null,
+      "mustSplitMontageInto": [
+        "revertSurfaceToDirt",
+        "addPrioritySigns"
+      ],
+      "unchanged": [
+        "vehicleTemplates",
+        "geometry",
+        "camera"
+      ],
+      "expectedLegalChange": true
+    },
+    {
+      "from": "A4",
+      "to": "A5",
+      "singleFactor": null,
+      "mustSplitMontageInto": [
+        "removePrioritySigns",
+        "maskAllSurfaceWithSnow"
+      ],
+      "unchanged": [
+        "vehicleTemplates",
+        "geometry",
+        "camera"
+      ],
+      "expectedLegalChange": true
+    },
+    {
+      "from": "C1",
+      "to": "C2",
+      "singleFactor": "legalRoadTypeAndItsThroughStreetContext",
+      "unchanged": [
+        "vehicleTemplates",
+        "camera",
+        "surface"
+      ],
+      "expectedLegalChange": true
+    }
+  ],
+  "testRules": [
+    "No winner when expected.kind is underdetermined/legal-review-required.",
+    "All A worlds share identical vehicle transform and road axes.",
+    "C1/C2 share identical vehicle transform and horizontal road, but legal roadType changes.",
+    "A2 has remaining dirt farther from the crossing, A3 paved full branch.",
+    "Priority signs A4 face their corresponding approaching driver, not spectators.",
+    "Legal status of C1 cannot be inferred from a graphic dead-end alone."
+  ]
+}
