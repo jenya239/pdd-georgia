@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374 597" role="img" aria-label="Пять шагов проверки закона: знак, штраф, баллы, экзамен и официальная редакция Matsne">
+<rect width="374" height="597" rx="14" fill="#e4ebe6"/>
+<text x="18" y="35" font-family="sans-serif" font-size="21" font-weight="700" fill="#294d42">Куда смотреть?</text>
+<g font-family="sans-serif">
+<rect x="14" y="55" width="346" height="90" rx="12" fill="#fff" stroke="#b8cfc3" stroke-width="1.5"/>
+<text x="31" y="88" fill="#315b4a" font-size="19" font-weight="700">Правило, знак, разметка</text><text x="31" y="117" fill="#465f57" font-size="17">Закон «О дорожном движении»</text>
+<rect x="14" y="156" width="346" height="90" rx="12" fill="#fff" stroke="#b8cfc3" stroke-width="1.5"/>
+<text x="31" y="189" fill="#315b4a" font-size="19" font-weight="700">Денежный штраф</text><text x="31" y="214" fill="#465f57" font-size="16">Кодекс об административных</text><text x="31" y="234" fill="#465f57" font-size="16">правонарушениях</text>
+<rect x="14" y="257" width="346" height="90" rx="12" fill="#fff" stroke="#b8cfc3" stroke-width="1.5"/>
+<text x="31" y="290" fill="#315b4a" font-size="19" font-weight="700">Сокращение баллов</text><text x="31" y="318" fill="#465f57" font-size="17">Статья 58 и приложение 5</text>
+<rect x="14" y="358" width="346" height="90" rx="12" fill="#fff" stroke="#b8cfc3" stroke-width="1.5"/>
+<text x="31" y="391" fill="#315b4a" font-size="19" font-weight="700">Теоретический экзамен</text><text x="31" y="419" fill="#465f57" font-size="17">Приказ МВД № 598 и поправки</text>
+<rect x="14" y="459" width="346" height="108" rx="12" fill="#d4e7db" stroke="#91b19e" stroke-width="1.5"/>
+<text x="31" y="492" fill="#28583e" font-size="19" font-weight="700">Какая редакция действует?</text><text x="31" y="520" fill="#3d654f" font-size="17">Официальный Matsne;</text><text x="31" y="544" fill="#3d654f" font-size="17">решающий текст — грузинский</text>
+</g></svg>
