@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374 920" role="img" aria-label="Мобильная памятка по устройству дороги: тротуар, обочина, проезжая часть, линия и разделительная полоса, полосы без разметки, пешеходы за городом">
+<rect width="374" height="920" rx="15" fill="#e6ede6"/>
+<g font-family="Arial, sans-serif">
+<text x="19" y="36" font-size="22" font-weight="700" fill="#29473e">Одна дорога — разные части</text>
+<rect x="14" y="54" width="346" height="174" rx="12" fill="#fff" stroke="#bdcfc5"/>
+<text x="30" y="84" font-size="18" font-weight="700" fill="#2f5748">Тротуар · обочина · проезжая</text>
+<text x="30" y="107" font-size="18" font-weight="700" fill="#2f5748">часть — не одно и то же</text>
+<rect x="32" y="121" width="60" height="60" fill="#e9dbbf"/><rect x="92" y="121" width="32" height="60" fill="#a9b0a6"/>
+<rect x="124" y="121" width="129" height="60" fill="#4f5c63"/><path d="M188 124v54" stroke="#f7efda" stroke-width="3" stroke-dasharray="10 8"/>
+<rect x="253" y="121" width="32" height="60" fill="#a9b0a6"/><rect x="285" y="121" width="60" height="60" fill="#e9dbbf"/>
+<rect x="144" y="141" width="50" height="26" rx="8" fill="#277fb5"/><rect x="197" y="141" width="42" height="26" rx="8" fill="#ce6356"/>
+<text x="64" y="200" font-size="14" text-anchor="middle" fill="#516359">Тротуар</text><text x="108" y="219" font-size="13" text-anchor="middle" fill="#516359">Обочина</text>
+<text x="189" y="200" font-size="14" text-anchor="middle" fill="#516359">Проезжая часть</text>
+<rect x="14" y="239" width="346" height="181" rx="12" fill="#fff" stroke="#bdcfc5"/>
+<text x="30" y="271" font-size="20" font-weight="700" fill="#2f5748">Линия ≠ разделитель</text>
+<rect x="33" y="286" width="130" height="58" rx="4" fill="#515d64"/><path d="M98 290v50" stroke="#f7efda" stroke-width="3"/>
+<rect x="212" y="286" width="129" height="58" rx="4" fill="#515d64"/><rect x="273" y="286" width="7" height="58" fill="#9dbd83"/>
+<text x="98" y="371" font-size="15" text-anchor="middle" fill="#516359">Одна</text><text x="98" y="390" font-size="15" text-anchor="middle" fill="#516359">проезжая часть</text>
+<text x="276" y="371" font-size="15" text-anchor="middle" fill="#516359">Две</text><text x="276" y="390" font-size="15" text-anchor="middle" fill="#516359">проезжие части</text>
+<rect x="14" y="431" width="346" height="129" rx="12" fill="#fff" stroke="#bdcfc5"/>
+<text x="30" y="462" font-size="20" font-weight="700" fill="#2f5748">Полосы бывают без разметки</text>
+<rect x="32" y="480" width="310" height="42" rx="4" fill="#515d64"/>
+<rect x="69" y="489" width="77" height="24" rx="8" fill="#277fb5"/>
+<rect x="228" y="489" width="77" height="24" rx="8" fill="#ce6356"/>
+<text x="30" y="543" font-size="15" fill="#516359">Учитывают ширину и интервалы.</text>
+<rect x="14" y="571" width="346" height="129" rx="12" fill="#fff" stroke="#bdcfc5"/>
+<text x="30" y="602" font-size="20" font-weight="700" fill="#2f5748">Обочина — не полоса объезда</text>
+<rect x="32" y="621" width="310" height="42" rx="4" fill="#515d64"/>
+<rect x="32" y="663" width="310" height="12" fill="#a9b0a6"/>
+<rect x="68" y="628" width="73" height="27" rx="9" fill="#277fb5"/>
+<text x="30" y="690" font-size="15" fill="#516359">Обычный затор — не исключение.</text>
+<rect x="14" y="711" width="346" height="177" rx="12" fill="#fff" stroke="#bdcfc5"/>
+<text x="30" y="743" font-size="20" font-weight="700" fill="#2f5748">За городом без тротуара</text>
+<text x="30" y="771" font-size="17" fill="#516359">Пешеход на обочине</text><text x="30" y="793" font-size="17" fill="#516359">идёт навстречу движению.</text>
+<rect x="32" y="809" width="310" height="43" rx="4" fill="#515d64"/><rect x="32" y="852" width="310" height="11" fill="#a9b0a6"/>
+<rect x="228" y="816" width="73" height="29" rx="9" fill="#ce6356"/>
+<circle cx="91" cy="858" r="6" fill="#293e4b"/>
+<path d="M78 857H48m12-8-12 8 12 8" fill="none" stroke="#35754e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</g></svg>

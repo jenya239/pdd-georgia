@@ -27,18 +27,19 @@ test("episode 3 is a continuous illustrated explanation, not a legacy lesson", (
   assert.ok(script.includes("lesson-appendix"));
 });
 
-test("episode 2 has a narrative sequence with verified illustrated ticket examples", () => {
+test("episode 2 is a continuous road-space narrative with grounded pedestrian evidence", () => {
   const html = readFileSync("site/lessons/ep02-plain.html", "utf8");
-  assert.equal((html.match(/<figure\b/g) || []).length, 7);
-  const moments = ["Дорога шире того места", "Что делает дорогу разделённой",
-    "Полосы, которых не видно", "Как меняется правило для пешехода"];
+  assert.equal((html.match(/<figure\b/g) || []).length, 8);
+  const moments = ["Улица шире проезжей части", "Одна линия меняется на разделитель",
+    "Полосы не исчезают вместе с разметкой", "У края дороги меняется назначение пространства",
+    "Когда тротуар заканчивается", "Одна дорога — несколько разных границ"];
   const positions = moments.map(text => html.indexOf(text));
   assert.ok(positions.every((x, i) => x >= 0 && (i === 0 || x > positions[i - 1])));
   for (const ticket of [390, 391]) assert.ok(html.includes(`№${ticket}`));
-  for (const norm of ["st5-p9", "st5-p12", "st5-p45"])
+  for (const norm of ["st5-p9", "st5-p12", "st5-p45", "st31-p18"])
     assert.ok(html.includes(`norm/${norm}.html`));
+  assert.ok(html.includes("164 пешехода") && html.includes("35% всех погибших"));
 });
-
 test("first episode develops one source-checking argument with contextual crash data", () => {
   const html = readFileSync("site/lessons/ep01-plain.html", "utf8");
   assert.equal((html.match(/<figure/g) || []).length, 7);
