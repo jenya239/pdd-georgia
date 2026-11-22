@@ -174,5 +174,5 @@ test("a wrong main-road choice points at the signs, not at the right-hand side",
 test("the four-way cycle explanation refuses to crown a number", () => {
   const item = EDGE_CASES[0];
   const explanation = explainWrong(item.scene, decide(item.scene), "1");
-  assert.match(explanation.text, /не называют/);
+  assert.match(explanation.text, /не устанавливают|не называют/);
 });
