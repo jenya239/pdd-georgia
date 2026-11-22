@@ -46,6 +46,20 @@ def emit_domain() -> dict:
     return files
 
 
+def emit_intersection() -> dict:
+    """Browser ESM compiled from packages/intersection/*.ts."""
+    completed = subprocess.run(
+        ["node", "tools/emit-intersection.mjs"],
+        cwd=paths.REPO, capture_output=True, text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or "tools/emit-intersection.mjs failed")
+    files = json.loads(completed.stdout)
+    if "solver.mjs" not in files:
+        raise RuntimeError("intersection emit did not produce solver.mjs")
+    return files
+
+
 def stamp_ticket_hashes(tickets: list) -> None:
     """Hash of each bank ticket's question, options and correct index. The hash is computed in Node."""
     completed = subprocess.run(
@@ -283,6 +297,8 @@ def generate():
             copies[src.relative_to(paths.WEB).as_posix()] = src
     for name, text in sorted(emit_domain().items()):
         files["assets/domain/" + name] = text
+    for name, text in sorted(emit_intersection().items()):
+        files["assets/intersection/" + name] = text
     files[".nojekyll"] = ""
 
     report = {"stats": dict(stat), "quotes": len(idx.quotes), "plan": len(plan),

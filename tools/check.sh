@@ -29,6 +29,7 @@ fi
 
 echo "== prisma: course release";  ./node_modules/.bin/prisma generate && ./node_modules/.bin/prisma migrate deploy
 echo "== tsc: domain";               node node_modules/typescript/bin/tsc -p packages/domain --noEmit
+echo "== tsc: intersection";         node node_modules/typescript/bin/tsc -p packages/intersection --noEmit
 echo "== tsc: course";               node node_modules/typescript/bin/tsc -p packages/course --noEmit
 echo "== node: domain modules";      node --test tests/js/*.test.mjs
 echo "== pytest: build, ontology, lessons, video"; "$PY" -m pytest -q tests/py tests/video

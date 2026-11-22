@@ -49,7 +49,16 @@ const CLEAN = {
     theme: v => (typeof v === "string" && THEMES.includes(v) ? v : undefined),
     notes: cleanNotes,
     session: cleanSession,
+    intersection: cleanIntersection,
 };
+/** Trainer counts stay out of the ticket journal. A bad or foreign shape is dropped, not repaired. */
+function cleanIntersection(v) {
+    if (!isObj(v) || v.version !== 1)
+        return undefined;
+    if (typeof v.answered !== "number" || typeof v.firstTry !== "number" || !isObj(v.concepts))
+        return undefined;
+    return { version: 1, answered: v.answered, firstTry: v.firstTry, concepts: v.concepts };
+}
 export function cleanState(data) {
     const out = {};
     for (const [id, fn] of Object.entries(CLEAN)) {
@@ -122,6 +131,9 @@ export function mergeState(current, incoming) {
     const session = current.session ?? incoming.session;
     if (session)
         out.session = session;
+    const intersection = current.intersection ?? incoming.intersection;
+    if (intersection)
+        out.intersection = intersection;
     return out;
 }
 export function applyImport(current, incoming, mode) {

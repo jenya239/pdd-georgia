@@ -15,6 +15,7 @@ export const STORAGE = [
     { id: "theme", key: "pddge.theme", kind: "text", what: "светлая или тёмная тема" },
     { id: "notes", key: "pddge.notes.v1", kind: "json", what: "ваши заметки к билетам и нашим вопросам" },
     { id: "session", key: "pddge.session.v1", kind: "json", what: "незаконченная самопроверка: какие вопросы, на каком остановились, сколько уже верных и ошибок" },
+    { id: "intersection", key: "pddge.intersection.v1", kind: "json", what: "счётчик понятий тренажёра перекрёстков: сколько раз понятие встретилось и сколько первых попыток были верными. Не выбирает следующую норму и не входит в журнал билетов" },
 ];
 /** Keys older versions wrote; the store deletes them on open, imports ignore their sections. */
 export const RETIRED = [

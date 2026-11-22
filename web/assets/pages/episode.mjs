@@ -7,6 +7,7 @@ import { renderQuestion } from "../app/question.mjs";
 import { TYPE_LABEL } from "../domain/items.mjs";
 import { episodeKind, splitLesson, lessonEditions, pickEdition } from "../domain/episode.mjs";
 import { lk, lawDetails } from "../domain/normlinks.mjs";
+import { mountIntersection, trainerShell } from "./intersection.mjs";
 (async () => {
   header("course");
   const [D, E] = await Promise.all([loadTickets(), loadEpisodes()]);
@@ -38,6 +39,16 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
   const kindLine = `<div class="small mut"><a href="course.html">Курс</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
+  const trainerInLesson = r.id === "ep03" && !showFilm && (chosen?.id === "plain" || (isText && !editions.length));
+  const trainer = trainerInLesson
+    ? `<section class="ix-lesson" id="trainer"><h2>Два автомобиля: кто может ехать сейчас</h2>
+   <p>Дальше можно проверить узкий случай, который уже виден на схемах. Два автомобиля, одна полоса, прямо или поворот. Дороги либо равнозначные, либо главная идёт прямо и обозначена знаками 2.1 и 2.3. Нажмите автомобиль, который может ехать сейчас. Если таких двое, верен любой из них.</p>
+   <p>Сцена не меняет покрытие, не прячет его под снегом, не выезжает со двора и не поворачивает главную. Светофора и знака «стоп» на ней нет: эти различия остаются в тексте выше. <a href="intersection.html">Та же сцена отдельной страницей</a>.</p>
+   ${trainerShell({ embed: true })}</section>`
+    : "";
+  const filmPointer = r.id === "ep03" && !trainerInLesson
+    ? `<p class="small"><a href="episode.html?id=ep03#trainer">Упражнение с двумя автомобилями</a> стоит в тексте выпуска, после объяснения проезда.</p>`
+    : "";
   const filmNote = r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : "";
   const ticketsFilm = r.tickets_video
     ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>
@@ -48,7 +59,8 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   const visualArticle = !showFilm && (chosen?.id === "plain" || (isText && !editions.length));
   const visualMarkup = visualArticle ? `${kindLine}<h1>${esc(r.title)}</h1>
    ${editionBar}
-   <article class="lesson visuallesson" id="lb">${lesson.before}${lesson.after}</article>
+   <article class="lesson visuallesson" id="lb">${lesson.before}${lesson.after}
+   ${trainer}</article>
    <details class="lesson-appendix"><summary>Нормы, билеты и самопроверка</summary>
      ${lawPart}${ticketsFilm}
      <h2>Билеты к выпуску</h2><div id="tk"></div><div id="own-items"></div>
@@ -57,6 +69,7 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   m.innerHTML = visualArticle ? visualMarkup : showFilm
     ? `${kindLine}<h1>${esc(r.title)}</h1>
    ${editionBar}
+   ${filmPointer}
    <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
    ${filmNote}
    <p class="small mut">Снятый ролик.</p>
@@ -79,6 +92,11 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
    <div id="cum"></div>${nav}`;
   const { enhanceFigures } = await import("../app/figzoom.mjs");
   enhanceFigures(m);
+  const trainerHost = document.getElementById("trainer");
+  if (trainerHost) {
+    mountIntersection(trainerHost, { embed: true });
+    if (location.hash === "#trainer") trainerHost.scrollIntoView({ block: "start" });
+  }
   const bar = document.querySelector(".editions");
   if (bar) bar.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-edition]");
@@ -152,6 +170,12 @@ import { lk, lawDetails } from "../domain/normlinks.mjs";
   document.addEventListener("keydown", e => {
     if (e.target.closest("input,select,textarea") || e.ctrlKey || e.metaKey || e.altKey) return;
     const n = parseInt(e.key, 10); if (!(n >= 1 && n <= 4)) return;
+    const practice = document.getElementById("trainer");
+    if (practice) {
+      const box = practice.getBoundingClientRect();
+      const mid = innerHeight / 2;
+      if ((box.width > 0 && box.top < mid && box.bottom > mid) || e.target.closest("#trainer")) return;
+    }
     const mid = innerHeight / 2; let best = null, bd = 1e9;
     for (const [d] of all) { const b = d.getBoundingClientRect(); if (b.bottom < 0 || b.top > innerHeight) continue; if (d._state.answered) continue;
       const dist = Math.abs((b.top + b.bottom) / 2 - mid); if (dist < bd) { bd = dist; best = d; } }
