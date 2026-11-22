@@ -25,6 +25,7 @@ on:
       - 'tests/js/ep02-editorial.test.mjs'
       - 'video/episodes/ep03/v2/**'
       - 'tools/ep03-v2.mjs'
+      - 'AGENTS.md'
       - 'tests/js/ep03-v2-preproduction.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
       - '.github/workflows/visual-editorial.yml'
@@ -52,6 +53,7 @@ on:
       - 'tests/js/ep02-editorial.test.mjs'
       - 'video/episodes/ep03/v2/**'
       - 'tools/ep03-v2.mjs'
+      - 'AGENTS.md'
       - 'tests/js/ep03-v2-preproduction.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
 jobs:
