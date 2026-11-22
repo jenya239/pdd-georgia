@@ -13,6 +13,14 @@ test("all 12 scenarios are stable and reading copies are generated, not hand-edi
   assert.match(out,/in sync/);
   assert.equal(scenario.schemaVersion,2);
   assert.equal(scenario.scenes.length,12);
+  assert.ok(scenario.narrativeArc?.centralQuestion?.includes("одно и то же"));
+  assert.ok(scenario.narrativeArc?.resolution?.includes("правило"));
+  for (const scene of scenario.scenes) {
+    assert.ok(scene.dramaticFunction?.length > 25, scene.id);
+    assert.ok(scene.bridgeToNext?.length > 30, scene.id);
+  }
+  assert.equal(scenario.scenes[9].mode,"legal-neighbor");
+  assert.equal(scenario.scenes[10].mode,"documented-case");
   assert.deepEqual(scenario.scenes.map(s=>s.id),Array.from({length:12},(_,i)=>"S"+String(i).padStart(2,"0")));
   const screenplay = read(base+"SCREENPLAY.md");
   const voice = read(base+"VOICE.txt");
@@ -60,7 +68,7 @@ test("law references are real locally tracked norm pages; real crash has externa
     assert.ok(existsSync(path),id);
     assert.ok(read(path).length>300,id);
   }
-  const incident=scenario.scenes.find(s=>s.id==="S09");
+  const incident=scenario.scenes.find(s=>s.id==="S10");
   assert.ok(incident.source_url.startsWith("https://www.ntsb.gov/"));
   assert.ok(incident.voice.join(" ").includes("американском штате Нью-Джерси"));
   assert.ok(incident.voice.join(" ").includes("не пример неверного применения грузинской"));
@@ -71,6 +79,8 @@ test("production document set is complete, and existing ep03 published assets st
   const docs=["README.md","SCREENPLAY.md","VOICE.txt","VISUAL_BIBLE.md","LEGAL_AND_EVIDENCE.md",
     "PRODUCTION.md","ACCEPTANCE.md","GROKBOT_START.md","design/worlds.json"];
   for(const name of docs)assert.ok(existsSync(base+name),name);
+  assert.ok(existsSync(base+"NARRATIVE_BIBLE.md"));
+  assert.ok(read(base+"NARRATIVE_BIBLE.md").includes("Тест А — слушать без изображения"));
   assert.ok(existsSync("video/episodes/ep03/scenes.py"));
   assert.ok(existsSync("video/episodes/ep03/boards.py"));
   assert.ok(existsSync("content/media/ep03.mp4"));
