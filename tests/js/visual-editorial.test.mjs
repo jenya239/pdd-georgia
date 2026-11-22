@@ -41,7 +41,7 @@ test("episode 2 has a narrative sequence with verified illustrated ticket exampl
 
 test("first episode develops one source-checking argument with contextual crash data", () => {
   const html = readFileSync("site/lessons/ep01-plain.html", "utf8");
-  assert.equal((html.match(/<figure\\b/g) || []).length, 7);
+  assert.equal((html.match(/<figure/g) || []).length, 7);
   const steps = ["Один знак — несколько вопросов", "Правило и наказание — разные сведения",
     "Правильный источник тоже может устареть", "Почему в старом пособии может быть неверный ответ",
     "Карта источников"];
