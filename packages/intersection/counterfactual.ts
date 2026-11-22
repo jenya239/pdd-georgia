@@ -116,29 +116,29 @@ export function counterfactual(before: Scenario, delta: Delta): Pair {
 
 function explainChange(delta: Delta, supported: boolean, admissibleChanged: boolean): string {
   if (!supported) {
-    return "Такая замена выходит за проверенный срез. Решатель не подставляет ответ для правила, которое ещё не разобрано.";
+    return "Такую ситуацию тренажёр пока не умеет проверять. Ответ не будет угадан.";
   }
   if (delta.kind === "signs" && admissibleChanged) {
-    return "Знаки приоритета убраны, остальное на месте. Кто может ехать сейчас, изменилось: без знаков стороны и пересечение путей решают там, где раньше решала главная дорога.";
+    return "Без знаков главная дорога больше не определяет очередность. Теперь решение изменилось — проверь, кому нужно уступить.";
   }
   if (delta.kind === "signs") {
-    return "Знаки приоритета убраны, но кто может ехать сейчас, не изменился. Пути и раньше не заставляли ждать, либо ждать по-прежнему нужно уже по другому основанию.";
+    return "Знаки убрали, но решение осталось прежним. В этой ситуации оно не зависело только от знаков.";
   }
   if (delta.kind === "maneuver" && admissibleChanged) {
-    return `У автомобиля ${delta.vehicle} теперь другой манёвр. Пути сходятся иначе, и набор тех, кто может ехать сейчас, изменился.`;
+    return `Автомобиль ${delta.vehicle} теперь выполняет другой манёвр. Из-за этого изменилось, кому нужно уступить.`;
   }
   if (delta.kind === "maneuver") {
-    return `У автомобиля ${delta.vehicle} другой манёвр, но кто может ехать сейчас, остался тем же.`;
+    return `Автомобиль ${delta.vehicle} изменил манёвр, но очередность осталась прежней.`;
   }
   if (delta.kind === "from" && admissibleChanged) {
-    return `Автомобиль ${delta.vehicle} подъезжает с другой стороны. Из-за этого меняется, кто может ехать сейчас.`;
+    return `Автомобиль ${delta.vehicle} теперь подъезжает с другой стороны, и решение меняется.`;
   }
   if (delta.kind === "from") {
-    return `Автомобиль ${delta.vehicle} подъезжает с другой стороны, но набор допустимых проездов остался тем же.`;
+    return `Автомобиль ${delta.vehicle} теперь подъезжает с другой стороны, но решение осталось прежним.`;
   }
   return admissibleChanged
-    ? "Изменилось одно условие, и набор тех, кто может ехать сейчас, тоже изменился."
-    : "Изменилось одно условие, а набор тех, кто может ехать сейчас, остался прежним.";
+    ? "Мы изменили одно условие — и теперь первым может проехать другой автомобиль."
+    : "Условие изменилось, но решение осталось прежним.";
 }
 
 export function sameSignature(before: Scenario, after: Scenario): boolean {
@@ -146,10 +146,10 @@ export function sameSignature(before: Scenario, after: Scenario): boolean {
 }
 
 export function leadFor(delta: Delta): string {
-  if (delta.kind === "signs") return "Знаки приоритета убраны. Всё остальное на месте.";
-  if (delta.kind === "maneuver") return `У автомобиля ${delta.vehicle} другой манёвр. Остальное на месте.`;
-  if (delta.kind === "from") return `Автомобиль ${delta.vehicle} подъезжает с другой стороны. Остальное на месте.`;
-  return "Изменилось одно условие.";
+  if (delta.kind === "signs") return "Теперь знаков приоритета нет. Кто может проехать?";
+  if (delta.kind === "maneuver") return `Автомобиль ${delta.vehicle} теперь поворачивает иначе. Что изменилось?`;
+  if (delta.kind === "from") return `Автомобиль ${delta.vehicle} теперь подъезжает с другой стороны. Что изменилось?`;
+  return "Посмотри, что изменилось в этой ситуации.";
 }
 
 /** Candidate single-fact changes after a wrong selection. Order is the teaching order. */
