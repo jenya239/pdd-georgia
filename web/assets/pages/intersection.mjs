@@ -26,11 +26,11 @@ const CONCEPT = {
   clear: "пути не мешают",
 };
 
-const params = new URLSearchParams(location.search);
-let seed = Number(params.get("seed"));
-if (!Number.isInteger(seed)) seed = 1;
-let style = styleName(params.get("style"));
-let progress = loadProgress();
+let host = null;
+let embed = false;
+let seed = 1;
+let style = "soft";
+let progress = null;
 let task = null;
 let session = null;
 let followMeta = null;
@@ -40,51 +40,112 @@ let nextAction = null;
 let timer = 0;
 let token = 0;
 let motion = null;
+let stage = null;
+let canvas = null;
+let ctx = null;
+let motionQuery = null;
 
-header("trainer");
-const stage = document.getElementById("stage");
-const canvas = document.getElementById("board");
-const ctx = canvas.getContext("2d");
-const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
-
-if (params.get("topic") === "ep03") {
-  document.getElementById("limit").textContent = "Рядом с выпуском 3. В этом срезе нет покрытия, выезда со двора и изгиба главной: эти правила решатель пока не разыгрывает. Клавиши 1 и 2 — номера автомобилей.";
+function q(id) {
+  return host.querySelector("#" + id);
 }
 
-document.getElementById("bug").addEventListener("click", () => {
-  const report = document.getElementById("report");
-  report.hidden = false;
-  report.textContent = `Скопируйте текст. В нём нет имени и истории ответов.\n${JSON.stringify(bugReport(session.scenario), null, 2)}`;
-});
-document.getElementById("next").addEventListener("click", goNext);
-for (const button of document.querySelectorAll("[data-style]")) {
-  button.addEventListener("click", () => setStyle(button.dataset.style));
+/** Controls shared by the standalone page and the episode 3 exercise. */
+export function trainerShell({ embed: embedded = false } = {}) {
+  const limit = embedded
+    ? "Клавиши 1 и 2 — номера автомобилей на схеме."
+    : "Два автомобиля, одна полоса. Равнозначные дороги или прямая главная. Клавиши 1 и 2 — номера автомобилей. Покрытие, двор, изгиб главной, светофор и знак «стоп» этот срез не разыгрывает.";
+  return `<p class="small mut" id="limit">${limit}</p>
+<div class="ix-bar">
+  <div class="ix-styles" role="group" aria-label="Оформление">
+    <button type="button" data-style="soft">Мягкий</button>
+    <button type="button" data-style="ink">Чернила</button>
+  </div>
+  <button type="button" class="btn ghost" id="bug">Сообщить об ошибке</button>
+  <button type="button" class="btn" id="next" hidden>Дальше</button>
+</div>
+<p id="lead" class="ix-lead" hidden></p>
+<div class="ix-stage" id="ix-scene">
+  <canvas id="board" aria-hidden="true"></canvas>
+  <div id="hits"></div>
+</div>
+<p id="live" class="sr" aria-live="polite"></p>
+<div id="explain" class="ix-explain"></div>
+<details class="ix-note">
+  <summary>Что считает эта сцена</summary>
+  <p id="assume"></p>
+</details>
+<details class="ix-note">
+  <summary>Что уже встречалось</summary>
+  <p id="concepts" class="small"></p>
+</details>
+<pre id="report" hidden tabindex="0"></pre>`;
 }
-document.addEventListener("keydown", (event) => {
-  if (event.metaKey || event.ctrlKey || event.altKey) return;
-  if (event.key === "Enter" && nextAction && session.phase === "done") {
-    event.preventDefault();
-    goNext();
-    return;
+
+/** Draw one checked scene into a container that already holds trainerShell(). */
+export function mountIntersection(root, options = {}) {
+  host = root;
+  embed = options.embed === true;
+  const params = new URLSearchParams(location.search);
+  seed = Number(params.get("seed"));
+  if (!Number.isInteger(seed)) seed = 1;
+  style = styleName(params.get("style"));
+  progress = loadProgress();
+  stage = q("ix-scene");
+  canvas = q("board");
+  ctx = canvas.getContext("2d");
+  motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+  q("bug").addEventListener("click", () => {
+    const report = q("report");
+    report.hidden = false;
+    report.textContent = `Скопируйте текст. В нём нет имени и истории ответов.\n${JSON.stringify(bugReport(session.scenario), null, 2)}`;
+  });
+  q("next").addEventListener("click", goNext);
+  for (const button of host.querySelectorAll("[data-style]")) {
+    button.addEventListener("click", () => setStyle(button.dataset.style));
   }
-  if (!/^[1-9]$/.test(event.key)) return;
-  const target = event.target;
-  if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return;
-  const vehicle = task.vehicles.find((item) => item.id === event.key);
-  if (vehicle) choose(vehicle.id);
-});
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden || !motion) return;
-  if (performance.now() - motion.start >= motion.ms) finishMotion();
-  else requestAnimationFrame(tick);
-});
-motionQuery.addEventListener("change", () => paint());
-new ResizeObserver(() => {
-  paint();
-  placeHits();
-}).observe(stage);
+  document.addEventListener("keydown", (event) => {
+    if (!ownsKeys(event)) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key === "Enter" && nextAction && session.phase === "done") {
+      event.preventDefault();
+      goNext();
+      return;
+    }
+    if (!/^[1-9]$/.test(event.key)) return;
+    const target = event.target;
+    if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement || target instanceof HTMLSelectElement) return;
+    const vehicle = task?.vehicles.find((item) => item.id === event.key);
+    if (vehicle) choose(vehicle.id);
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden || !motion) return;
+    if (performance.now() - motion.start >= motion.ms) finishMotion();
+    else requestAnimationFrame(tick);
+  });
+  motionQuery.addEventListener("change", () => paint());
+  new ResizeObserver(() => {
+    paint();
+    placeHits();
+  }).observe(stage);
+  begin(generate(seed).scenario, seed, null);
+}
 
-begin(generate(seed).scenario, seed, null);
+function ownsKeys(event) {
+  const target = event.target;
+  if (target instanceof Element && host.contains(target)) return true;
+  if (!embed) return true;
+  const box = host.getBoundingClientRect();
+  if (box.width <= 0 || box.height <= 0) return false;
+  const mid = window.innerHeight / 2;
+  return box.top < mid && box.bottom > mid;
+}
+
+function rememberUrl(edit) {
+  if (embed) return;
+  const url = new URL(location.href);
+  edit(url);
+  history.replaceState(null, "", url);
+}
 
 function begin(scenario, nextSeed, meta) {
   seed = nextSeed;
@@ -96,9 +157,7 @@ function begin(scenario, nextSeed, meta) {
   motion = null;
   nextAction = null;
   clearTimeout(timer);
-  const url = new URL(location.href);
-  url.searchParams.set("seed", String(seed));
-  history.replaceState(null, "", url);
+  rememberUrl((url) => url.searchParams.set("seed", String(seed)));
   render();
 }
 
@@ -182,10 +241,10 @@ function goNext() {
 
 function setStyle(next) {
   style = styleName(next);
-  const url = new URL(location.href);
-  if (style === "soft") url.searchParams.delete("style");
-  else url.searchParams.set("style", style);
-  history.replaceState(null, "", url);
+  rememberUrl((url) => {
+    if (style === "soft") url.searchParams.delete("style");
+    else url.searchParams.set("style", style);
+  });
   paint();
   markStyles();
 }
@@ -194,7 +253,7 @@ function render() {
   paint();
   placeHits();
   markStyles();
-  const lead = document.getElementById("lead");
+  const lead = q("lead");
   if (followMeta && session.phase !== "done") {
     lead.hidden = false;
     lead.textContent = followMeta.lead;
@@ -208,10 +267,10 @@ function render() {
       showText("Этот проехал. Оставшийся теперь может ехать.", "ok");
     }
   } else if (session.phase !== "done") clearExplain();
-  document.getElementById("assume").textContent = explanation
+  q("assume").textContent = explanation
     ? `${STANDING} ${explanation.assumption}`
     : STANDING;
-  document.getElementById("next").hidden = !nextAction;
+  q("next").hidden = !nextAction;
   announce(liveText(explanation));
   renderProgress();
   stage.dataset.phase = session.phase;
@@ -229,7 +288,7 @@ function liveText(explanation) {
   if (explanation) return explanation.text;
   if (followMeta && session.phase !== "done") return followMeta.lead;
   if (session.phase === "moving" && session.outcome === "go") return `Автомобиль ${session.actor} поехал.`;
-  if (session.phase === "done") return document.getElementById("explain").textContent || "Сцена пройдена.";
+  if (session.phase === "done") return q("explain").textContent || "Сцена пройдена.";
   if (session.phase === "blocked") return "Эта сцена вне проверенного среза.";
   return "Выберите автомобиль, который может ехать сейчас.";
 }
@@ -241,31 +300,31 @@ function explanationHtml(explanation) {
 }
 
 function showText(text, kind) {
-  const box = document.getElementById("explain");
+  const box = q("explain");
   box.className = `ix-explain ${kind}`;
   box.textContent = text;
 }
 
 function showHtml(html, kind) {
-  const box = document.getElementById("explain");
+  const box = q("explain");
   box.className = `ix-explain ${kind}`;
   box.innerHTML = html;
 }
 
 function clearExplain() {
-  const box = document.getElementById("explain");
+  const box = q("explain");
   box.className = "ix-explain";
   box.textContent = "";
 }
 
 function announce(text) {
-  const live = document.getElementById("live");
+  const live = q("live");
   if (live.textContent !== text) live.textContent = text;
 }
 
 function renderProgress() {
   const rows = Object.entries(progress.concepts);
-  const box = document.getElementById("concepts");
+  const box = q("concepts");
   if (!rows.length) {
     box.textContent = "Пока пусто. Счётчик считает понятия, а не очки, и не выбирает следующую норму.";
     return;
@@ -277,7 +336,7 @@ function renderProgress() {
 }
 
 function markStyles() {
-  for (const button of document.querySelectorAll("[data-style]")) {
+  for (const button of host.querySelectorAll("[data-style]")) {
     button.setAttribute("aria-pressed", String(button.dataset.style === style));
   }
 }
@@ -285,7 +344,7 @@ function markStyles() {
 function placeHits() {
   if (!task || !session) return;
   const { width, height } = viewSize();
-  const root = document.getElementById("hits");
+  const root = q("hits");
   root.replaceChildren();
   const active = session.phase === "ready" || session.phase === "error";
   for (const hit of hotspots(task, width, height, session.remaining)) {
@@ -706,4 +765,14 @@ function saveProgress() {
   } catch {
     /* private mode */
   }
+}
+
+const standalone = document.getElementById("ix-app");
+if (standalone) {
+  header("trainer");
+  standalone.innerHTML = `<p class="kicker">Тренажёр</p>
+<h1>Кто может ехать сейчас</h1>
+<p class="deck">Два автомобиля. Нажмите тот, который может ехать сейчас. Иногда таких двое: верен любой из них.</p>
+${trainerShell()}`;
+  mountIntersection(standalone);
 }

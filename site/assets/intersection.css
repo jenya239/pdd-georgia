@@ -1,7 +1,10 @@
+.ix-lesson{position:relative;margin:1.8em 0 0;padding-top:1.4em;border-top:1px solid var(--line);scroll-margin-top:72px}
+.ix-lesson > p{margin:0 0 .95em}
 .ix-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
 .ix-styles{display:flex;gap:4px}
-.ix-styles button{font:inherit;font-size:14px;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
+.ix-styles button{font:inherit;font-size:14px;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:48px}
 .ix-styles button[aria-pressed="true"]{background:var(--acc2);color:var(--acc);border-color:var(--acc);font-weight:600}
+.ix-bar .btn{min-height:48px}
 .ix-styles button:focus-visible,.ix-hit:focus-visible,#bug:focus-visible,#next:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .ix-lead{margin:0 0 8px;padding:8px 12px;background:var(--warnbg);border-radius:8px}
 .ix-stage{position:relative;width:min(100%,680px);aspect-ratio:1;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#d5e3d0}
@@ -17,7 +20,7 @@
 .ix-note{margin:8px 0}
 .ix-note summary{cursor:pointer}
 #report{white-space:pre-wrap;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:13px;max-width:680px}
-.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);overflow:hidden}
+.ix-lesson .sr,#ix-app .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);overflow:hidden}
 @media (prefers-reduced-motion: reduce){
   .ix-stage,.ix-explain{transition:none}
 }

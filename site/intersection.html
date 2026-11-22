@@ -1,33 +1,4 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Тренажёр перекрёстков — ПДД Грузии</title><link rel="icon" href="data:,"><link rel="stylesheet" href="assets/app.css"><link rel="stylesheet" href="assets/intersection.css"></head>
-<body><main>
-<p class="kicker">Тренажёр</p>
-<h1>Кто может ехать сейчас</h1>
-<p class="deck">Два автомобиля. Нажмите тот, который может ехать сейчас. Иногда таких двое: верен любой из них.</p>
-<p class="small mut" id="limit">Два автомобиля, одна полоса. Равнозначные дороги или прямая главная. Клавиши 1 и 2 — номера автомобилей. Покрытие, двор, изгиб главной, светофор и знак «стоп» этот срез не разыгрывает.</p>
-<div class="ix-bar">
-  <div class="ix-styles" role="group" aria-label="Оформление">
-    <button type="button" data-style="soft">Мягкий</button>
-    <button type="button" data-style="ink">Чернила</button>
-  </div>
-  <button type="button" class="btn ghost" id="bug">Сообщить об ошибке</button>
-  <button type="button" class="btn" id="next" hidden>Дальше</button>
-</div>
-<p id="lead" class="ix-lead" hidden></p>
-<div class="ix-stage" id="stage">
-  <canvas id="board" aria-hidden="true"></canvas>
-  <div id="hits"></div>
-</div>
-<p id="live" class="sr" aria-live="polite"></p>
-<div id="explain" class="ix-explain"></div>
-<details class="ix-note">
-  <summary>Что считает эта сцена</summary>
-  <p id="assume"></p>
-</details>
-<details class="ix-note">
-  <summary>Что уже встречалось</summary>
-  <p id="concepts" class="small"></p>
-</details>
-<pre id="report" hidden tabindex="0"></pre>
-</main>
+<body><main id="ix-app"></main>
 <script type="module" src="assets/pages/intersection.mjs"></script></body></html>
