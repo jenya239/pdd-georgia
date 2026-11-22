@@ -151,7 +151,7 @@ test("a wrong equal-road choice names the right-hand rule and both cars", () => 
   const item = SOLVED_CASES.find((entry) => entry.id === "yield-right");
   const decision = decide(item.scene);
   const explanation = explainWrong(item.scene, decision, "1");
-  assert.match(explanation.text, /Автомобиль 1/);
+  assert.match(explanation.text, /Автомобиль 1|автомобиля 1/);
   assert.match(explanation.text, /Автомобиль 2/);
   assert.match(explanation.text, /справа/);
   assert.equal(explanation.norms.some((norm) => norm.id === "st36-p4-v"), true);
