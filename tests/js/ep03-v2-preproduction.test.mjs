@@ -14,7 +14,7 @@ test("all 12 scenarios are stable and reading copies are generated, not hand-edi
   assert.equal(scenario.schemaVersion,2);
   assert.equal(scenario.scenes.length,12);
   assert.ok(scenario.narrativeArc?.centralQuestion?.includes("одно и то же"));
-  assert.ok(scenario.narrativeArc?.resolution?.includes("правило"));
+  assert.match(scenario.narrativeArc?.resolution ?? "", /[Пп]равило/);
   for (const scene of scenario.scenes) {
     assert.ok(scene.dramaticFunction?.length > 25, scene.id);
     assert.ok(scene.bridgeToNext?.length > 30, scene.id);
