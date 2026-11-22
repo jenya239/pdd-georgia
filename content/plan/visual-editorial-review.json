@@ -8,7 +8,7 @@
       "id": "ep01",
       "status": "rewritten",
       "published": "site/lessons/ep01-plain.html",
-      "minFigures": 5,
+      "minFigures": 7,
       "requiredNormLinks": [
         "norm/st2-p1.html",
         "norm/st2-p2.html"
@@ -16,7 +16,7 @@
       "integratedTickets": [],
       "candidateTickets": [],
       "formatMigrated": true,
-      "reviewNote": "Five concise diagrams explain the legal source of signs, annexes, penalties, languages and exam regulations."
+      "reviewNote": "Rebuilt narrative: one road sign leads to its legal source, five annexes, separate liability rules, authentic-language/current-version checks, the 2026 B/B1 examination change and a concluding source map. Seven explanatory figures. UNECE Georgia 2022 crash category (890 events, 82 deaths) is woven into the sign discussion with explicit denominator and non-causality caution; law quotes retained."
     },
     {
       "id": "ep02",
