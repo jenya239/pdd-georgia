@@ -1,0 +1,10 @@
+<svg viewBox="0 0 700 280" role="img" aria-label="Где проверять требования: правила движения и знаки — закон и приложения, штрафы — кодекс, баллы — приложение 5, экзамен — приказ МВД, актуальность — Matsne" xmlns="http://www.w3.org/2000/svg">
+<rect width="700" height="280" rx="14" fill="#e4ebe6"/>
+<text x="28" y="39" font-size="22" font-weight="650" fill="#294d42">Нужно проверить — куда смотреть?</text>
+<g font-size="17">
+<rect x="25" y="58" width="318" height="63" rx="12" fill="#fff" stroke="#b8cfc3"/><text x="44" y="84" fill="#315b4a" font-weight="650">Правило, знак, разметка</text><text x="44" y="106" fill="#465f57" font-size="15">Закон «О дорожном движении»</text>
+<rect x="357" y="58" width="318" height="63" rx="12" fill="#fff" stroke="#b8cfc3"/><text x="376" y="84" fill="#315b4a" font-weight="650">Денежный штраф</text><text x="376" y="106" fill="#465f57" font-size="15">Кодекс об административных нарушениях</text>
+<rect x="25" y="132" width="318" height="63" rx="12" fill="#fff" stroke="#b8cfc3"/><text x="44" y="158" fill="#315b4a" font-weight="650">Сокращение баллов</text><text x="44" y="180" fill="#465f57" font-size="15">Ст. 58 и приложение 5</text>
+<rect x="357" y="132" width="318" height="63" rx="12" fill="#fff" stroke="#b8cfc3"/><text x="376" y="158" fill="#315b4a" font-weight="650">Порядок экзамена</text><text x="376" y="180" fill="#465f57" font-size="15">Приказ МВД № 598 и поправки</text>
+<rect x="25" y="206" width="650" height="51" rx="12" fill="#d4e7db" stroke="#91b19e"/><text x="44" y="236" fill="#28583e" font-weight="650">Актуальная редакция и язык → официальный Matsne</text>
+</g></svg>
