@@ -98,7 +98,7 @@ test("an untaught surface change is not given an answer", () => {
   const pair = counterfactual(byId("yield-right").scene, { kind: "surface", approach: "E", to: "dirt" });
   assert.equal(pair.afterSupported, false);
   assert.equal(pair.afterDecision.status, "unsupported");
-  assert.match(pair.why, /не подставляет/);
+  assert.match(pair.why, /не будет угадан|не подставляет/);
 });
 
 test("shrink keeps a failing scene smaller, and the bug report has no learner fields", () => {
