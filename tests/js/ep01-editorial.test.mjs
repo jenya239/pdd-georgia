@@ -52,7 +52,7 @@ test("narrative has explanatory figures, timely exam comparison and a final sour
   assert.ok(html.includes("new.matsne.gov.ge/ka/document/view/6867586"));
   assert.match(html, /27 верных ответов/);
   assert.match(html, /25/);
-  assert.ok(html.indexOf("Пять частей одного закона") < html.indexOf('<h2 id="liability">'));
+  assert.ok(html.indexOf('data-editorial-role="annexes"') < html.indexOf('<h2 id="liability">'));
   assert.ok(html.indexOf('<h2 id="recap">') < html.indexOf('<h2 id="sources">'));
   assert.ok(html.indexOf('<h2 id="sources">') < html.indexOf("<!--AFTER-TICKETS-->"));
 });
