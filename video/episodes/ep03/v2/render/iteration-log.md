@@ -76,3 +76,74 @@ What changed since previous iteration:
 Next smallest verified deliverable:
   Человеческий просмотр двух прототипов. Озвучка — только когда есть рабочий TTS без секрета в репозитории.
 ```
+
+## Итерация после 6965abb
+
+```text
+HEAD, branch, changed files:
+  В origin/main влит 6965abb обычным merge, коммит 72b5f01, конфликтов не было.
+  Поверх: литературная правка scenario.json, пересобранные SCREENPLAY.md и VOICE.txt,
+  tools/ep03-v2.mjs (запрет производственной фразы про победителя),
+  render/narrative-review.md, voice/speak.mjs и читка, порядок stoppark перед case в stories.mjs,
+  пересобранный немой preview, строки S09/S10 в legal-matrix.md.
+
+Scene IDs delivered:
+  Те же S00–S11. В кадре S09 — остановка и стоянка, S10 — NTSB. Речь не наложена на картинку.
+
+Actual preview paths / contact sheet / video duration:
+  Прототипы не перекодировались: картинка от новой речи не меняется.
+  A2-A3-svg.mp4 sha256 55358343b42870ee28ffae2521bdd2a73ee4e963d0969d68861d6ffbb242cecd, 22.000 с.
+  Немой фильм заново: render/preview/ep03-v2-silent-preview.mp4
+  206.000 с, 4944 кадра, 1920×1080, h264, 24/1, только видео.
+  sha256 ceea6b630abacb7f3ebe76a5d369e641ce5cff0a954bfa37657d0285b1250ca7
+  Девять кусков по ≤600 кадров, ffmpeg concat -c copy.
+  Кадры с диска: 12 с — оговорка «справа недостаточно», машины стоят;
+  96 с — снег, обе «своя — второстепенная», проезда нет;
+  112 с — поворот главной, машины стоят, «На главной — ещё не первый»;
+  160 с — 5 м от края и отдельный запрет стоянки у выезда;
+  176 с — США, 16 февраля 2012, NTSB, автобус южнее пересечения, приписка «схема учебная»;
+  200 с — сводка из восьми строк. На ширине 375 px кадры 160 с и 200 с читаются.
+  Читка без графики: voice/readthrough.mp3, 481.080 с, 2.7 МБ, mp3 24 кГц, 1 канал.
+  mean_volume −20.9 dB, max_volume −3.6 dB. 29/29 фраз.
+  edge-tts 7.3.1, ru-RU-SvetlanaNeural, rate +10%, pitch −4Hz.
+  Семь фраз сорвались с NoAudioReceived и собрались повтором; у S01.2 отказ был и на второй попытке, затем успех.
+
+Legal evidence for changed claims:
+  Новые фразы нормы не добавляют. Матрица приведена к порядку S09 остановка, S10 NTSB.
+  Авторская проверка по-прежнему needs-review.
+
+What a silent viewer can infer:
+  На 160 с виден запрет остановки у пересечения и отдельно запрет стоянки у двора.
+  На 176 с виден учебный кадр американского случая до столкновения.
+  Это проверка порядка сцен, не человеческий тест вопросов 1–6.
+
+Automated checks and exact statuses:
+  node tools/ep03-v2.mjs --check → in sync, exit 0
+  node tools/ep03-v2.mjs --summary → scenes 12, narrationWords 1054, estimatedSeconds 433
+  tests/js/ep03-v2-geometry.test.mjs + ep03-v2-preproduction.test.mjs → 11 pass, 0 fail
+  tsc domain, intersection, course → exit 0
+  node tools/visual-editorial-audit.mjs → Visual editorial structure OK: 8/8, exit 0
+  node tools/build.mjs --check → site up to date, exit 0
+  node --test tests/js/*.test.mjs → 324 tests, 305 pass, 19 fail
+    (reflect-metadata, Postgres ENOENT, нет .venv/bin/python, хеши теории ep01–ep03)
+  pytest → 232 passed, 2 failed, 6 skipped, 31.70 с
+    (test_lessons.py defs == [], test_normsite.py links.json)
+  prisma migrate deploy → P1001, /var/run/postgresql:5432
+  e2e не запускался: нет Playwright
+  tools/check.sh ALL GREEN не печатает.
+
+Manual reviewer findings (or NOT YET DONE):
+  Литературный лист — narrative-review.md. Статус не «одобрено».
+  Человек читку и кадры не смотрел: NOT YET DONE. Владелец смотрит сам.
+
+Unresolved blockers:
+  Нет второго человека. S06 без вычисленной очереди. Речь не сведена с картинкой:
+  читка 481 с, немой ролик 206 с, estimate_s не подгонялся.
+  Dmitry +10% с этой VM не звучит. Платного голоса нет.
+
+What changed since previous iteration:
+  Слияние 6965abb. Вторая редактура стыков. Читка. Немой черновик в новом порядке сцен.
+
+Next smallest verified deliverable:
+  Прослушивание voice/readthrough.mp3 человеком и просмотр двух прототипов.
+```

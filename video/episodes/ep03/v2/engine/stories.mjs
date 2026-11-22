@@ -237,13 +237,13 @@ export function film() {
         t: local,
       };
     } },
+    { dur: 16, at: () => ({ scene: "stoppark", world: "C3", cars: stillCars(), overlays: [] }) },
     { dur: 18, at: (local) => ({
       scene: "case", world: "D1", cars: stillCars(),
       busAlong: local < 4 ? 0 : local < 8 ? ease((local - 4) / 4) : 1,
       overlays: [],
       t: local,
     }) },
-    { dur: 16, at: () => ({ scene: "stoppark", world: "C3", cars: stillCars(), overlays: [] }) },
     { dur: 20, at: (local) => {
       const flashes = [
         { scene: "junction", world: "A1", pave: { type: "dirt" } },
