@@ -171,6 +171,33 @@ test("a wrong main-road choice points at the signs, not at the right-hand side",
   assert.notEqual(explanation.text, explainWrong(SOLVED_CASES.find((entry) => entry.id === "yield-right").scene, decide(SOLVED_CASES.find((entry) => entry.id === "yield-right").scene), "1").text);
 });
 
+test("ep03 bending main is refused instead of given a queue", () => {
+  const scene = scenario({
+    id: "ep03-b1",
+    approaches: [
+      { id: "N", role: "road", surface: "paved", sign: "main" },
+      { id: "E", role: "road", surface: "paved", sign: "yield" },
+      { id: "S", role: "road", surface: "paved", sign: "yield" },
+      { id: "W", role: "road", surface: "paved", sign: "main" },
+    ],
+    vehicles: [
+      { id: "blue", from: "W", maneuver: "straight" },
+      { id: "red", from: "N", maneuver: "straight" },
+      { id: "gray", from: "E", maneuver: "straight" },
+    ],
+  });
+  const straight = decide(scene);
+  assert.equal(straight.status, "unsupported");
+  assert.equal(straight.reason, "unverified-priority");
+  assert.deepEqual(straight.admissible, []);
+  const left = decide({
+    ...scene,
+    vehicles: scene.vehicles.map((vehicle) => vehicle.id === "blue" ? { ...vehicle, maneuver: "left" } : vehicle),
+  });
+  assert.equal(left.status, "unsupported");
+  assert.equal(left.reason, "unverified-priority");
+});
+
 test("the four-way cycle explanation refuses to crown a number", () => {
   const item = EDGE_CASES[0];
   const explanation = explainWrong(item.scene, decide(item.scene), "1");

@@ -113,8 +113,8 @@ function clip(parts) {
   };
 }
 
-export function film() {
-  return clip([
+export function filmParts() {
+  return [
     { dur: 16, at: (local) => ({
       scene: "junction", world: "A0", pave: { type: "dirt" }, snow: 0,
       contrast: local < 3 ? 0.35 : local < 7 ? 0.35 + 0.65 * ((local - 3) / 4) : 1,
@@ -202,7 +202,7 @@ export function film() {
     } },
     { dur: 16, at: (local) => ({
       scene: "bend", world: "B1", cars: stillCars(),
-      overlays: local > 4 ? ["На главной — ещё не первый"] : [],
+      overlays: ["Не определено"],
       t: local,
     }) },
     { dur: 16, at: (local) => {
@@ -260,5 +260,9 @@ export function film() {
       }
       return { scene: "recap", world: "OUTRO", cars: stillCars(), overlays: [], t: local };
     } },
-  ]);
+  ];
+}
+
+export function film() {
+  return clip(filmParts());
 }

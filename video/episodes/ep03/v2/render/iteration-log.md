@@ -147,3 +147,62 @@ What changed since previous iteration:
 Next smallest verified deliverable:
   Прослушивание voice/readthrough.mp3 человеком и просмотр двух прототипов.
 ```
+
+```text
+HEAD, branch, changed files:
+  ветка cursor/ep03-v2-video-6e59. Коммит этой итерации — после push.
+  S06: scenario.json overlay «Не определено», design/worlds.json, render/s06-decision.json,
+  tests/js/intersection-solver.test.mjs. Речь S06 не менялась.
+  Сведение: engine/master.mjs, engine/review-checks.mjs, engine/frame.mjs, engine/stories.mjs,
+  engine/render-clip.mjs, render/timeline.json, render/sources.json,
+  render/final/ep03-v2-review.mp4, .srt, ep03-v2-review-report.md.
+  Не тронут: content/media/ep03.mp4.
+
+Scene IDs delivered:
+  S00–S11 в одном файле со речью. Это обзорный мастер v2, не замена опубликованного ролика.
+
+Actual preview paths / contact sheet / video duration:
+  video/episodes/ep03/v2/render/final/ep03-v2-review.mp4
+  517.042 с, h264 1920×1080 24/1, aac 48 кГц моно, 13 МБ.
+  sha256 0492779bffa5f6c01097c585255802fc739e2c1f882f7f408aad934b52cd55df
+  Субтитры: render/final/ep03-v2-review.srt, 98 реплик.
+  Контактный лист на 12 сцен не собирался. Открыты кадры 2.4, 40, 75, 100, 120, 136, 155,
+  183, 234, 235, 290, 345, 369, 406, 471, 486 с и два кадра шириной 375 px.
+
+Legal evidence for changed claims:
+  render/s06-decision.json. Решатель intersection-0.1.0: unsupported / unverified-priority,
+  admissible пуст и для прямого проезда, и для левого поворота синей. Очередь не назначена.
+  Кадр: «Не определено», along = 0. Независимая правовая приёмка: needs-review.
+
+What a silent viewer can infer:
+  На 183 с снег и две подписи «своя — второстепенная», проезда нет.
+  На 234 с излом главной и «Не определено», машины стоят.
+  На 406 с учебный кадр NTSB до столкновения, приписка под титром.
+  Это просмотр отдельных кадров, не ответы на вопросы 1–6.
+
+Automated checks and exact statuses:
+  review-checks.mjs: failures [], duration 517.042, phrases 29, cues 98,
+  mean −21.2 dB, max −3.5 dB, sceneBreaths 11, longestBreath 4.161 с, blackdetect пусто.
+  node tools/ep03-v2.mjs --check → in sync, exit 0
+  tests geometry + master + preproduction + intersection-solver → 28 pass, 0 fail
+  node tools/visual-editorial-audit.mjs → 8/8, exit 0
+  node tools/build.mjs --check → site up to date, exit 0
+  prisma migrate deploy → P1001, /var/run/postgresql:5432
+  .venv/bin/python нет. playwright не импортируется. e2e не запускался.
+
+Manual reviewer findings (or NOT YET DONE):
+  Читка: владелец, 2026-11-23, «да нормально», замечаний нет. Это не вопросы 1–6.
+  Просмотр сведённого ролика человеком: NOT YET DONE.
+
+Unresolved blockers:
+  Нет ответов на вопросы 1–6. S06 и ориентация 8.13 остаются needs-review.
+  Dmitry +10% с этой VM не звучит. tools/check.sh ALL GREEN не печатает:
+  нет Postgres, нет .venv, нет Playwright.
+
+What changed since previous iteration:
+  Плашка S06 заменена на «Не определено» без правки принятой речи.
+  Речь сведена с картинкой по длинам фраз. Приписка NTSB поднята из-под автобуса.
+
+Next smallest verified deliverable:
+  Человеческие ответы на вопросы 1–6 по сведённому файлу.
+```

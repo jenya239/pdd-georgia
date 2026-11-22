@@ -10,6 +10,7 @@ import { Resvg } from "@resvg/resvg-js";
 import { buildFrame } from "./frame.mjs";
 import { frameToSvg } from "./svg.mjs";
 import { encodePng, rasterize } from "./raster.mjs";
+import { loadTimeline, reviewStory } from "./master.mjs";
 import { PROTO_A, PROTO_C, film, prototypeAState, prototypeCState } from "./stories.mjs";
 
 const FONTS = {
@@ -30,6 +31,7 @@ function storyByName(name) {
   if (name === "a") return { ...PROTO_A, at: prototypeAState };
   if (name === "c") return { ...PROTO_C, at: prototypeCState };
   if (name === "film") return { id: "S00-S11", ...film(), stills: filmStills() };
+  if (name === "review") return reviewStory(loadTimeline());
   throw new Error(`unknown story ${name}`);
 }
 

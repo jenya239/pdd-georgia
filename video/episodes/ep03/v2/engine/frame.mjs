@@ -329,10 +329,12 @@ function drawCase(state, shapes) {
   add(shapes, { op: "text", x: ox, y: oy + 6, text: "STOP", size: 16, fill: "#fff", weight: 700, anchor: "middle", role: "sign" });
   const flash = 0.45 + 0.55 * Math.abs(Math.sin((state.t ?? 0) * 1.6));
   add(shapes, { op: "circle", cx: ox, cy: oy - 48, r: 12, fill: "#d02020", opacity: flash, role: "beacon" });
-  add(shapes, { op: "text", x: 960, y: 990, text: "Схема учебная. Геометрия не реконструирует место ДТП.", size: 30, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "case-note" });
+  const noteY = state.subtitle?.length ? 150 : 990;
+  add(shapes, { op: "text", x: 960, y: noteY, text: "Схема учебная. Геометрия не реконструирует место ДТП.", size: 30, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "case-note" });
 }
 
-function drawStopPark(shapes) {
+function drawStopPark(shapes, state = {}) {
+  const prose = state.diagramProse !== false;
   const d = STOP_DIAGRAM;
   add(shapes, { op: "text", x: 480, y: 150, text: "Пересечение проезжих частей", size: 32, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
   add(shapes, { op: "poly", pts: [[180, d.crossingTop + 40], [620, d.crossingTop + 40], [620, d.crossingBottom - 40], [180, d.crossingBottom - 40]], fill: PALETTE.paved, role: "road" });
@@ -347,23 +349,25 @@ function drawStopPark(shapes) {
   add(shapes, { op: "line", pts: [[d.measureStartX, 540], [d.measureEndX, 540]], stroke: PALETTE.ink, width: 4, role: "measure", fromX: d.measureStartX });
   add(shapes, { op: "line", pts: [[d.measureStartX, 524], [d.measureStartX, 556]], stroke: PALETTE.ink, width: 4, role: "measure-tick" });
   add(shapes, { op: "text", x: (d.measureStartX + d.measureEndX) / 2, y: 490, text: "5 м от края", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
-  add(shapes, { op: "text", x: 480, y: 820, text: "Остановка запрещена на пересечении", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
-  add(shapes, { op: "text", x: 480, y: 858, text: "и ближе 5 м от его краёв.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
-  const words = d.exception;
-  add(shapes, { op: "text", x: 480, y: 910, text: "Исключение — напротив бокового выезда", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "exception" });
-  add(shapes, { op: "text", x: 480, y: 948, text: "T-пересечения со сплошной или разделителем.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "exception" });
+  if (prose) {
+    add(shapes, { op: "text", x: 480, y: 820, text: "Остановка запрещена на пересечении", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
+    add(shapes, { op: "text", x: 480, y: 858, text: "и ближе 5 м от его краёв.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
+    add(shapes, { op: "text", x: 480, y: 910, text: "Исключение — напротив бокового выезда", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "exception" });
+    add(shapes, { op: "text", x: 480, y: 948, text: "T-пересечения со сплошной или разделителем.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "exception" });
+  }
   add(shapes, { op: "text", x: 1440, y: 150, text: "Выезд автомобиля со двора", size: 32, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
   add(shapes, { op: "poly", pts: [[1100, 520], [1780, 520], [1780, 620], [1100, 620]], fill: PALETTE.paved, role: "road" });
   add(shapes, { op: "poly", pts: [[1380, 620], [1500, 620], [1500, 860], [1380, 860]], fill: PALETTE.court, role: "context", kind: "yard" });
   add(shapes, { op: "poly", pts: [[1408, 700], [1472, 700], [1472, 780], [1408, 780]], fill: PALETTE.red, role: "parked" });
   add(shapes, { op: "circle", cx: 1440, cy: 740, r: 36, fill: "none", stroke: PALETTE.stopRed, width: 6, role: "no-parking" });
   add(shapes, { op: "line", pts: [[1416, 764], [1464, 716]], stroke: PALETTE.stopRed, width: 6, role: "no-parking" });
-  add(shapes, { op: "text", x: 1440, y: 920, text: "Запрещена стоянка.", size: 30, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
-  add(shapes, { op: "text", x: 1440, y: 962, text: "Это не запрет любой остановки.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
-  void words;
+  if (prose) {
+    add(shapes, { op: "text", x: 1440, y: 920, text: "Запрещена стоянка.", size: 30, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
+    add(shapes, { op: "text", x: 1440, y: 962, text: "Это не запрет любой остановки.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
+  }
 }
 
-function drawRecap(shapes) {
+function drawRecap(shapes, state = {}) {
   const lines = [
     ["1", "Место: выезд со двора — не перекрёсток"],
     ["2", "Чем задан приоритет"],
@@ -384,8 +388,24 @@ function drawRecap(shapes) {
     add(shapes, { op: "text", x: x + 28, y: y + 30, text: line[0], size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "recap" });
     add(shapes, { op: "text", x: x + 70, y: y + 30, text: line[1], size: 28, fill: PALETTE.ink, weight: 700, anchor: "start", role: "recap" });
   });
-  add(shapes, { op: "text", x: 960, y: 860, text: "Остановка у пересечения и стоянка у выезда со двора — разные запреты.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "recap" });
-  add(shapes, { op: "text", x: 960, y: 980, text: "Сводка не заменяет уже увиденные сцены.", size: 28, fill: "#3d4650", weight: 400, anchor: "middle", role: "recap" });
+  const banY = state.subtitle?.length ? 820 : 860;
+  const footY = state.subtitle?.length ? 880 : 980;
+  add(shapes, { op: "text", x: 960, y: banY, text: "Остановка у пересечения и стоянка у выезда со двора — разные запреты.", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "recap" });
+  add(shapes, { op: "text", x: 960, y: footY, text: "Сводка не заменяет уже увиденные сцены.", size: 28, fill: "#3d4650", weight: 400, anchor: "middle", role: "recap" });
+}
+
+function drawSubtitle(shapes, lines) {
+  const size = 32;
+  const gap = 40;
+  const h = 18 + lines.length * gap;
+  const y = VIEW.height - h - 16;
+  add(shapes, { op: "poly", pts: [[80, y], [1840, y], [1840, y + h], [80, y + h]], fill: PALETTE.plate, role: "subtitle" });
+  lines.forEach((text, i) => {
+    add(shapes, {
+      op: "text", x: VIEW.width / 2, y: y + 36 + i * gap, text, size,
+      fill: PALETTE.ink, weight: 700, anchor: "middle", role: "subtitle",
+    });
+  });
 }
 
 export function buildFrame(state) {
@@ -399,8 +419,8 @@ export function buildFrame(state) {
     else if (scene === "yard") drawYard(state, shapes);
     else if (scene === "bend") drawBend(shapes);
     else if (scene === "case") drawCase(state, shapes);
-    else if (scene === "stoppark") drawStopPark(shapes);
-    else if (scene === "recap") drawRecap(shapes);
+    else if (scene === "stoppark") drawStopPark(shapes, state);
+    else if (scene === "recap") drawRecap(shapes, state);
   }
   if (scene === "junction" || scene === "yard") {
     if (state.signs === "a4") {
@@ -418,6 +438,7 @@ export function buildFrame(state) {
     }
   }
   if (state.layers !== "cars") overlays(shapes, state.overlays);
+  if (state.layers !== "cars" && state.subtitle?.length) drawSubtitle(shapes, state.subtitle);
   const pave = scene === "junction" ? paveSpec(state) : null;
   return {
     width: VIEW.width,
