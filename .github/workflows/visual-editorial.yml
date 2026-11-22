@@ -57,6 +57,10 @@ jobs:
         run: node tools/visual-editorial-audit.mjs
       - name: Run visual editorial test
         run: node --test tests/js/visual-editorial.test.mjs
+      - name: Syntax check browser entrypoints
+        run: |
+          node --check web/assets/pages/intersection.mjs
+          node --check web/assets/pages/episode.mjs
       - name: Check intersection trainer behavior and texts
         run: node --test tests/js/intersection-*.test.mjs
       - name: Install dependencies
