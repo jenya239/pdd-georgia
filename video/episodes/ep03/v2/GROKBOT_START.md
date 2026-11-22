@@ -11,7 +11,7 @@
 ### Непреложное начало
 
 1. Проверь current HEAD, ветку, статус незакоммиченных файлов, актуальные файлы сценария. Не доверяй предыдущему сообщению вместо репозитория.
-2. Прочти **полностью**: `AGENTS.md`, `docs/lesson-prose.md`, `docs/ep03-visual-gold-standard.md`, `content/lessons/ep03/plain.mjs`, `content/ontology/lessons.json`, `docs/real-road-cases-sourcebook.md`, затем все файлы этой папки.
+2. Прочти **полностью**: `NARRATIVE_BIBLE.md`, `NARRATIVE_REVISION_NOTES.md`, `AGENTS.md`, `docs/lesson-prose.md`, `docs/ep03-visual-gold-standard.md`, `content/lessons/ep03/plain.mjs`, `content/ontology/lessons.json`, `docs/real-road-cases-sourcebook.md`, затем все файлы этой папки.
 3. **Первым делом** прочти `NARRATIVE_BIBLE.md`, слей VO в один монолог и составь критическую карту художественных «швов». Литературная редактура должна предшествовать графическим прототипам.
 4. `node tools/ep03-v2.mjs --check`; если не проходит — найди **причину** различий, а не переписывай случайно обе копии речи.
 5. Сделай матрицу `S00–S11 → юридический тезис → полный текст нормы (KA) → условия → исключения → визуальное решение → reviewer verdict`. Указывай фактические данные, версию Matsne, сохраняй ссылки и цитирование источника. Запрещено заменять правовую проверку голосованием трёх LLM.
