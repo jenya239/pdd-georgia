@@ -23,6 +23,9 @@ on:
       - 'tests/js/visual-editorial.test.mjs'
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
+      - 'video/episodes/ep03/v2/**'
+      - 'tools/ep03-v2.mjs'
+      - 'tests/js/ep03-v2-preproduction.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
       - '.github/workflows/visual-editorial.yml'
   pull_request:
@@ -47,6 +50,9 @@ on:
       - 'tests/js/visual-editorial.test.mjs'
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
+      - 'video/episodes/ep03/v2/**'
+      - 'tools/ep03-v2.mjs'
+      - 'tests/js/ep03-v2-preproduction.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
 jobs:
   editorial:
@@ -63,6 +69,10 @@ jobs:
         run: node --test tests/js/ep02-editorial.test.mjs
       - name: Check episode 1 narrative and evidence
         run: node --test tests/js/ep01-editorial.test.mjs
+      - name: Validate ep03 v2 preproduction screenplay and law fixtures
+        run: |
+          node tools/ep03-v2.mjs --check
+          node --test tests/js/ep03-v2-preproduction.test.mjs
       - name: Run visual editorial test
         run: node --test tests/js/visual-editorial.test.mjs
       - name: Syntax check browser entrypoints
