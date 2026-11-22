@@ -32,6 +32,7 @@ test("statistics have year, specific category, source, and limitation", () => {
 test("narrative has explanatory figures, timely exam comparison and a final source map", () => {
   const figures = [...html.matchAll(/<figure\b[\s\S]*?<\/figure>/g)].map(m => m[0]);
   assert.equal(figures.length, 7);
+  assert.equal((html.match(/<picture>/g) || []).length, 3);
   for (const [i, f] of figures.entries()) {
     if (f.includes("<picture>")) {
       assert.match(f, /<source /, `figure ${i + 1} responsive source`);
@@ -43,7 +44,8 @@ test("narrative has explanatory figures, timely exam comparison and a final sour
     assert.match(f, /<figcaption>/, `figure ${i + 1}`);
   }
   for (const [name, width] of [["ep01-recap.svg", 700], ["ep01-recap-mobile.svg", 374],
-    ["ep01-annexes.svg", 700], ["ep01-annexes-mobile.svg", 374]]) {
+    ["ep01-annexes.svg", 700], ["ep01-annexes-mobile.svg", 374],
+    ["ep01-exam.svg", 700], ["ep01-exam-mobile.svg", 374]]) {
     const svg = read(`site/assets/${name}`);
     assert.ok(svg.includes(`viewBox="0 0 ${width} `), name);
     assert.ok(svg.includes('role="img"'), name);
