@@ -53,7 +53,8 @@ export function trainerShell({ embed: embedded = false } = {}) {
   const scope = embedded
     ? "Пока здесь два автомобиля на равнозначных дорогах или на прямой главной. Остальные ситуации третьего выпуска разбираются в тексте."
     : "Пока доступны простые перекрёстки: два автомобиля, одна полоса, равнозначные дороги или прямая главная. Остальные ситуации появятся после проверки правил.";
-  return `<div class="ix-layout">
+  return `<p class="ix-mobile-prompt">Выбери автомобиль, который может проехать.</p>
+<div class="ix-layout">
   <div class="ix-stage" id="ix-scene">
     <canvas id="board" aria-hidden="true"></canvas>
     <div id="hits"></div>
