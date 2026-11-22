@@ -14,7 +14,7 @@ import { parseProgress, recordProgress } from "../intersection/progress.mjs";
 import { openSession, reduce } from "../intersection/session.mjs";
 import { primaryConcept } from "../intersection/solver.mjs";
 
-const STANDING = "«Может ехать сейчас» значит: для каждого другого автомобиля либо пути с запасом не сходятся, либо пересекаются, но проверенное правило не обязывает выбранного уступить. Скоростей нет, так что это не обещание безопасного проезда. Если правило молчит, автомобиль не засчитывается.";
+const STANDING = "Схема помогает разобраться, кто кому уступает. Она не учитывает скорость, обзор и другие опасности реальной дороги. В спорных ситуациях тренажёр не угадывает ответ.";
 const CONCEPT = {
   right: "помеха справа",
   left: "левый поворот и встречный",
@@ -37,7 +37,6 @@ let followMeta = null;
 let missedId = null;
 let recorded = false;
 let nextAction = null;
-let timer = 0;
 let token = 0;
 let motion = null;
 let stage = null;
@@ -51,36 +50,38 @@ function q(id) {
 
 /** Controls shared by the standalone page and the episode 3 exercise. */
 export function trainerShell({ embed: embedded = false } = {}) {
-  const limit = embedded
-    ? "Клавиши 1 и 2 — номера автомобилей на схеме."
-    : "Два автомобиля, одна полоса. Равнозначные дороги или прямая главная. Клавиши 1 и 2 — номера автомобилей. Покрытие, двор, изгиб главной, светофор и знак «стоп» этот срез не разыгрывает.";
-  return `<p class="small mut" id="limit">${limit}</p>
-<div class="ix-bar">
+  const scope = embedded
+    ? "Пока здесь два автомобиля на равнозначных дорогах или на прямой главной. Остальные ситуации третьего выпуска разбираются в тексте."
+    : "Пока доступны простые перекрёстки: два автомобиля, одна полоса, равнозначные дороги или прямая главная. Остальные ситуации появятся после проверки правил.";
+  return `<p class="ix-mobile-prompt">Выбери автомобиль, который может проехать.</p>
+<div class="ix-layout">
+  <div class="ix-stage" id="ix-scene">
+    <canvas id="board" aria-hidden="true"></canvas>
+    <div id="hits"></div>
+    <div id="ix-flash" class="ix-flash" hidden aria-hidden="true"></div>
+  </div>
+  <div class="ix-panel">
+    <h3 class="ix-question" id="ix-question">Кто может проехать сейчас?</h3>
+    <p class="ix-help">Нажми на машину или клавишу с её номером.</p>
+    <p id="lead" class="ix-lead" hidden></p>
+    <div id="explain" class="ix-explain"></div>
+    <button type="button" class="btn ix-next" id="next" hidden>Следующая ситуация</button>
+  </div>
+</div>
+<p id="live" class="sr" aria-live="polite" aria-atomic="true"></p>
+<details class="ix-details">
+  <summary>Настройки и подробности</summary>
+  <p>${scope}</p>
+  <p id="assume" class="small mut"></p>
   <div class="ix-styles" role="group" aria-label="Оформление">
     <button type="button" data-style="soft">Мягкий</button>
-    <button type="button" data-style="ink">Чернила</button>
+    <button type="button" data-style="ink">Контрастный</button>
   </div>
-  <button type="button" class="btn ghost" id="bug">Сообщить об ошибке</button>
-  <button type="button" class="btn" id="next" hidden>Дальше</button>
-</div>
-<p id="lead" class="ix-lead" hidden></p>
-<div class="ix-stage" id="ix-scene">
-  <canvas id="board" aria-hidden="true"></canvas>
-  <div id="hits"></div>
-</div>
-<p id="live" class="sr" aria-live="polite"></p>
-<div id="explain" class="ix-explain"></div>
-<details class="ix-note">
-  <summary>Что считает эта сцена</summary>
-  <p id="assume"></p>
-</details>
-<details class="ix-note">
-  <summary>Что уже встречалось</summary>
-  <p id="concepts" class="small"></p>
-</details>
-<pre id="report" hidden tabindex="0"></pre>`;
+  <details class="ix-note"><summary>Пройденные правила</summary><p id="concepts" class="small"></p></details>
+  <button type="button" class="btn ghost" id="bug">Данные для сообщения об ошибке</button>
+  <pre id="report" hidden tabindex="0"></pre>
+</details>`;
 }
-
 /** Draw one checked scene into a container that already holds trainerShell(). */
 export function mountIntersection(root, options = {}) {
   host = root;
@@ -156,7 +157,6 @@ function begin(scenario, nextSeed, meta) {
   recorded = false;
   motion = null;
   nextAction = null;
-  clearTimeout(timer);
   rememberUrl((url) => url.searchParams.set("seed", String(seed)));
   render();
 }
@@ -204,41 +204,36 @@ function onDone() {
   progress = recordProgress(progress, primaryConcept(session.opening), !session.firstTryWrong);
   saveProgress();
   const note = closingNote(session.opening);
+  const nextSeed = seed + 1;
   if (followMeta) {
     showText(followMeta.why, "ok");
-    const nextSeed = seed + 1;
-    armNext(2600, () => begin(generate(nextSeed).scenario, nextSeed, null));
+    armNext("Следующая ситуация", () => begin(generate(nextSeed).scenario, nextSeed, null));
     return;
   }
   if (session.firstTryWrong && missedId) {
     const pair = followUp(session.scenario, missedId);
     if (pair) {
-      if (note) showText(note, "ok");
-      const scenario = { ...pair.after, id: `ix-after-${seed}-${missedId}`, seed };
-      armNext(900, () => begin(scenario, seed, { why: pair.why, lead: leadFor(pair.delta) }));
+      showText("Готово. Теперь изменим одну деталь и посмотрим, как изменится решение.", "ok");
+      const scenario = { ...pair.after, id: "ix-after-" + seed + "-" + missedId, seed };
+      armNext("Сравнить ситуацию", () => begin(scenario, seed, { why: pair.why, lead: leadFor(pair.delta) }));
       return;
     }
   }
-  if (note) showText(note, "ok");
-  const nextSeed = seed + 1;
-  armNext(note ? 1600 : 700, () => begin(generate(nextSeed).scenario, nextSeed, null));
+  showText(note || "Все автомобили проехали. Можно перейти к следующему перекрёстку.", "ok");
+  armNext("Следующая ситуация", () => begin(generate(nextSeed).scenario, nextSeed, null));
 }
 
-function armNext(ms, fn) {
+function armNext(label, fn) {
   nextAction = fn;
-  clearTimeout(timer);
-  if (motionQuery.matches) return;
-  timer = setTimeout(goNext, ms);
+  q("next").textContent = label;
 }
 
 function goNext() {
   const fn = nextAction;
   if (!fn) return;
   nextAction = null;
-  clearTimeout(timer);
   fn();
 }
-
 function setStyle(next) {
   style = styleName(next);
   rememberUrl((url) => {
@@ -254,29 +249,46 @@ function render() {
   placeHits();
   markStyles();
   const lead = q("lead");
-  if (followMeta && session.phase !== "done") {
-    lead.hidden = false;
-    lead.textContent = followMeta.lead;
-  } else if (session.phase !== "done") lead.hidden = true;
+  lead.hidden = !(followMeta && session.phase !== "done");
+  if (!lead.hidden) lead.textContent = followMeta.lead;
   const explanation = faultExplanation();
+  q("ix-question").textContent = session.remaining.length === 1
+    ? "Кто может ехать следующим?" : "Кто может проехать сейчас?";
   if (explanation) showHtml(explanationHtml(explanation), "bad");
   else if (session.phase === "ready" && session.remaining.length < task.vehicles.length) {
     const note = closingNote(session.opening);
     if (note) showText(note, "ok");
     else if (session.remaining.length === 1 && session.decision.admissible.includes(session.remaining[0])) {
-      showText("Этот проехал. Оставшийся теперь может ехать.", "ok");
+      showText("Верно. Теперь может проехать оставшийся автомобиль.", "ok");
     }
   } else if (session.phase !== "done") clearExplain();
-  q("assume").textContent = explanation
-    ? `${STANDING} ${explanation.assumption}`
-    : STANDING;
+  q("assume").textContent = STANDING;
   q("next").hidden = !nextAction;
+  const flash = q("ix-flash");
+  if (explanation) {
+    const first = explanation.highlight.yieldTo[0];
+    const cause = explanation.decisive === "автомобиль справа" ? ": он справа"
+      : explanation.decisive === "знак главной дороги" ? ": он на главной"
+      : explanation.decisive === "встречное направление" ? ": встречный" : "";
+    flash.textContent = first ? "Сначала автомобиль " + first + cause : "Нет однозначного первого";
+    flash.className = "ix-flash is-error";
+    flash.hidden = false;
+  } else if (session.phase === "moving" && session.outcome === "go") {
+    flash.textContent = "Верно";
+    flash.className = "ix-flash is-ok";
+    flash.hidden = false;
+  } else if (session.phase === "done") {
+    flash.textContent = "Все проехали";
+    flash.className = "ix-flash is-ok";
+    flash.hidden = false;
+  } else {
+    flash.hidden = true;
+  }
   announce(liveText(explanation));
   renderProgress();
   stage.dataset.phase = session.phase;
   stage.dataset.task = task.id;
 }
-
 function faultExplanation() {
   if (!session.explanation) return null;
   if (session.phase === "error") return session.explanation;
@@ -326,12 +338,12 @@ function renderProgress() {
   const rows = Object.entries(progress.concepts);
   const box = q("concepts");
   if (!rows.length) {
-    box.textContent = "Пока пусто. Счётчик считает понятия, а не очки, и не выбирает следующую норму.";
+    box.textContent = "Здесь появится история разобранных правил.";
     return;
   }
   box.textContent = rows.map(([id, count]) => {
     const name = CONCEPT[id] || id;
-    return `${name}: ${count.seen}, с первого раза ${count.firstTry}`;
+    return `${name}: ${count.seen} задач, ${count.firstTry} без ошибок`;
   }).join(". ") + ".";
 }
 
@@ -482,16 +494,9 @@ function drawMarkings(ctx, P, scale, color, ink, font) {
     ctx.setLineDash([8, 10]);
   }
   ctx.setLineDash([]);
-  ctx.fillStyle = ink;
-  ctx.font = `600 14px ${font}`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  const letters = { N: { x: -0.62, y: 1.16 }, S: { x: 0.62, y: -1.16 }, E: { x: 1.16, y: -0.62 }, W: { x: -1.16, y: 0.62 } };
-  for (const [letter, at] of Object.entries(letters)) {
-    const p = P(at);
-    ctx.fillText(letter, p.x, p.y);
-  }
   void scale;
+  void ink;
+  void font;
   ctx.restore();
 }
 
@@ -771,8 +776,8 @@ const standalone = document.getElementById("ix-app");
 if (standalone) {
   header("trainer");
   standalone.innerHTML = `<p class="kicker">Тренажёр</p>
-<h1>Кто может ехать сейчас</h1>
-<p class="deck">Два автомобиля. Нажмите тот, который может ехать сейчас. Иногда таких двое: верен любой из них.</p>
+<h1>Проезд перекрёстка</h1>
+<p class="deck">Выбери автомобиль, который может проехать. Иногда оба могут ехать независимо — тогда верен любой выбор.</p>
 ${trainerShell()}`;
   mountIntersection(standalone);
 }

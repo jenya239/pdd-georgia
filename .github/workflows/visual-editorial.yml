@@ -14,6 +14,10 @@ on:
       - 'site/index.html'
       - 'site/course.html'
       - 'web/**'
+      - 'packages/intersection/**'
+      - 'site/assets/intersection/**'
+      - 'site/assets/pages/intersection.mjs'
+      - 'tests/js/intersection-*.test.mjs'
       - 'tools/visual-editorial-audit.mjs'
       - 'tools/editorial/**'
       - 'tests/js/visual-editorial.test.mjs'
@@ -32,6 +36,10 @@ on:
       - 'site/index.html'
       - 'site/course.html'
       - 'web/**'
+      - 'packages/intersection/**'
+      - 'site/assets/intersection/**'
+      - 'site/assets/pages/intersection.mjs'
+      - 'tests/js/intersection-*.test.mjs'
       - 'tools/visual-editorial-audit.mjs'
       - 'tools/editorial/**'
       - 'tests/js/visual-editorial.test.mjs'
@@ -49,6 +57,12 @@ jobs:
         run: node tools/visual-editorial-audit.mjs
       - name: Run visual editorial test
         run: node --test tests/js/visual-editorial.test.mjs
+      - name: Syntax check browser entrypoints
+        run: |
+          node --check web/assets/pages/intersection.mjs
+          node --check web/assets/pages/episode.mjs
+      - name: Check intersection trainer behavior and texts
+        run: node --test tests/js/intersection-*.test.mjs
       - name: Install dependencies
         run: npm ci --ignore-scripts
       - name: Generate typed Prisma client
@@ -57,6 +71,7 @@ jobs:
         run: |
           node node_modules/typescript/bin/tsc -p packages/domain --noEmit
           node node_modules/typescript/bin/tsc -p packages/course --noEmit
+          node node_modules/typescript/bin/tsc -p packages/intersection --noEmit
       - name: Check statutory quotations and literary lesson regressions
         run: node --test tests/js/lesson-quotes.test.mjs
       - name: Verify committed site matches regenerated release

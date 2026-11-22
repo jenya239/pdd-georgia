@@ -41,9 +41,8 @@ import { mountIntersection, trainerShell } from "./intersection.mjs";
   const kindLine = `<div class="small mut"><a href="course.html">Курс</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
   const trainerInLesson = r.id === "ep03" && !showFilm && (chosen?.id === "plain" || (isText && !editions.length));
   const trainer = trainerInLesson
-    ? `<section class="ix-lesson" id="trainer"><h2>Два автомобиля: кто может ехать сейчас</h2>
-   <p>Дальше можно проверить узкий случай, который уже виден на схемах. Два автомобиля, одна полоса, прямо или поворот. Дороги либо равнозначные, либо главная идёт прямо и обозначена знаками 2.1 и 2.3. Нажмите автомобиль, который может ехать сейчас. Если таких двое, верен любой из них.</p>
-   <p>Сцена не меняет покрытие, не прячет его под снегом, не выезжает со двора и не поворачивает главную. Светофора и знака «стоп» на ней нет: эти различия остаются в тексте выше. <a href="intersection.html">Та же сцена отдельной страницей</a>.</p>
+    ? `<section class="ix-lesson" id="trainer"><h2>Теперь попробуй сам</h2>
+   <p>На схемах мы наблюдали, кто кому уступает. Теперь решение за тобой: выбери автомобиль, который может проехать. Если он должен уступить, разберём причину прямо на перекрёстке.</p>
    ${trainerShell({ embed: true })}</section>`
     : "";
   const filmPointer = r.id === "ep03" && !trainerInLesson
