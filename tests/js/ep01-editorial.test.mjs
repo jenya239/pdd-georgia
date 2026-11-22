@@ -33,11 +33,22 @@ test("narrative has explanatory figures, timely exam comparison and a final sour
   const figures = [...html.matchAll(/<figure\b[\s\S]*?<\/figure>/g)].map(m => m[0]);
   assert.equal(figures.length, 7);
   for (const [i, f] of figures.entries()) {
-    assert.match(f, /<svg\b[^>]*role="img"/, `figure ${i + 1}`);
-    assert.match(f, /aria-label="/, `figure ${i + 1}`);
+    if (f.includes("<picture>")) {
+      assert.match(f, /<source /, `figure ${i + 1} responsive source`);
+      assert.match(f, /<img [^>]*alt="/, `figure ${i + 1} alt`);
+    } else {
+      assert.match(f, /<svg[^>]*role="img"/, `figure ${i + 1} svg`);
+      assert.match(f, /aria-label="/, `figure ${i + 1} svg label`);
+    }
     assert.match(f, /<figcaption>/, `figure ${i + 1}`);
   }
-  assert.ok(html.includes("viewBox=\"0 0 700 280\""));
+  for (const [name, width] of [["ep01-recap.svg", 700], ["ep01-recap-mobile.svg", 374],
+    ["ep01-annexes.svg", 700], ["ep01-annexes-mobile.svg", 374]]) {
+    const svg = read(`site/assets/${name}`);
+    assert.ok(svg.includes(`viewBox="0 0 ${width} `), name);
+    assert.ok(svg.includes('role="img"'), name);
+    assert.equal(svg, read(`web/assets/${name}`), name);
+  }
   assert.ok(html.includes("new.matsne.gov.ge/ka/document/view/6867586"));
   assert.match(html, /27 верных ответов/);
   assert.match(html, /25/);
