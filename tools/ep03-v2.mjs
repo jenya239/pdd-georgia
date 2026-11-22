@@ -18,13 +18,14 @@ const scenario = JSON.parse(readFileSync(path.join(folder,"scenario.json"),"utf8
 function assertData(d) {
   assert.equal(d.schemaVersion,2);
   assert.equal(d.episode,"ep03");
+  assert.ok(d.narrativeArc?.centralQuestion && d.narrativeArc?.resolution,"Narrative architecture is required");
   assert.ok(Array.isArray(d.scenes) && d.scenes.length >= 10);
   const ids = d.scenes.map(s=>s.id);
   assert.equal(new Set(ids).size,ids.length,"duplicate scene IDs");
   assert.ok(ids.every((id,i)=>id===`S${String(i).padStart(2,"0")}`),"unordered scene IDs");
   assert.ok(d.production.idealDurationRangeSeconds[0] < d.production.idealDurationRangeSeconds[1]);
   for (const s of d.scenes) {
-    for (const key of ["title","world","visual","motion","focus","delta","reveal","continuity"]) {
+    for (const key of ["title","world","visual","motion","focus","delta","reveal","continuity","dramaticFunction","bridgeToNext"]) {
       assert.equal(typeof s[key],"string",`${s.id} missing ${key}`);
       assert.ok(s[key].trim(),`${s.id} blank ${key}`);
     }
@@ -58,6 +59,20 @@ function screenplay(d) {
     "",
     "Зритель наблюдает один и тот же перекрёсток: не переставляем автомобили и не подменяем ракурс, а меняем одну правовую переменную за другой. Одна дорога, две одинаковые траектории — и разные обязанности. Городская часть с дворовым выездом строится таким же контрфактом. Это визуальное расследование, а не озвучивание учебника.",
     "",
+    "## Внутренний сюжет",
+    "",
+    "**Центральный вопрос:** "+d.narrativeArc.centralQuestion,
+    "",
+    "**Начальная иллюзия:** "+d.narrativeArc.openingMisdirection,
+    "",
+    "**Первый ложный сдвиг:** "+d.narrativeArc.firstFalseChange,
+    "",
+    "**Первый перелом:** "+d.narrativeArc.firstTrueReversal,
+    "",
+    "**Разрешение:** "+d.narrativeArc.resolution,
+    "",
+    "Главный стандарт литературной редактуры: `NARRATIVE_BIBLE.md`. Монтаж и техника должны следовать за развитием мысли.",
+    "",
     "## Сцены и дословный закадровый текст",
     ""
   ];
@@ -70,6 +85,8 @@ function screenplay(d) {
       "**Анимация и монтаж:** "+s.motion,"",
       "**Что меняем:** `"+s.delta+"` · **Следствие:** "+s.reveal,"",
       "**Зрительный акцент:** "+s.focus,"",
+      "**Драматургическая функция:** "+s.dramaticFunction,"",
+      "**Причина следующей сцены:** "+s.bridgeToNext,"",
       "**Переход:** "+s.continuity,
       `**Проверочные якоря:** ${s.norms.length?s.norms.join(", "):"внешний подтверждённый случай"}; билеты: ${s.tickets.join(", ")||"не требуются"}; пауза на осмысление: ${s.pause_s} с.`,
       "",
@@ -82,7 +99,7 @@ function screenplay(d) {
     "1. Синхронизировать тайминг с реальной TTS-озвучкой по абзацам и паузам, а не нарезать текст под `estimate_s` насильно.",
     "2. Для каждой сцены отрендерить контрольные still: до изменения, во время изменения и после; собрать контакт-лист.",
     "3. Проверить юридические факты отдельно от художественного результата; подробная матрица в `LEGAL_AND_EVIDENCE.md`.",
-    "4. Применять `VISUAL_BIBLE.md`, `PRODUCTION.md`, `ACCEPTANCE.md` и `GROKBOT_START.md`.",
+    "4. **В первую очередь:** `NARRATIVE_BIBLE.md`; затем `VISUAL_BIBLE.md`, `PRODUCTION.md`, `ACCEPTANCE.md` и `GROKBOT_START.md`.",
     "",
     "Существующие `video/episodes/ep03/scenes.py`, `boards.py`, `timeline.json` и опубликованный `content/media/ep03.mp4` этим документом **не заменяются**.",
     "");
