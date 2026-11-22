@@ -12,7 +12,7 @@ test("episode 2 published HTML equals the canonical source and retains exact law
   assert.equal(read("site/lessons/ep02-plain.html"), html);
   assert.ok(html.includes("<!--AFTER-TICKETS-->"));
   assert.ok(html.includes("Формулировки закона и уточнения"));
-  assert.ok(html.includes("В русской цитате пункта 14 статьи 31"));
+  assert.ok(html.includes("пункта 14 статьи 31") && html.includes("стоит «без прицепов»"));
   assert.ok(html.includes("გარდა მსვლელობით სიარულის შემთხვევებისა"));
   for (const name of ["st5-p9", "st5-p12", "st5-p45", "st31-p18"]) {
     assert.ok(html.includes(`data-norm="${name}"`), name);
