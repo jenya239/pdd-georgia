@@ -62,7 +62,7 @@ test("law references are real locally tracked norm pages; real crash has externa
   }
   const incident=scenario.scenes.find(s=>s.id==="S09");
   assert.ok(incident.source_url.startsWith("https://www.ntsb.gov/"));
-  assert.ok(incident.voice.join(" ").includes("США"));
+  assert.ok(incident.voice.join(" ").includes("американском штате Нью-Джерси"));
   assert.ok(incident.voice.join(" ").includes("не пример неверного применения грузинской"));
   assert.ok(worlds.worlds.D1.geometry.includes("symbolic"));
 });
