@@ -31,7 +31,10 @@ function storyByName(name) {
   if (name === "a") return { ...PROTO_A, at: prototypeAState };
   if (name === "c") return { ...PROTO_C, at: prototypeCState };
   if (name === "film") return { id: "S00-S11", ...film(), stills: filmStills() };
-  if (name === "review") return reviewStory(loadTimeline());
+  if (name === "review") {
+    const file = arg("timeline", "");
+    return reviewStory(loadTimeline(file || undefined));
+  }
   throw new Error(`unknown story ${name}`);
 }
 

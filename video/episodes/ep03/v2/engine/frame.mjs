@@ -59,7 +59,7 @@ function stippleRect(shapes, x0, y0, x1, y1, color, seed, step = 1.55, r = 1.35)
   for (let x = loX; x <= hiX; x += step) {
     for (let y = loY; y <= hiY; y += step) {
       const h = ((Math.imul(Math.floor(x * 10) + seed, 374761393) ^ Math.imul(Math.floor(y * 10), 668265263)) >>> 0) / 4294967295;
-      if (h < 0.55) continue;
+      if (h < 0.8) continue;
       const [sx, sy] = worldToScreen(x, y);
       add(shapes, { op: "circle", cx: sx, cy: sy, r: r + h, fill: color, role: "texture" });
       if (++n > 900) return;
@@ -132,23 +132,42 @@ function carPolys(spec, along) {
   const ry = fx;
   const cx = spec.x + fx * along * TRAVEL;
   const cy = spec.y + fy * along * TRAVEL;
-  const L = 4.8;
-  const W = 2.05;
+  const L = 4.7;
+  const W = 1.82;
   const p = (dl, dw) => worldToScreen(cx + fx * dl + rx * dw, cy + fy * dl + ry * dw);
+  const body = [
+    [-L * 0.92, -W * 0.55], [-L * 0.55, -W], [-L * 0.05, -W], [L * 0.42, -W * 0.92], [L * 0.78, -W * 0.48],
+    [L, -W * 0.22], [L, W * 0.22], [L * 0.78, W * 0.48], [L * 0.42, W * 0.92], [-L * 0.05, W], [-L * 0.55, W], [-L * 0.92, W * 0.55],
+  ].map(([dl, dw]) => p(dl, dw));
+  const shadow = [];
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    const [x, y] = p(Math.cos(a) * L * 0.72, Math.sin(a) * W * 0.85);
+    shadow.push([x, y + 7]);
+  }
   return {
     id: spec.id,
     center: { x: cx, y: cy },
-    body: [p(-L, -W), p(L * 0.7, -W), p(L, -W * 0.62), p(L, W * 0.62), p(L * 0.7, W), p(-L, W)],
-    glass: [p(L * 0.12, -W * 0.55), p(L * 0.58, -W * 0.38), p(L * 0.58, W * 0.38), p(L * 0.12, W * 0.55)],
-    mark: p(-L * 0.25, 0),
-    brakeL: [p(-L * 1.15, -W * 0.82), p(-L * 0.55, -W * 0.82), p(-L * 0.55, -W * 0.22), p(-L * 1.15, -W * 0.22)],
-    brakeR: [p(-L * 1.15, W * 0.22), p(-L * 0.55, W * 0.22), p(-L * 0.55, W * 0.82), p(-L * 1.15, W * 0.82)],
+    shadow,
+    body,
+    cabin: [p(-L * 0.02, -W * 0.62), p(L * 0.58, -W * 0.4), p(L * 0.58, W * 0.4), p(-L * 0.02, W * 0.62)],
+    glass: [p(L * 0.08, -W * 0.42), p(L * 0.48, -W * 0.26), p(L * 0.48, W * 0.26), p(L * 0.08, W * 0.42)],
+    mark: p(-L * 0.28, 0),
+    wheels: [[L * 0.5, -W * 0.72], [L * 0.5, W * 0.72], [-L * 0.48, -W * 0.72], [-L * 0.48, W * 0.72]].map(([dl, dw]) => p(dl, dw)),
+    brakeL: [p(-L * 0.92, -W * 0.42), p(-L * 0.62, -W * 0.42), p(-L * 0.62, -W * 0.12), p(-L * 0.92, -W * 0.12)],
+    brakeR: [p(-L * 0.92, W * 0.12), p(-L * 0.62, W * 0.12), p(-L * 0.62, W * 0.42), p(-L * 0.92, W * 0.42)],
   };
 }
 
 function drawCar(shapes, spec, along, brake, fill) {
   const g = carPolys(spec, along);
+  add(shapes, { op: "poly", pts: g.shadow, fill: "#c9c2b4", opacity: 0.9, role: "shadow", id: spec.id });
+  for (const [x, y] of g.wheels) {
+    add(shapes, { op: "circle", cx: x, cy: y, r: 6.2, fill: "#2a2e32", role: "car", id: spec.id });
+    add(shapes, { op: "circle", cx: x, cy: y, r: 2.4, fill: "#d7d2c8", role: "car", id: spec.id });
+  }
   add(shapes, { op: "poly", pts: g.body, fill, role: "car", id: spec.id });
+  add(shapes, { op: "poly", pts: g.cabin, fill: mixHex(fill, "#101418", 0.18), role: "car", id: spec.id });
   add(shapes, { op: "poly", pts: g.glass, fill: PALETTE.glass, role: "car", id: spec.id });
   const markFill = "#f4f1ea";
   if (spec.mark === "square") {
@@ -215,8 +234,11 @@ function drawJunction(state, shapes) {
   const contrast = state.contrast ?? 1;
   const pave = paveSpec(state);
   const segments = verticalSegments(pave);
+  const shoulder = snow >= 0.98 ? PALETTE.snow : "#d4cdc0";
+  add(shapes, { op: "poly", pts: rect(-100, -HALF - 2.4, 100, HALF + 2.4), fill: shoulder, role: "shoulder", arm: "h" });
+  add(shapes, { op: "poly", pts: rect(-HALF - 2.4, -100, HALF + 2.4, 100), fill: shoulder, role: "shoulder", arm: "v" });
   add(shapes, { op: "poly", pts: rect(-100, -HALF, 100, HALF), fill: roadFill("paved", snow, contrast), role: "road", material: snow >= 0.98 ? "snow" : "paved", arm: "h" });
-  if (snow < 0.98 && contrast > 0.4) stippleRect(shapes, -100, -HALF, 100, HALF, "#7a756e", 3, 2.4, 1.1);
+  if (snow < 0.98 && contrast > 0.4) stippleRect(shapes, -100, -HALF, 100, HALF, "#5f6460", 3, 7.5, 2.1);
   for (const seg of segments) {
     const material = snow >= 0.98 ? "snow" : seg.material;
     add(shapes, {
@@ -227,8 +249,14 @@ function drawJunction(state, shapes) {
       material,
       arm: "v",
     });
-    if (snow < 0.98 && seg.material === "dirt") stippleRect(shapes, -HALF, seg.y0, HALF, seg.y1, "#7a4e24", 9, 1.45, 1.45);
-    if (snow < 0.98 && seg.material === "paved") stippleRect(shapes, -HALF, seg.y0, HALF, seg.y1, "#6f6b64", 4, 2.8, 1.05);
+    if (snow < 0.98 && seg.material === "dirt") stippleRect(shapes, -HALF, seg.y0, HALF, seg.y1, "#7a4e28", 9, 8, 2.2);
+    if (snow < 0.98 && seg.material === "paved") stippleRect(shapes, -HALF, seg.y0, HALF, seg.y1, "#5c615c", 4, 8, 2.1);
+  }
+  if (snow < 0.98) {
+    add(shapes, { op: "line", pts: [worldToScreen(-100, -HALF), worldToScreen(100, -HALF)], stroke: "#f4f0e8", width: 3, role: "edge" });
+    add(shapes, { op: "line", pts: [worldToScreen(-100, HALF), worldToScreen(100, HALF)], stroke: "#f4f0e8", width: 3, role: "edge" });
+    add(shapes, { op: "line", pts: [worldToScreen(-HALF, -100), worldToScreen(-HALF, 100)], stroke: "#f4f0e8", width: 3, role: "edge" });
+    add(shapes, { op: "line", pts: [worldToScreen(HALF, -100), worldToScreen(HALF, 100)], stroke: "#f4f0e8", width: 3, role: "edge" });
   }
   if (snow >= 0.98) {
     stippleRect(shapes, -100, -HALF, 100, HALF, "#f7fbff", 2, 2.2, 1.3);
@@ -379,7 +407,9 @@ function drawRecap(shapes, state = {}) {
     ["8", "Главная поворачивает — внутри группы"],
   ];
   add(shapes, { op: "text", x: 960, y: 78, text: "Место, приоритет, участники, манёвр", size: 36, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "overlay" });
+  const shown = state.recapCount ?? lines.length;
   lines.forEach((line, i) => {
+    if (i >= shown) return;
     const col = i < 4 ? 0 : 1;
     const row = i % 4;
     const x = 140 + col * 900;
@@ -408,6 +438,99 @@ function drawSubtitle(shapes, lines) {
   });
 }
 
+function roadEdge(y, side, pan) {
+  const t = Math.min(1, Math.max(0, (y - 300) / 720));
+  const half = 64 + (380 - 64) * t;
+  const center = 960 + pan * (0.15 + 0.85 * t);
+  return [center + side * half, y];
+}
+
+function ribbon(y0, y1, sidePad, pan) {
+  const pts = [];
+  for (let y = y0; y <= y1; y += 28) pts.push(roadEdge(y, -1, pan).map((v, i) => i === 0 ? v - sidePad : v));
+  for (let y = y1; y >= y0; y -= 28) pts.push(roadEdge(y, 1, pan).map((v, i) => i === 0 ? v + sidePad : v));
+  return pts;
+}
+
+function drawPrologue(shapes, state) {
+  const phase = state.phase ?? "road";
+  if (phase === "arrive") return;
+  const u = state.u ?? 0;
+  const pan = phase === "road" ? (u - 0.2) * 180 : 0;
+  add(shapes, { op: "poly", pts: [[0, 0], [1920, 0], [1920, 280], [0, 280]], fill: "#d9d0c2", role: "prologue", kind: "sky" });
+  if (phase === "compare") {
+    drawCompare(shapes, u);
+    return;
+  }
+  const clusters = [[140, 210, 78], [230, 250, 42], [390, 190, 64], [560, 230, 36], [1320, 200, 58], [1540, 240, 46], [1720, 188, 72]];
+  for (const [x, y, r] of clusters) {
+    const shift = pan * 0.22;
+    add(shapes, { op: "circle", cx: x + shift, cy: y, r, fill: "#6d755f", role: "prologue", kind: "trees" });
+    add(shapes, { op: "circle", cx: x + shift + r * 0.45, cy: y + 16, r: r * 0.62, fill: "#87917a", role: "prologue", kind: "trees" });
+  }
+  add(shapes, { op: "poly", pts: ribbon(320, 1000, 28, pan), fill: "#d4ccbe", role: "prologue", kind: "verge" });
+  add(shapes, { op: "poly", pts: ribbon(320, 1000, 0, pan), fill: "#6f736c", role: "prologue", kind: "surface" });
+  const left = [];
+  const right = [];
+  for (let y = 320; y <= 1000; y += 24) {
+    left.push(roadEdge(y, -1, pan));
+    right.push(roadEdge(y, 1, pan));
+  }
+  add(shapes, { op: "line", pts: left, stroke: "#f4f0e7", width: 3, role: "prologue", kind: "edge" });
+  add(shapes, { op: "line", pts: right, stroke: "#f4f0e7", width: 3, role: "prologue", kind: "edge" });
+  const signY = 460;
+  const [signX] = roadEdge(signY, 1, pan);
+  const board = [[signX + 8, signY - 36], [signX + 78, signY - 36], [signX + 78, signY + 16], [signX + 8, signY + 16]];
+  add(shapes, { op: "line", pts: [[signX + 43, signY + 16], [signX + 43, signY + 78]], stroke: "#3a3e3c", width: 5, role: "prologue", kind: "sign" });
+  add(shapes, { op: "poly", pts: board, fill: "#2c3134", role: "prologue", kind: "sign" });
+  const nearY = 760;
+  const farY = 860;
+  const [nearX] = roadEdge(nearY, 1, pan);
+  const [farX] = roadEdge(farY, 1, pan);
+  const house = nearX + 210;
+  add(shapes, {
+    op: "poly",
+    pts: [[nearX - 4, nearY - 8], [house, nearY - 36], [farX + 200, farY - 8], [farX - 4, farY + 18]],
+    fill: "#8b8f86",
+    role: "prologue",
+    kind: "drive",
+  });
+  add(shapes, { op: "poly", pts: [[house - 10, nearY - 110], [house + 150, nearY - 110], [house + 150, nearY - 16], [house - 10, nearY - 16]], fill: "#ddd6cb", role: "prologue", kind: "drive" });
+  add(shapes, { op: "poly", pts: [[house + 48, nearY - 70], [house + 92, nearY - 70], [house + 92, nearY - 16], [house + 48, nearY - 16]], fill: "#4e5852", role: "prologue", kind: "drive" });
+  if (state.focus === "surface") {
+    const patch = [];
+    for (let y = 620; y <= 820; y += 20) patch.push(roadEdge(y, -0.45, pan));
+    for (let y = 820; y >= 620; y -= 20) patch.push(roadEdge(y, 0.45, pan));
+    add(shapes, { op: "poly", pts: patch, fill: "#8d928a", opacity: 0.9, role: "prologue-focus", kind: "surface" });
+  } else if (state.focus === "sign") {
+    add(shapes, { op: "poly", pts: board, fill: "none", stroke: PALETTE.ink, width: 3, role: "prologue-focus", kind: "sign" });
+  } else if (state.focus === "drive") {
+    add(shapes, { op: "poly", pts: [[nearX - 12, nearY - 20], [house + 160, nearY - 120], [house + 160, farY], [farX - 8, farY + 28]], fill: "none", stroke: PALETTE.ink, width: 3, role: "prologue-focus", kind: "drive" });
+  }
+  const leave = state.leave ?? 0;
+  if (leave > 0.001) {
+    const fade = 1 - leave;
+    for (const shape of shapes) {
+      if (shape.role === "prologue" || shape.role === "prologue-focus") shape.opacity = fade;
+    }
+  }
+}
+
+function drawCompare(shapes, u) {
+  const grow = u < 0.46 ? 0.22 : 0.22 + 0.78 * ((u - 0.46) / 0.54);
+  add(shapes, { op: "poly", pts: [[760, 180], [1160, 180], [1160, 980], [760, 980]], fill: "#d9d1c3", role: "prologue", kind: "verge" });
+  add(shapes, { op: "poly", pts: [[820, 180], [1100, 180], [1100, 980], [820, 980]], fill: "#a56b38", role: "prologue", kind: "surface" });
+  const y0 = 560 - 400 * grow;
+  const y1 = 560 + 400 * grow;
+  add(shapes, { op: "poly", pts: [[820, y0], [1100, y0], [1100, y1], [820, y1]], fill: "#74786f", role: "prologue", kind: "change" });
+  add(shapes, { op: "line", pts: [[820, 180], [820, 980]], stroke: "#f6f2ea", width: 4, role: "prologue", kind: "edge" });
+  add(shapes, { op: "line", pts: [[1100, 180], [1100, 980]], stroke: "#f6f2ea", width: 4, role: "prologue", kind: "edge" });
+}
+
+function tag(shapes, from, layer) {
+  for (let i = from; i < shapes.length; i++) shapes[i].layer = layer;
+}
+
 export function buildFrame(state) {
   assertNoPriorityPassage(state);
   const shapes = [];
@@ -415,27 +538,55 @@ export function buildFrame(state) {
   const scene = state.scene ?? "junction";
   let centers = null;
   if (state.layers !== "cars") {
-    if (scene === "junction") drawJunction(state, shapes);
-    else if (scene === "yard") drawYard(state, shapes);
-    else if (scene === "bend") drawBend(shapes);
+    if (scene === "prologue") {
+      drawPrologue(shapes, state);
+      if ((state.morph ?? 0) > 0.02) {
+        const from = shapes.length;
+        drawJunction({ ...state, snow: 0, contrast: 1, pave: { type: "dirt" }, legend: false }, shapes);
+        for (let i = from; i < shapes.length; i++) shapes[i].opacity = state.morph;
+        tag(shapes, from, "world");
+      }
+    } else if (scene === "junction") {
+      const from = shapes.length;
+      drawJunction(state, shapes);
+      tag(shapes, from, "world");
+    } else if (scene === "yard") {
+      const from = shapes.length;
+      drawYard(state, shapes);
+      tag(shapes, from, "world");
+    } else if (scene === "bend") drawBend(shapes);
     else if (scene === "case") drawCase(state, shapes);
     else if (scene === "stoppark") drawStopPark(shapes, state);
     else if (scene === "recap") drawRecap(shapes, state);
   }
-  if (scene === "junction" || scene === "yard") {
-    if (state.signs === "a4") {
+  if (scene === "junction" || scene === "yard" || (scene === "prologue" && (state.carsIn ?? 0) > 0.02)) {
+    const from = shapes.length;
+    if (scene === "junction" && state.path && (state.pathU ?? 0) > 0.02) {
+      const [a, b] = state.path;
+      const t = state.pathU;
+      add(shapes, {
+        op: "line",
+        pts: [worldToScreen(a[0], a[1]), worldToScreen(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)],
+        stroke: "#243028", width: 4, role: "path",
+      });
+    }
+    if (scene !== "prologue" && state.signs === "a4") {
       for (const sign of worldsDoc.worlds.A4.signs) {
         if (sign.code === "2.1") drawSign21(shapes, sign.approxWorldPosition[0], sign.approxWorldPosition[1]);
         if (sign.code === "2.3") drawSign23(shapes, sign.approxWorldPosition[0], sign.approxWorldPosition[1]);
       }
     }
     centers = drawPairCars(state, shapes);
-    if ((state.snow ?? 0) >= 0.98 && centers) {
+    if ((state.snow ?? 0) >= 0.98 && centers && scene !== "prologue") {
       const blueLabel = worldToScreen(centers.blue.x, centers.blue.y + 8);
       const redLabel = worldToScreen(centers.red.x + 8, centers.red.y);
       add(shapes, { op: "text", x: blueLabel[0], y: blueLabel[1], text: "своя — второстепенная", size: 28, fill: PALETTE.ink, weight: 700, anchor: "middle", role: "snow-duty" });
       add(shapes, { op: "text", x: redLabel[0], y: redLabel[1], text: "своя — второстепенная", size: 28, fill: PALETTE.ink, weight: 700, anchor: "start", role: "snow-duty" });
     }
+    if (scene === "prologue") {
+      for (let i = from; i < shapes.length; i++) shapes[i].opacity = state.carsIn;
+    }
+    tag(shapes, from, "world");
   }
   if (state.layers !== "cars") overlays(shapes, state.overlays);
   if (state.layers !== "cars" && state.subtitle?.length) drawSubtitle(shapes, state.subtitle);
@@ -443,6 +594,7 @@ export function buildFrame(state) {
   return {
     width: VIEW.width,
     height: VIEW.height,
+    view: state.view ?? null,
     shapes,
     meta: {
       scene,

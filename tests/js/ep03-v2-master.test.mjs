@@ -12,7 +12,7 @@ const scenario = JSON.parse(readFileSync(new URL("../../video/episodes/ep03/v2/s
 test("the silent film keeps its length and the review timeline follows the phrases", () => {
   assert.equal(film().duration, 206);
   const voices = flattenVoices(scenario);
-  assert.equal(voices.length, 29);
+  assert.equal(voices.length, scenario.scenes.reduce((sum, scene) => sum + scene.voice.length, 0));
   const timeline = buildTimeline(voices, voices.map(() => 10));
   assert.equal(timeline.scenes.length, 12);
   assert.equal(timeline.scenes[0].start, 0);

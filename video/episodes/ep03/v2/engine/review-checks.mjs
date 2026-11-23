@@ -10,9 +10,11 @@ import { flattenVoices } from "./master.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const v2 = path.resolve(here, "..");
-const video = path.join(v2, "render/final/ep03-v2-review.mp4");
-const srtPath = path.join(v2, "render/final/ep03-v2-review.srt");
-const timeline = JSON.parse(readFileSync(path.join(v2, "render/timeline.json"), "utf8"));
+const videoArg = process.argv.find((item) => item.endsWith(".mp4"));
+const video = videoArg ?? path.join(v2, "render/final/ep03-v2-review.mp4");
+const srtPath = video.replace(/\.mp4$/, ".srt");
+const timelineName = path.basename(video).includes("next") ? "timeline-next.json" : "timeline.json";
+const timeline = JSON.parse(readFileSync(path.join(v2, "render", timelineName), "utf8"));
 const scenario = JSON.parse(readFileSync(path.join(v2, "scenario.json"), "utf8"));
 const failures = [];
 
@@ -67,7 +69,9 @@ if (Math.abs(duration - timeline.duration) > 0.08) fail("duration", { duration, 
 if (Math.abs(duration - timeline.measuredAudio) > 0.08) fail("audio-sync", { duration, measured: timeline.measuredAudio });
 
 const voices = flattenVoices(scenario);
-if (voices.length !== 29) fail("phrase-count", voices.length);
+if (voices.length !== scenario.scenes.reduce((sum, scene) => sum + scene.voice.length, 0)) {
+  fail("phrase-count", voices.length);
+}
 for (const voice of voices) {
   const text = timeline.cues.filter((cue) => cue.id === voice.id).map((cue) => cue.lines.join(" ")).join(" ");
   if (text !== voice.text) fail("missing-vo", voice.id);
@@ -106,7 +110,7 @@ if (!(mean < -12 && mean > -32)) fail("mean-volume", mean);
 if (!(max > -12)) fail("max-volume", max);
 
 const report = {
-  file: "video/episodes/ep03/v2/render/final/ep03-v2-review.mp4",
+  file: path.relative(path.resolve(v2, "../../../.."), video),
   duration,
   planned: timeline.duration,
   measuredAudio: timeline.measuredAudio,

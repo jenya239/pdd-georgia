@@ -266,3 +266,164 @@ export function filmParts() {
 export function film() {
   return clip(filmParts());
 }
+
+function moveCars(who, u, enabled) {
+  const cars = stillCars();
+  if (!enabled) return cars;
+  const along = u < 0.14 ? 0 : ease((u - 0.14) / 0.72);
+  if (who === "blue") {
+    cars.blueAlong = along;
+    cars.redBrake = along > 0.02;
+  } else {
+    cars.redAlong = along;
+    cars.blueBrake = along > 0.02;
+  }
+  return cars;
+}
+
+function directPrologue(id, u, inLead) {
+  const cars = stillCars();
+  if (inLead || !id || id === "S00.1") {
+    const uu = inLead || !id ? 0 : u;
+    let focus = "space";
+    if (uu > 0.4) focus = "surface";
+    if (uu > 0.6) focus = "sign";
+    if (uu > 0.78) focus = "drive";
+    return { scene: "prologue", phase: "road", u: uu, focus, morph: 0, carsIn: 0, cars, world: null };
+  }
+  if (id === "S00.2") {
+    return { scene: "prologue", phase: "compare", u, focus: null, morph: 0, carsIn: 0, cars, world: null };
+  }
+  if (u < 0.14) {
+    return {
+      scene: "prologue", phase: "road", u: 1, focus: "space", morph: 0, carsIn: 0,
+      leave: ease(u / 0.14), cars, world: null,
+    };
+  }
+  const morph = u < 0.28 ? ease((u - 0.14) / 0.14) : 1;
+  const carsIn = u < 0.3 ? 0 : ease(Math.min(1, (u - 0.3) / 0.22));
+  return {
+    scene: "prologue", phase: "arrive", u, focus: null, morph, carsIn, cars,
+    world: "A0", pave: { type: "dirt" }, snow: 0, contrast: 1,
+  };
+}
+
+/** Картинка обзорного ролика привязана к фразе, а не к старому немому хронометражу. */
+export function directedState(index, speech = {}) {
+  const inLead = !!speech.inLead;
+  const u = inLead ? 0 : Math.min(1, Math.max(0, speech.u ?? 0));
+  const id = speech.id ?? "";
+  const last = !inLead && speech.count > 0 && speech.ordinal === speech.count - 1;
+  if (index === 0) return directPrologue(id, u, inLead);
+  if (index === 1) {
+    return {
+      scene: "junction", world: "A1", pave: { type: "dirt" }, snow: 0, contrast: 1,
+      cars: moveCars("blue", u, last),
+      legend: id === "S01.1" && u > 0.18 && u < 0.9,
+      path: last ? [[-38, 0], [28, 0]] : null,
+      pathU: last ? Math.min(1, u / 0.36) : 0,
+      view: { scale: 1, cx: 960, cy: 540 },
+    };
+  }
+  if (index === 2) {
+    const cars = stillCars();
+    let length = PATCH_LEN;
+    let scale = 0.9;
+    if (inLead || id === "S02.1") {
+      const uu = inLead ? 0 : u;
+      length = uu < 0.42 ? ease(uu / 0.42) * PATCH_LEN : PATCH_LEN;
+      scale = uu < 0.42 ? 1.1 : 1.1 - 0.22 * ease((uu - 0.42) / 0.58);
+    } else {
+      Object.assign(cars, moveCars("blue", u, true));
+    }
+    return {
+      scene: "junction", world: "A2", pave: { type: "patch", length }, snow: 0, contrast: 1, cars,
+      path: id === "S02.2" ? [[-38, 0], [28, 0]] : null,
+      pathU: id === "S02.2" ? Math.min(1, u / 0.36) : 0,
+      view: { scale, cx: 960, cy: 520 },
+    };
+  }
+  if (index === 3) {
+    const cars = stillCars();
+    let paveU = 1;
+    if (inLead || id === "S03.1") {
+      const uu = inLead ? 0 : u;
+      paveU = uu < 0.12 ? 0 : ease(Math.min(1, (uu - 0.12) / 0.7));
+    } else {
+      const gated = u < 0.52 ? 0 : (u - 0.52) / 0.48;
+      Object.assign(cars, moveCars("red", gated, true));
+    }
+    const done = paveU >= 0.999;
+    return {
+      scene: "junction", world: done ? "A3" : "A2",
+      pave: { type: "spread", u: paveU }, snow: 0, contrast: 1, cars,
+      path: id === "S03.2" ? [[0, -38], [0, 28]] : null,
+      pathU: id === "S03.2" ? Math.min(1, u / 0.36) : 0,
+      view: { scale: 1, cx: 960, cy: 540 },
+    };
+  }
+  if (index === 4) {
+    const cars = stillCars();
+    let back = 0;
+    let signs = true;
+    if (inLead || id === "S04.1") {
+      const uu = inLead ? 0 : u;
+      back = uu < 0.42 ? 1 - ease(uu / 0.42) : 0;
+      signs = uu > 0.62;
+    } else Object.assign(cars, moveCars("red", u, true));
+    return {
+      scene: "junction", world: signs ? "A4" : "A1",
+      pave: back <= 0.001 ? { type: "dirt" } : { type: "spread", u: back },
+      signs: signs ? "a4" : "none", snow: 0, contrast: 1, cars,
+      view: { scale: 1, cx: 960, cy: 540 },
+    };
+  }
+  if (index === 5) {
+    let signs = id === "S05.1" || inLead;
+    let snow = 0;
+    if (id === "S05.2") {
+      signs = u < 0.22;
+      snow = u < 0.28 ? 0 : ease(Math.min(1, (u - 0.28) / 0.55));
+    } else if (id === "S05.3") {
+      signs = false;
+      snow = 1;
+    }
+    return {
+      scene: "junction", world: snow > 0.85 ? "A5" : "A4",
+      pave: { type: "dirt" }, signs: signs ? "a4" : "none", snow, contrast: 1, cars: stillCars(),
+    };
+  }
+  if (index === 6) return { scene: "bend", world: "B1", cars: stillCars(), t: u };
+  if (index === 7) {
+    return {
+      scene: "yard", world: "C1", yardU: 0, pedestrian: true,
+      cars: moveCars("blue", u, last),
+    };
+  }
+  if (index === 8) {
+    const yardU = inLead || speech.ordinal === 0 ? (inLead ? 0 : ease(Math.min(1, u / 0.55))) : 1;
+    return {
+      scene: "yard", world: yardU >= 0.999 ? "C2" : "C1", yardU, pedestrian: true,
+      cars: moveCars("red", u, last),
+    };
+  }
+  if (index === 9) return { scene: "stoppark", world: "C3", cars: stillCars() };
+  if (index === 10) {
+    const busAlong = id === "S10.2" ? Math.min(0.62, ease(u) * 0.62) : id === "S10.3" ? 0.62 : 0;
+    return { scene: "case", world: "D1", cars: stillCars(), busAlong, t: u * 6 };
+  }
+  if (inLead || speech.ordinal === 0) {
+    return { scene: "junction", world: "A1", pave: { type: "dirt" }, snow: 0, contrast: 1, cars: stillCars() };
+  }
+  if (speech.ordinal === 1) {
+    const memories = [
+      { scene: "junction", world: "A2", pave: { type: "patch", length: PATCH_LEN } },
+      { scene: "junction", world: "A3", pave: { type: "paved" } },
+      { scene: "junction", world: "A5", pave: { type: "dirt" }, snow: 1 },
+      { scene: "yard", world: "C1", yardU: 0, pedestrian: true },
+    ];
+    const item = memories[Math.min(memories.length - 1, Math.floor(u * memories.length))];
+    return { ...item, snow: item.snow ?? 0, contrast: 1, cars: stillCars() };
+  }
+  return { scene: "recap", world: "OUTRO", cars: stillCars(), recapCount: Math.max(1, Math.ceil(Math.max(u, 0.05) * 8)) };
+}
