@@ -24,6 +24,10 @@ on:
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
       - 'tests/js/course-narrative-blocks.test.mjs'
+      - 'tests/js/lesson-theory-hash.test.mjs'
+      - 'tests/js/fixtures/ep01-theory.sha256'
+      - 'tests/js/fixtures/ep02-theory.sha256'
+      - 'tests/js/fixtures/ep03-theory.sha256'
       - 'docs/course-narrative-blocks-0-1.md'
       - 'packages/lesson/ep07.ts'
       - 'packages/lesson/ep08.ts'
@@ -56,6 +60,10 @@ on:
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
       - 'tests/js/course-narrative-blocks.test.mjs'
+      - 'tests/js/lesson-theory-hash.test.mjs'
+      - 'tests/js/fixtures/ep01-theory.sha256'
+      - 'tests/js/fixtures/ep02-theory.sha256'
+      - 'tests/js/fixtures/ep03-theory.sha256'
       - 'docs/course-narrative-blocks-0-1.md'
       - 'packages/lesson/ep07.ts'
       - 'packages/lesson/ep08.ts'
@@ -104,5 +112,7 @@ jobs:
           node node_modules/typescript/bin/tsc -p packages/intersection --noEmit
       - name: Check statutory quotations and literary lesson regressions
         run: node --test tests/js/lesson-quotes.test.mjs
+      - name: Ensure canonical reading theory and its SHA256 fixtures match release
+        run: node --test tests/js/lesson-theory-hash.test.mjs
       - name: Verify committed site matches regenerated release
         run: node tools/build.mjs --check
