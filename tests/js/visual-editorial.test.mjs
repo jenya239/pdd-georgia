@@ -23,7 +23,9 @@ test("episode 3 is a continuous illustrated explanation, not a legacy lesson", (
   for (const norm of ["st5-p13", "st5-p37", "st36-p4-v", "st36-p8"])
     assert.ok(html.includes(`norm/${norm}.html`));
   const script = readFileSync("site/assets/pages/episode.mjs", "utf8");
-  assert.ok(script.includes('!showFilm && (chosen?.id === "plain" || (isText && !editions.length))'));
+  assert.ok(script.includes('class="lesson visuallesson"'));
+  assert.ok(script.includes("${lesson.before}${lesson.after}"));
+  assert.ok(!script.includes("С диалогом") && !script.includes("data-edition"));
   assert.ok(script.includes("lesson-appendix"));
 });
 
@@ -63,8 +65,9 @@ test("every released episode has a continuous visual-reading edition", () => {
     assert.ok(episode.integratedTickets.every(ticket => page.includes(`№${ticket}`)), episode.id);
   }
   const renderer = readFileSync("site/assets/pages/episode.mjs", "utf8");
-  assert.ok(renderer.includes('!showFilm && (chosen?.id === "plain" || (isText && !editions.length))'));
+  assert.ok(renderer.includes('class="lesson visuallesson"'));
   assert.ok(renderer.includes('${lesson.before}${lesson.after}'));
+  assert.ok(!renderer.includes("С диалогом") && !renderer.includes("data-edition"));
   assert.ok(renderer.includes('class="lesson-appendix"'));
 });
 

@@ -227,55 +227,33 @@ def generate():
         ep["law_quotes"] += [idx.annex_quote(an, it) for an, it in ep.get("annex_quotes", [])]
         for q in ep["law_quotes"]:
             assert q["text"], q
-        labels = ep.get("edition_labels")
         for k in EPISODE_SOURCE_KEYS:
             ep.pop(k, None)
         plain = rendered["raw"].get(f"{ep['id']}-plain")
-        if plain and ep["kind"] != "text":
+        body = rendered["raw"].get(ep["id"])
+        if body:
+            lessons[ep["id"]] = body
+        if plain:
             plains[ep["id"]] = plain
-            ep["editions"] = [
-                {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
-                {"id": "dialogue", "label": "Ролик", "href": ep["video"]},
-            ]
         if ep["kind"] == "text":
             lesson_dir = paths.LESSONS / ep["id"]
-            html = rendered["raw"][ep["id"]]
-            lessons[ep["id"]] = html
-            if plain:
-                plains[ep["id"]] = plain
-                if labels:
-                    ep["editions"] = [
-                        {"id": "short", "label": labels[1], "href": f"lessons/{ep['id']}-plain.html"},
-                        {"id": "full", "label": labels[0], "href": ep["lesson"]},
-                    ]
-                else:
-                    ep["editions"] = [
-                        {"id": "plain", "label": "Без персонажей", "href": f"lessons/{ep['id']}-plain.html"},
-                        {"id": "dialogue", "label": "С диалогом", "href": ep["lesson"]},
-                    ]
-                if ep.get("video"):
-                    ep["editions"].append({"id": "film", "label": "Ролик", "href": ep["video"]})
+            published = plain or body or ""
             prefix = f"lessons/{ep['id']}/"
-            names = set(lesson_asset_refs(html, prefix))
-            if plain:
-                names |= set(lesson_asset_refs(plain, prefix))
-            for name in sorted(names):
+            for name in sorted(set(lesson_asset_refs(published, prefix))):
                 src = lesson_dir / name
                 copies[prefix + name] = src if src.exists() else paths.SIGNS / name
-        for key in ("poster", "video", "tickets_video"):
-            rel = ep.get(key)
-            if rel and rel.startswith("lessons/"):
-                copies[rel] = paths.LESSONS / rel[len("lessons/"):]
-            elif rel and rel.startswith("media/"):
-                copies[rel] = paths.MEDIA / rel[len("media/"):]
 
     items_export = checkitems.export(items, world)
     linker = normsite.link_content(world.norms, world, eps, lessons, tickets, Q, idx.quotes, items_export, plains)
     for ep in eps:
-        if ep["id"] in lessons:
-            files[ep["lesson"]] = rendered["linked"][ep["lesson"]]
-        if ep["id"] in plains:
-            files[f"lessons/{ep['id']}-plain.html"] = rendered["linked"][f"lessons/{ep['id']}-plain.html"]
+        lesson_rel = ep.get("lesson")
+        if lesson_rel in rendered["linked"]:
+            files[lesson_rel] = rendered["linked"][lesson_rel]
+        plain_rel = f"lessons/{ep['id']}-plain.html"
+        if ep["id"] in plains and plain_rel in rendered["linked"]:
+            files[plain_rel] = rendered["linked"][plain_rel]
+        for key in ("video", "poster", "tickets_video", "video_note", "editions"):
+            ep.pop(key, None)
     norm_model, norm_copies, _ = normsite.norm_files(world.norms, world, linker, eps, tickets, items_export)
     files.update(node_json("tools/render-norm-pages.mjs", norm_model))
     copies.update(norm_copies)

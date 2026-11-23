@@ -16,7 +16,7 @@ test("episode 3 keeps the trainer after the explained article and out of the pub
   assert.ok(episode.includes("mountIntersection(trainerHost, { embed: true })"));
   assert.ok(episode.includes('location.hash === "#trainer"'));
   assert.ok(!episode.includes("не часть текста выпуска"));
-  assert.ok(episode.includes('href="episode.html?id=ep03#trainer"'));
+  assert.ok(!episode.includes("С диалогом") && !episode.includes("data-edition"));
   const lesson = read("content/lessons/ep03/plain.mjs");
   assert.ok(!lesson.includes("ix-scene") && !lesson.includes('id="trainer"'));
   const published = read("site/lessons/ep03-plain.html");

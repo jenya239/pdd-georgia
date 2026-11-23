@@ -77,16 +77,29 @@ export function auditVisualEditorial(root = defaultRoot, world = loadWorld(root)
       problems.push(`${item.id}: duplicate SVG or input ids`);
     }
   }
-  for (const [a, b] of [["web/visual.html", "site/visual.html"], ["web/index.html", "site/index.html"], ["web/course.html", "site/course.html"]]) {
+  for (const [a, b] of [["web/index.html", "site/index.html"], ["web/course.html", "site/course.html"]]) {
     if (!existsSync(path.join(root, a)) || !existsSync(path.join(root, b)) || read(root, a) !== read(root, b)) {
       problems.push(`static source/published mismatch: ${a} <-> ${b}`);
     }
   }
-  const visual = read(root, "site/visual.html");
-  if (figures(visual) !== 6 || /type="radio"/.test(visual)) problems.push("visual.html: expected six uninteractive figures");
-  for (const link of links(visual)) {
-    const target = localTarget(link);
-    if (target && !existsSync(path.join(root, "site", target))) problems.push(`visual.html: dead link ${link}`);
+  const retired = [
+    "site/visual.html",
+    "web/visual.html",
+    "site/lessons/ep04.html",
+    "site/lessons/ep05.html",
+    "site/lessons/ep06.html",
+    "site/media/ep01.mp4",
+    "site/media/ep02.mp4",
+    "site/media/ep03.mp4",
+    "site/media/ep04.mp4",
+    "site/media/ep04-tickets.mp4",
+  ];
+  for (const rel of retired) {
+    if (existsSync(path.join(root, rel))) problems.push(`retired material still published: ${rel}`);
+  }
+  for (const rel of ["site/index.html", "site/course.html"]) {
+    const page = read(root, rel);
+    if (/visual\.html|С диалогом|Без персонажей/.test(page)) problems.push(`${rel}: old edition or prototype link`);
   }
   return { problems, covered: metadata.episodes.length, rewritten: metadata.episodes.filter(x => x.status === "rewritten").length };
 }

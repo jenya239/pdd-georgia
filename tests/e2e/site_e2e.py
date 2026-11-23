@@ -32,6 +32,14 @@ def check(cond, msg):
         problems.append(msg)
 
 
+def show_appendix(page):
+    """Tickets and law quotes sit in the collapsed lesson appendix until the reader opens it."""
+    summary = page.locator("details.lesson-appendix > summary")
+    summary.wait_for()
+    if not page.locator("details.lesson-appendix").evaluate("el => el.open"):
+        summary.click()
+
+
 def shot(page, name, **kw):
     if SHOTS:
         SHOTS.mkdir(parents=True, exist_ok=True)
@@ -74,6 +82,7 @@ def legacy_root():
         page.goto(base + "episode.html?id=ep01#tk")
         page.wait_for_url("**/site/**")
         check(page.url == base + "site/episode.html?id=ep01#tk", f"old deep link forwarded ({page.url})")
+        show_appendix(page)
         page.wait_for_selector(".points li")
         check(page.locator(".points li").count() > 0, "forwarded episode page renders")
         br.close()
@@ -88,19 +97,19 @@ def norms(br, base):
     page.goto(base + "episode.html?id=ep05")
     page.wait_for_selector("article.lesson a.nref")
     n_links = page.locator("article.lesson a.nref").count()
-    check(n_links > 10, f"norm links: ep05 lesson has {n_links} auto-linked references")
-    a = page.locator('article.lesson a.nref[data-norm="st5-p87"]').first
+    check(n_links >= 8, f"norm links: ep05 lesson has {n_links} auto-linked references")
+    a = page.locator('article.lesson a.nref[data-norm="st5-p61"]').first
     a.scroll_into_view_if_needed()
-    page.evaluate("window.scrollBy(0, 200 - document.querySelector('article.lesson a.nref[data-norm=\"st5-p87\"]').getBoundingClientRect().top)")
+    page.evaluate("window.scrollBy(0, 200 - document.querySelector('article.lesson a.nref[data-norm=\"st5-p61\"]').getBoundingClientRect().top)")
     a.hover()
     page.wait_for_selector("#npop:not([hidden]) .npop-x[lang=ru]")
-    ru = page.evaluate("fetch('norm/chunks/st5.json').then(r => r.json()).then(c => c['st5-p87'].ru)")
+    ru = page.evaluate("fetch('norm/chunks/st5.json').then(r => r.json()).then(c => c['st5-p61'].ru)")
     shown = page.inner_text("#npop .npop-x")
-    check(ru and " ".join(shown.split())[:120] == " ".join(ru.split())[:120], f"hover panel shows the verbatim RU text of ст. 5, п. 87 ({shown[:50]!r})")
+    check(ru and " ".join(shown.split())[:120] == " ".join(ru.split())[:120], f"hover panel shows the verbatim RU text of ст. 5, п. 61 ({shown[:50]!r})")
     side = page.get_attribute("#npop", "data-side")
     pb, lb = page.locator("#npop").bounding_box(), page.locator("article.lesson").first.bounding_box()
     check(side == "right" and pb["x"] >= lb["x"] + lb["width"], f"panel sits in the right margin beside the text ({side}, x={pb['x']:.0f})")
-    check(page.get_attribute("#npop a.btn", "href").endswith("norm/st5-p87.html") and page.locator("#npop [data-copy]").count() == 1,
+    check(page.get_attribute("#npop a.btn", "href").endswith("norm/st5-p61.html") and page.locator("#npop [data-copy]").count() == 1,
           "panel has the permanent link and a copy button")
     check(a.get_attribute("aria-expanded") == "true", "link reports aria-expanded")
     page.locator("#npop").hover()
@@ -111,7 +120,7 @@ def norms(br, base):
     check(page.locator("#npop[hidden]").count() == 1, "Esc closes the panel")
     page.mouse.move(5, 5)
     page.wait_for_timeout(400)
-    page.locator("article.lesson a.nref").nth(3).focus()
+    page.locator('article.lesson a.nref[data-norm="st5-p61"]').first.focus()
     page.wait_for_selector("#npop:not([hidden]) .npop-x")
     check(True, "keyboard focus opens the panel")
     page.keyboard.press("Escape")
@@ -142,7 +151,7 @@ def norms(br, base):
     watch(mp)
     mp.goto(base + "episode.html?id=ep05")
     mp.wait_for_selector("article.lesson a.nref")
-    link = mp.locator('article.lesson a.nref[data-norm="st5-p87"]').first
+    link = mp.locator('article.lesson a.nref[data-norm="st5-p61"]').first
     link.scroll_into_view_if_needed()
     link.tap()
     mp.wait_for_selector("#npop.sheet:not([hidden]) .npop-x")
@@ -268,6 +277,7 @@ def ticket_details(br, base):
           and q.locator('.tdet [data-tab="note"]').inner_text() == "Заметка •", "note saved, marker shown")
     # second view: the lesson page — note marker before answering, remembered tab, two attempts in history
     page.goto(base + "episode.html?id=ep03")
+    show_appendix(page)
     page.wait_for_selector('#tk .q[data-id="54"] .ans')
     lq = page.locator('#tk .q[data-id="54"]')
     check(lq.locator(".notemark").is_visible() and lq.locator(".tdet").count() == 0, "lesson: note marker on the unanswered ticket, no panel yet")
@@ -497,40 +507,25 @@ def main():
         page.wait_for_selector("#stage h2")
         check(page.locator("#stage .q").count() == 0, "explain mode returns to the lesson text")
 
-        # video episodes open the new text; the filmed lesson is a small button
+        # every release is the visual article: no dialogue switch and no old film
         for r in E["released"]:
-            if r.get("kind") == "text":
-                continue
-            page.goto(base + f"episode.html?id={r['id']}")
-            page.wait_for_selector("#lb")
+            page.goto(base + f"episode.html?id={r['id']}&edition=dialogue")
+            page.wait_for_selector("#lb.visuallesson")
             page.wait_for_timeout(200)
             n = len(r["tickets_core"]) + len(r["tickets_linked"])
-            check(page.locator("video").count() == 0 and page.locator("#tk .q").count() == n, f"{r['id']}: new text + {n} tickets, no film")
-            check(page.locator(".editions button", has_text="Ролик").count() == 1, f"{r['id']}: small button for the film")
-            page.locator(".editions button", has_text="Ролик").click()
-            page.wait_for_selector("video")
-            dur = page.evaluate("new Promise(r=>{const v=document.querySelector('video'); if(v.readyState>=1) r(v.duration); else v.onloadedmetadata=()=>r(v.duration); setTimeout(()=>r(-1),8000)})")
-            check(dur > 60, f"{r['id']}: video metadata loads ({dur:.0f}s)")
+            check(page.locator("video").count() == 0 and page.locator(".editions").count() == 0, f"{r['id']}: no film and no edition switch")
+            check(page.get_by_text("С диалогом").count() == 0 and page.get_by_role("button", name="Ролик").count() == 0, f"{r['id']}: old editions are not offered")
+            check(page.locator(".badge.kind.text").count() == 1, f"{r['id']}: text lesson")
+            if r["id"] == "ep03":
+                check(page.locator("#trainer").count() == 1, "ep03 keeps the intersection trainer")
+            page.locator("details.lesson-appendix > summary").click()
+            page.wait_for_selector(".points li")
+            check(page.locator("#tk .q").count() == n, f"{r['id']}: {n} tickets rendered")
             if r.get("linked_title") and r["tickets_linked"]:
                 check(page.get_by_text(r["linked_title"]).count() == 1, f"{r['id']}: linked section title from data")
-
-        # text episode
-        for r in E["released"]:
-            if r.get("kind") != "text":
-                continue
-            page.goto(base + f"episode.html?id={r['id']}")
-            page.wait_for_selector("#tk .q")
-            n = len(r["tickets_core"]) + len(r["tickets_linked"])
-            film_button = any(e.get("id") == "film" for e in r.get("editions") or [])
-            videos = (0 if film_button else (1 if r.get("video") else 0)) + (1 if r.get("tickets_video") else 0)
-            check(page.locator("video").count() == videos and page.locator(".badge.kind.text").count() == 1,
-                  f"{r['id']}: text lesson badge, video={videos}")
-            if videos:
-                durs = page.evaluate("Promise.all([...document.querySelectorAll('video')].map(v => new Promise(r=>{if(v.readyState>=1) r(v.duration); else v.onloadedmetadata=()=>r(v.duration); setTimeout(()=>r(-1),8000)})))")
-                check(all(d > 60 for d in durs), f"{r['id']}: lesson video metadata loads ({durs})")
-            check(page.locator("#tk .q").count() == n, f"{r['id']}: {n} tickets rendered")
             figs = page.locator("figure.fig").count()
-            check(page.locator("figure.fig svg").count() == figs, f"{r['id']}: every lesson figure is an svg")
+            illustrated = page.locator("figure.fig:has(svg), figure.fig:has(img)").count()
+            check(illustrated == figs, f"{r['id']}: every lesson figure is a picture")
             ids = page.evaluate("[...document.querySelectorAll('[id]')].map(e => e.id)")
             check(len(ids) == len(set(ids)), f"{r['id']}: element ids unique on the page")
             dangling = page.evaluate("""[...document.querySelectorAll('svg [marker-end],svg [fill^="url("],svg [marker-start]')]
@@ -539,21 +534,23 @@ def main():
             check(not dangling, f"{r['id']}: svg url(#…) refs resolve {dangling}")
             broken = page.evaluate("[...document.images].filter(i => i.getAttribute('src') && i.complete && !i.naturalWidth).map(i => i.src)")
             check(not broken, f"{r['id']}: no broken images {broken}")
-            before = page.evaluate("localStorage.getItem('pddge.progress.v1')")
-            q = page.locator("#tk .q").first
-            tid = int(q.get_attribute("data-id"))
-            c = page.evaluate(f"{LOAD_T}.then(D => D.byId[{tid}].c)")
-            na = q.locator(".ans").count()
-            q.locator(".ans").nth((c + 1) % na).click()
-            page.wait_for_timeout(100)
-            rec = page.evaluate("JSON.parse(localStorage.getItem('pddge.progress.v1'))")[str(tid)]
-            check((before is None or str(tid) not in json.loads(before)) and rec["w"] == 1 and rec["k"] == 0 and rec["p"] == {str((c + 1) % na): 1}, f"{r['id']}: wrong pick recorded {rec}")
+            if n:
+                before = page.evaluate("localStorage.getItem('pddge.progress.v1')")
+                q = page.locator("#tk .q").first
+                tid = int(q.get_attribute("data-id"))
+                c = page.evaluate(f"{LOAD_T}.then(D => D.byId[{tid}].c)")
+                na = q.locator(".ans").count()
+                q.locator(".ans").nth((c + 1) % na).click()
+                page.wait_for_timeout(100)
+                rec = page.evaluate("JSON.parse(localStorage.getItem('pddge.progress.v1'))")[str(tid)]
+                check((before is None or str(tid) not in json.loads(before)) and rec["w"] == 1 and rec["k"] == 0 and rec["p"] == {str((c + 1) % na): 1}, f"{r['id']}: wrong pick recorded {rec}")
             shot(page, f"{r['id']}_desktop_full.png", full_page=True)
 
         # own check items on every lesson page
         for r in E["released"]:
             own = r.get("own_items", [])
             page.goto(base + f"episode.html?id={r['id']}")
+            page.locator("details.lesson-appendix > summary").click()
             page.wait_for_selector(".points li")
             page.wait_for_timeout(200)
             check(len(own) > 0 and page.locator("#own-items .q").count() == len(own)
@@ -562,12 +559,14 @@ def main():
         figs = [i for i in items["items"] if i.get("fig")]
         check(len(figs) >= 5, f"{len(figs)} own items with figures")
         page.goto(base + f"episode.html?id={figs[0]['lesson']}")
+        show_appendix(page)
         page.wait_for_selector("#own-items .q")
         check(page.locator(f'#own-items .q[data-id="{figs[0]["id"]}"] .qfig svg').count() == 1, "own item figure rendered")
         ids = page.evaluate("[...document.querySelectorAll('[id]')].map(e => e.id)")
         check(len(ids) == len(set(ids)), "element ids unique with own figures")
         sec = next(i for i in figs if i["fig"]["kind"] == "section")
         page.goto(base + f"episode.html?id={sec['lesson']}")
+        show_appendix(page)
         page.wait_for_selector(f'#own-items .q[data-id="{sec["id"]}"] .qfig svg')
         fills = page.evaluate(f"""[...document.querySelectorAll('#own-items .q[data-id="{sec["id"]}"] .qfig rect.strip')].map(r => getComputedStyle(r).fill)""")
         check(len(set(fills)) >= 3, f"section figure: strip kinds styled apart {sorted(set(fills))}")
@@ -575,6 +574,7 @@ def main():
         mapped = next(i for i in items["items"] if any(items["misconceptions"].get(m or "") for m in i["distractors"].values()))
         wrong_i = int(next(k for k, m in mapped["distractors"].items() if m))
         page.goto(base + f"episode.html?id={mapped['lesson']}")
+        show_appendix(page)
         page.wait_for_selector(f'#own-items .q[data-id="{mapped["id"]}"]')
         oq = page.locator(f'#own-items .q[data-id="{mapped["id"]}"]')
         oq.locator(".ans").nth(wrong_i).click()
@@ -592,6 +592,7 @@ def main():
         tk_id, tk_choice = next((t, int(i)) for t, d in td.items() for i, m in d.items() if m and any(int(t) in rr["tickets_core"] + rr["tickets_linked"] for rr in E["released"]))
         tk_ep = next(rr["id"] for rr in E["released"] if int(tk_id) in rr["tickets_core"] + rr["tickets_linked"])
         page.goto(base + f"episode.html?id={tk_ep}")
+        show_appendix(page)
         page.wait_for_selector(f'#tk .q[data-id="{tk_id}"]')
         bq = page.locator(f'#tk .q[data-id="{tk_id}"]')
         bq.locator(".ans").nth(tk_choice).click()
@@ -600,6 +601,7 @@ def main():
 
         # per-question «оригинал (KA)» toggle (no global language switch)
         page.goto(base + "episode.html?id=ep05")
+        show_appendix(page)
         page.wait_for_selector("#tk .q")
         q = page.locator("#tk .q:has(.katoggle)").first
         tid = int(q.get_attribute("data-id"))
@@ -849,7 +851,7 @@ def main():
         mp = mob.new_page()
         watch(mp)
         mp.goto(base + f"episode.html?id={last['id']}")
-        mp.wait_for_selector("#tk .q")
+        mp.wait_for_selector("#lb.visuallesson")
         sw = mp.evaluate("document.documentElement.scrollWidth")
         check(sw <= 390, f"mobile: no horizontal overflow ({sw})")
         bx = mp.evaluate("""[...document.querySelectorAll('header.top .pfbtns .iconbtn')].map(b => { const r = b.getBoundingClientRect(); return [r.left, r.right, r.height]; })""")
@@ -858,12 +860,16 @@ def main():
         # wide lesson figures on a phone: hint + fullscreen view (text lessons only)
         for r in [x for x in E["released"] if x.get("format") == "text" or x.get("kind") == "text"]:
             mp.goto(base + f"episode.html?id={r['id']}")
-            mp.wait_for_selector("#tk .q")
+            mp.wait_for_selector("#lb.visuallesson")
             nfig = mp.locator("article.lesson figure.fig").count()
             if not nfig:
                 continue
             hints = mp.locator(".fighint:not([hidden])")
-            check(hints.count() == nfig, f"{r['id']} mobile: every cut-off figure has a visible hint ({hints.count()}/{nfig})")
+            overflow = mp.locator("article.lesson figure.fig").evaluate_all(
+                "figs => figs.filter(f => f.scrollWidth > f.clientWidth + 1).length")
+            check(hints.count() == overflow, f"{r['id']} mobile: hint only on cut-off figures ({hints.count()}/{overflow} of {nfig})")
+            if not hints.count():
+                continue
             check("листайте" in hints.first.inner_text(), f"{r['id']} mobile: hint tells to scroll")
             hints.first.locator("button").click()
             mp.wait_for_selector(".figmodal[role=dialog] svg")
@@ -878,13 +884,13 @@ def main():
             sw = mp.evaluate("document.documentElement.scrollWidth")
             check(sw <= 390, f"{r['id']} mobile: no horizontal overflow ({sw})")
             page.goto(base + f"episode.html?id={r['id']}")
-            page.wait_for_selector("#tk .q")
+            page.wait_for_selector("#lb.visuallesson")
             check(page.locator(".fighint:not([hidden])").count() == 0, f"{r['id']} desktop: no figure hint when figures fit")
         mp.goto(base + f"episode.html?id={last['id']}")
-        mp.wait_for_selector("#tk .q")
+        mp.wait_for_selector("#lb.visuallesson")
         mp.evaluate("localStorage.setItem('pddge.theme','dark')")
         mp.reload()
-        mp.wait_for_selector("#tk .q")
+        mp.wait_for_selector("#lb.visuallesson")
         check(mp.evaluate("document.documentElement.dataset.theme") == "dark", "dark theme persists")
         shot(mp, f"{last['id']}_mobile_dark.png")
         norms(br, base)

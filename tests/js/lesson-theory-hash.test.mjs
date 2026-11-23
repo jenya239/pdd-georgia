@@ -8,9 +8,9 @@ const pages = {
   ep01: "site/lessons/ep01-plain.html",
   ep02: "site/lessons/ep02-plain.html",
   ep03: "site/lessons/ep03-plain.html",
-  ep04: "site/lessons/ep04.html",
-  ep05: "site/lessons/ep05.html",
-  ep06: "site/lessons/ep06.html",
+  ep04: "site/lessons/ep04-plain.html",
+  ep05: "site/lessons/ep05-plain.html",
+  ep06: "site/lessons/ep06-plain.html",
 };
 
 function theoryHash(htmlPath) {

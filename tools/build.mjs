@@ -27,7 +27,6 @@ import {
   lessonAssetSource,
   linkedTotal,
   matchStats,
-  mediaSource,
   normPairs,
   plain,
   planCopies,
@@ -98,6 +97,7 @@ export function buildSite() {
     skipExRu,
   });
   stats.set("norm_links", linkedTotal(report));
+  for (const episode of episodes) stripLegacyPublication(episode);
   const byNorm = new Map(normList.map((norm) => [norm.id, norm]));
   const tickets = records.map((record, index) => finishTicket(record, linkedBr.get(record.get("id")), shadows[index]._r, world, byNorm));
   for (const item of itemDoc.items) {
@@ -169,38 +169,16 @@ function assembleEpisode(episode, questions, assigned, items, ru, annexRu) {
   built.tickets_core = core;
   built.tickets_linked = linkedTicketIds(episode, questions, core, lessonIds);
   built.law_quotes = episodeQuotes(episode, ru, annexRu);
-  return withEditions(built, episode, kind);
-}
-
-function withEditions(built, episode, kind) {
-  const plain = hasPlain(episode.id);
-  if (plain && kind !== "text") {
-    built.editions = [
-      { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
-      { id: "dialogue", label: "Ролик", href: episode.video },
-    ];
-  }
-  if (kind === "text" && plain) built.editions = textEditions(episode);
   return built;
 }
 
-function hasPlain(id) {
-  return existsSync(path.join(root, "content/lessons", id, "plain.mjs")) || Object.hasOwn(lessonBundle().raw, `${id}-plain`);
-}
-
-function textEditions(episode) {
-  const labels = episode.edition_labels;
-  const editions = Array.isArray(labels) && labels.length === 2
-    ? [
-      { id: "short", label: labels[1], href: `lessons/${episode.id}-plain.html` },
-      { id: "full", label: labels[0], href: episode.lesson },
-    ]
-    : [
-      { id: "plain", label: "Без персонажей", href: `lessons/${episode.id}-plain.html` },
-      { id: "dialogue", label: "С диалогом", href: episode.lesson },
-    ];
-  if (episode.video) editions.push({ id: "film", label: "Ролик", href: episode.video });
-  return editions;
+/** Film files and the retired dialogue edition stay out of the published episode record. */
+function stripLegacyPublication(episode) {
+  delete episode.video;
+  delete episode.poster;
+  delete episode.tickets_video;
+  delete episode.video_note;
+  delete episode.editions;
 }
 
 function finishTicket(record, br, ann, world, byNorm) {
@@ -238,19 +216,12 @@ function copyMap(episodes, records, raw, normList) {
   for (const episode of episodes) {
     if (episode.kind === "text") {
       const prefix = `lessons/${episode.id}/`;
-      const names = new Set([
-        ...lessonAssetRefs(raw[episode.id] ?? "", prefix),
-        ...lessonAssetRefs(raw[`${episode.id}-plain`] ?? "", prefix),
-      ]);
+      const published = raw[`${episode.id}-plain`] ?? raw[episode.id] ?? "";
+      const names = new Set(lessonAssetRefs(published, prefix));
       for (const name of [...names].sort()) {
         const inLesson = existsSync(path.join(root, "content/lessons", episode.id, name));
         lessonAssets.push({ dest: prefix + name, source: lessonAssetSource(episode.id, name, inLesson) });
       }
-    }
-    for (const key of ["poster", "video", "tickets_video"]) {
-      const rel = episode[key];
-      const source = typeof rel === "string" ? mediaSource(rel) : null;
-      if (source) media.push({ dest: rel, source });
     }
   }
   const ticketImages = [];

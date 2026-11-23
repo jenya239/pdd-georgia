@@ -55,19 +55,32 @@ def test_linked_can_come_from_lesson_assignment():
     assert linked_ticket_ids(ep, Q, core=[1], lesson_ids=[4, 1, 2]) == [4, 2]
 
 
-def test_new_text_opens_before_the_old_editions():
+def test_released_lessons_publish_one_visual_text():
     root = pathlib.Path(__file__).resolve().parents[2]
     released = {ep["id"]: ep for ep in json.loads((root / "site/data/episodes.json").read_text(encoding="utf-8"))["released"]}
-    for eid in ("ep01", "ep02", "ep03", "ep04", "ep05", "ep06"):
-        editions = released[eid]["editions"]
-        assert editions[0]["id"] == "plain", eid
-        assert editions[0]["label"] == "Без персонажей"
-        assert [e["id"] for e in editions].count("plain") == 1
-    assert [e["label"] for e in released["ep02"]["editions"]] == ["Без персонажей", "Ролик"]
-    assert [e["label"] for e in released["ep04"]["editions"]] == ["Без персонажей", "С диалогом", "Ролик"]
-    assert [e["label"] for e in released["ep05"]["editions"]] == ["Без персонажей", "С диалогом"]
+    pages = {
+        "ep01": "lessons/ep01-plain.html",
+        "ep02": "lessons/ep02-plain.html",
+        "ep03": "lessons/ep03-plain.html",
+        "ep04": "lessons/ep04-plain.html",
+        "ep05": "lessons/ep05-plain.html",
+        "ep06": "lessons/ep06-plain.html",
+        "ep07": "lessons/ep07.html",
+        "ep08": "lessons/ep08.html",
+    }
+    for eid, href in pages.items():
+        row = released[eid]
+        assert row["lesson"] == href, eid
+        assert row["kind"] == "text", eid
+        assert "editions" not in row, eid
+        assert not {"video", "poster", "tickets_video", "video_note"} & set(row), eid
+        assert (root / "site" / href).is_file(), href
+    for name in ("ep04.html", "ep05.html", "ep06.html", "visual.html"):
+        assert not (root / "site" / name).exists() and not (root / "site/lessons" / name).exists(), name
+    for name in ("ep01.mp4", "ep02.mp4", "ep03.mp4", "ep04.mp4", "ep04-tickets.mp4"):
+        assert not (root / "site/media" / name).exists(), name
     page = (root / "web/assets/pages/episode.mjs").read_text(encoding="utf-8")
-    assert 'aria-label="Другие редакции"' in page
+    assert "С диалогом" not in page and "data-edition" not in page and "Снятый ролик" not in page
     assert "settings().edition" not in page
 
 
@@ -96,7 +109,7 @@ def test_ep04_film_separates_a_jam_from_a_stop():
     assert "Знак 100 на другой дороге не поднимает потолок 90." in cues
     assert "останавливаются, если человек на переходе или выходит из-за неё." in cues
     page = (root / "web/assets/pages/episode.mjs").read_text(encoding="utf-8")
-    assert 'lk(r, "video_note")' in page
+    assert 'lk(r, "video_note")' not in page and "<video" not in page
 
 
 def test_ep03_film_does_not_limit_the_right_hand_rule_to_a_slogan():
