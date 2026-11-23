@@ -18,6 +18,9 @@ const scenario = JSON.parse(readFileSync(path.join(folder,"scenario.json"),"utf8
 function assertData(d) {
   assert.equal(d.schemaVersion,2);
   assert.equal(d.episode,"ep03");
+  assert.ok(d.narrativeArc?.prologueFunction && d.narrativeArc?.visualThesis,"Narrative prologue and film language are required");
+  assert.ok(d.scenes[0]?.shotPlan?.length >= 4,"Opening scene must have distinct establishing shots");
+  assert.ok(d.scenes[0]?.voice?.[0]?.startsWith("В учебных билетах"),"The revised film must open with the road-context prologue, not directly on a junction");
   assert.ok(d.narrativeArc?.centralQuestion && d.narrativeArc?.resolution,"Narrative architecture is required");
   assert.ok(Array.isArray(d.scenes) && d.scenes.length >= 10);
   const ids = d.scenes.map(s=>s.id);
@@ -59,13 +62,17 @@ function screenplay(d) {
     "",
     "## Принцип",
     "",
-    "Зритель наблюдает один и тот же перекрёсток: не переставляем автомобили и не подменяем ракурс, а меняем одну правовую переменную за другой. Одна дорога, две одинаковые траектории — и разные обязанности. Городская часть с дворовым выездом строится таким же контрфактом. Это визуальное расследование, а не озвучивание учебника.",
+    "Сначала контекст: взгляд привык следить за движением, но забывает о неподвижных особенностях дороги. Перекрёсток появляется лишь после самостоятельного литературного и визуального пролога S00. Далее автомобили и камера сохраняют координаты между сравниваемыми контрфактами; анимация показывает изменение существенного условия, а не пересказывает текст под слайд-шоу.",
     "",
     "## Внутренний сюжет",
     "",
     "**Центральный вопрос:** "+d.narrativeArc.centralQuestion,
     "",
     "**Начальная иллюзия:** "+d.narrativeArc.openingMisdirection,
+    "",
+    "**Функция пролога:** "+d.narrativeArc.prologueFunction,
+    "",
+    "**Язык изображения:** "+d.narrativeArc.visualThesis,
     "",
     "**Первый ложный сдвиг:** "+d.narrativeArc.firstFalseChange,
     "",
@@ -94,6 +101,10 @@ function screenplay(d) {
       "",
       "**Короткие надписи на экране (НЕ читать диктором):** "+(s.overlay.length?s.overlay.map(t=>"`"+t+"`").join(" · "):"нет"),
       "");
+    if (s.shotPlan?.length) {
+      out.push("**Покадровый план вступления, привязанный к абзацам VO, а не к фиксированным секундам:**","");
+      for (const shot of s.shotPlan) out.push(`- **${shot.id}** · ${shot.intent} · VO[${shot.voiceParagraph}]: ${shot.visual} **Переход:** ${shot.transition}`,"");
+    }
     if (s.source_url) out.push("**Официальный внешний источник:** "+s.source_url,"");
     if (s.audio) out.push("**Звук:** "+s.audio,"");
   }
@@ -101,7 +112,7 @@ function screenplay(d) {
     "1. Синхронизировать тайминг с реальной TTS-озвучкой по абзацам и паузам, а не нарезать текст под `estimate_s` насильно.",
     "2. Для каждой сцены отрендерить контрольные still: до изменения, во время изменения и после; собрать контакт-лист.",
     "3. Проверить юридические факты отдельно от художественного результата; подробная матрица в `LEGAL_AND_EVIDENCE.md`.",
-    "4. **В первую очередь:** `NARRATIVE_BIBLE.md`; затем `VISUAL_BIBLE.md`, `PRODUCTION.md`, `ACCEPTANCE.md` и `GROKBOT_START.md`.",
+    "4. **В первую очередь:** `NARRATIVE_BIBLE.md` и `MOTION_DIRECTION.md`; затем `VISUAL_BIBLE.md`, `PRODUCTION.md`, `ACCEPTANCE.md` и `GROKBOT_START.md`.",
     "",
     "Существующие `video/episodes/ep03/scenes.py`, `boards.py`, `timeline.json` и опубликованный `content/media/ep03.mp4` этим документом **не заменяются**.",
     "");
