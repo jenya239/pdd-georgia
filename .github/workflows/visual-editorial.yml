@@ -23,6 +23,8 @@ on:
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
       - 'tests/js/course-narrative-blocks.test.mjs'
+      - 'tests/js/block-0-1-safety-audit.test.mjs'
+      - 'docs/block-0-1-completeness-safety-audit.md'
       - 'tests/js/lesson-theory-hash.test.mjs'
       - 'tests/js/fixtures/ep01-theory.sha256'
       - 'tests/js/fixtures/ep02-theory.sha256'
@@ -58,6 +60,8 @@ on:
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
       - 'tests/js/course-narrative-blocks.test.mjs'
+      - 'tests/js/block-0-1-safety-audit.test.mjs'
+      - 'docs/block-0-1-completeness-safety-audit.md'
       - 'tests/js/lesson-theory-hash.test.mjs'
       - 'tests/js/fixtures/ep01-theory.sha256'
       - 'tests/js/fixtures/ep02-theory.sha256'
@@ -81,6 +85,8 @@ jobs:
           node-version: '24'
       - name: Verify visual lesson law links, accessibility, and ticket ontology
         run: node tools/visual-editorial-audit.mjs
+      - name: Check completeness, safety traps and explained official tickets
+        run: node --test tests/js/block-0-1-safety-audit.test.mjs
       - name: Check cross-episode contextual narrative (blocks 0–1)
         run: node --test tests/js/course-narrative-blocks.test.mjs
       - name: Check episode 2 narrative and pedestrian evidence
