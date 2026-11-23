@@ -24,7 +24,22 @@ export type LearnerState = {
   theme?: string;
   notes?: Record<string, Note>;
   session?: { ids: (string | number)[]; i: number; ok: number; bad: number; held: boolean };
-  intersection?: { version: 1; answered: number; firstTry: number; concepts: Record<string, unknown> };
+  intersection?: {
+    version: 1;
+    answered: number;
+    firstTry: number;
+    concepts: Record<string, unknown>;
+    history?: {
+      scenario: Record<string, unknown>;
+      steps: {
+        vehicleId: string;
+        correct: boolean;
+        text: string;
+        norms: { id: string; label: string }[];
+        highlight?: { selected: string; yieldTo: string[]; paths: string[]; signs: string[] };
+      }[];
+    }[];
+  };
 };
 
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
@@ -68,7 +83,40 @@ const CLEAN: Record<string, (v: unknown) => unknown> = {
 function cleanIntersection(v: unknown) {
   if (!isObj(v) || v.version !== 1) return undefined;
   if (typeof v.answered !== "number" || typeof v.firstTry !== "number" || !isObj(v.concepts)) return undefined;
-  return { version: 1 as const, answered: v.answered, firstTry: v.firstTry, concepts: v.concepts };
+  const history = cleanTrainerHistory(v.history);
+  const base = { version: 1 as const, answered: v.answered, firstTry: v.firstTry, concepts: v.concepts };
+  return history.length ? { ...base, history } : base;
+}
+
+function cleanTrainerHistory(raw: unknown) {
+  if (!Array.isArray(raw)) return [];
+  const records = [];
+  for (const item of raw) {
+    if (!isObj(item) || !isObj(item.scenario) || !Array.isArray(item.scenario.vehicles) || item.scenario.vehicles.length === 0) continue;
+    if (!Array.isArray(item.steps)) continue;
+    const steps = [];
+    for (const step of item.steps) {
+      if (!isObj(step) || typeof step.vehicleId !== "string" || typeof step.correct !== "boolean") continue;
+      if (typeof step.text !== "string" || step.text.length === 0) continue;
+      const norms = Array.isArray(step.norms)
+        ? step.norms.flatMap((norm) => isObj(norm) && typeof norm.id === "string" && typeof norm.label === "string"
+          ? [{ id: norm.id, label: norm.label }] : [])
+        : [];
+      const highlight = isObj(step.highlight) ? {
+        selected: typeof step.highlight.selected === "string" ? step.highlight.selected : step.vehicleId,
+        yieldTo: stringList(step.highlight.yieldTo),
+        paths: stringList(step.highlight.paths),
+        signs: stringList(step.highlight.signs),
+      } : undefined;
+      steps.push({ vehicleId: step.vehicleId, correct: step.correct, text: step.text, norms, ...(highlight ? { highlight } : {}) });
+    }
+    if (steps.length) records.push({ scenario: item.scenario, steps });
+  }
+  return records.slice(-40);
+}
+
+function stringList(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string").slice(0, 8) : [];
 }
 
 export function cleanState(data: Record<string, unknown>) {

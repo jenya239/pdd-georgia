@@ -1,5 +1,5 @@
 import { decide } from "./solver.mjs";
-import { explainWrong } from "./explain.mjs";
+import { explainRight, explainWrong } from "./explain.mjs";
 export function openSession(scenario) {
     const decision = decide(scenario);
     const playable = decision.status === "ready";
@@ -42,7 +42,7 @@ function select(session, id) {
         phase: "moving",
         actor: id,
         outcome: "go",
-        explanation: null,
+        explanation: explainRight(session.scenario, session.decision, id),
     };
 }
 function finishMotion(session) {
@@ -67,7 +67,6 @@ function finishMotion(session) {
         decision,
         actor: null,
         outcome: null,
-        explanation: null,
     };
 }
 function emptyDecision(previous) {

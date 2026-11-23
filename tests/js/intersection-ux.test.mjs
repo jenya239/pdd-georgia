@@ -20,14 +20,13 @@ test("road and question appear before developer settings", () => {
   assert.ok(!page.includes("const letters = { N:"));
 });
 
-test("feedback and comparison remain until a deliberate next action", () => {
+test("the next situation starts after a pause, and Enter can skip the wait", () => {
   const page = read("web/assets/pages/intersection.mjs");
-  assert.ok(page.includes('armNext("Следующая ситуация"'));
-  assert.ok(page.includes('armNext("Сравнить ситуацию"'));
-  assert.ok(page.includes('q("next").textContent = label'));
-  assert.ok(!page.includes("setTimeout(goNext"));
-  assert.ok(!page.includes("timer = setTimeout"));
+  assert.ok(page.includes('armAuto("Следующая ситуация"'));
+  assert.ok(page.includes('armAuto("Сравнить ситуацию"'));
+  assert.ok(page.includes("advancePause(motionQuery.matches)"));
   assert.ok(page.includes('event.key === "Enter"'));
+  assert.ok(page.includes("По прошлой задаче"));
 });
 
 test("each common mistake has a brief explanation with a norm", () => {

@@ -57,7 +57,44 @@ function cleanIntersection(v) {
         return undefined;
     if (typeof v.answered !== "number" || typeof v.firstTry !== "number" || !isObj(v.concepts))
         return undefined;
-    return { version: 1, answered: v.answered, firstTry: v.firstTry, concepts: v.concepts };
+    const history = cleanTrainerHistory(v.history);
+    const base = { version: 1, answered: v.answered, firstTry: v.firstTry, concepts: v.concepts };
+    return history.length ? { ...base, history } : base;
+}
+function cleanTrainerHistory(raw) {
+    if (!Array.isArray(raw))
+        return [];
+    const records = [];
+    for (const item of raw) {
+        if (!isObj(item) || !isObj(item.scenario) || !Array.isArray(item.scenario.vehicles) || item.scenario.vehicles.length === 0)
+            continue;
+        if (!Array.isArray(item.steps))
+            continue;
+        const steps = [];
+        for (const step of item.steps) {
+            if (!isObj(step) || typeof step.vehicleId !== "string" || typeof step.correct !== "boolean")
+                continue;
+            if (typeof step.text !== "string" || step.text.length === 0)
+                continue;
+            const norms = Array.isArray(step.norms)
+                ? step.norms.flatMap((norm) => isObj(norm) && typeof norm.id === "string" && typeof norm.label === "string"
+                    ? [{ id: norm.id, label: norm.label }] : [])
+                : [];
+            const highlight = isObj(step.highlight) ? {
+                selected: typeof step.highlight.selected === "string" ? step.highlight.selected : step.vehicleId,
+                yieldTo: stringList(step.highlight.yieldTo),
+                paths: stringList(step.highlight.paths),
+                signs: stringList(step.highlight.signs),
+            } : undefined;
+            steps.push({ vehicleId: step.vehicleId, correct: step.correct, text: step.text, norms, ...(highlight ? { highlight } : {}) });
+        }
+        if (steps.length)
+            records.push({ scenario: item.scenario, steps });
+    }
+    return records.slice(-40);
+}
+function stringList(value) {
+    return Array.isArray(value) ? value.filter((item) => typeof item === "string").slice(0, 8) : [];
 }
 export function cleanState(data) {
     const out = {};

@@ -7,7 +7,7 @@ import type { Scenario } from "./model.ts";
 import type { Decision } from "./solver.ts";
 import { decide } from "./solver.ts";
 import type { Explanation } from "./explain.ts";
-import { explainWrong } from "./explain.ts";
+import { explainRight, explainWrong } from "./explain.ts";
 
 export type { Explanation };
 
@@ -67,7 +67,7 @@ function select(session: Session, id: string): Session {
     phase: "moving",
     actor: id,
     outcome: "go",
-    explanation: null,
+    explanation: explainRight(session.scenario, session.decision, id),
   };
 }
 
@@ -92,7 +92,6 @@ function finishMotion(session: Session): Session {
     decision,
     actor: null,
     outcome: null,
-    explanation: null,
   };
 }
 
