@@ -2,7 +2,7 @@
   "schema_version": 1,
   "standard": "docs/visual-course-editorial-standard.md",
   "source_of_truth": "content/ontology/",
-  "notes": "All eight episodes have connected narrative prose and static sequential diagrams. The curated official ticket analyses are ontology-assigned; automated structural/citation checks and law quote tests supplement, but do not replace, independent visual and legal review. Last full build validation is checked separately.",
+  "notes": "Eight main reader lessons are illustrated literary explanations. This manifest counts curated official cases, not all tickets solved in the separate training bank; semantic coverage is assessed in tests/js/block-0-1-safety-audit.test.mjs and docs/block-0-1-completeness-safety-audit.md. The ontology still records intentional later-scope gaps and 13 blocked tickets. A number citation alone does not prove an explanation.",
   "episodes": [
     {
       "id": "ep01",
@@ -30,11 +30,12 @@
       ],
       "integratedTickets": [
         390,
-        391
+        391,
+        265
       ],
       "candidateTickets": [],
       "formatMigrated": true,
-      "reviewNote": "Rebuilt continuous road-space narrative: road vs carriageway, painted line vs constructed median, unmarked lanes, shoulder and cycle facilities, rural walking and bicycle-leading exceptions; 7 preserved educational scenes plus a responsive final source map (desktop/mobile). Tickets #390 and #391 and all law quotations retained. Georgia 2025 pedestrian fatalities: 164 (35% of total), sourced to approved 2026–2030 strategy, explicitly not attributed to shoulder use or errors under this rule."
+      "reviewNote": "Rebuilt continuous road-space narrative: road vs carriageway, painted line vs constructed median, unmarked lanes, shoulder and cycle facilities, rural walking and bicycle-leading exceptions; 7 preserved educational scenes plus a responsive final source map (desktop/mobile). Tickets #390 and #391 and all law quotations retained. Georgia 2025 pedestrian fatalities: 164 (35% of total), sourced to approved 2026–2030 strategy, explicitly not attributed to shoulder use or errors under this rule. 2026-11-23 safety/ticket audit: added narrative breakdowns for official ticket #265; each states decisive condition, common wrong inference, and practical safety relevance without fabricated fine amounts."
     },
     {
       "id": "ep03",
@@ -50,13 +51,13 @@
       "integratedTickets": [
         54,
         81,
-        503
-      ],
-      "candidateTickets": [
-        1,
+        503,
         2
       ],
-      "reviewNote": "9 narrative diagrams + 1 responsive eight-rule synthesis including stopping and parking; official tickets #54, #81, #503.",
+      "candidateTickets": [
+        1
+      ],
+      "reviewNote": "9 narrative diagrams + 1 responsive eight-rule synthesis including stopping and parking; official tickets #54, #81, #503. 2026-11-23 safety/ticket audit: added narrative breakdowns for official ticket #2; each states decisive condition, common wrong inference, and practical safety relevance without fabricated fine amounts.",
       "formatMigrated": true
     },
     {
@@ -71,10 +72,13 @@
       "integratedTickets": [
         20,
         422,
-        515
+        515,
+        288,
+        418
       ],
       "candidateTickets": [],
-      "formatMigrated": true
+      "formatMigrated": true,
+      "reviewNote": "2026-11-23 safety/ticket audit: added narrative breakdowns for official tickets #288, #418; each states decisive condition, common wrong inference, and practical safety relevance without fabricated fine amounts."
     },
     {
       "id": "ep05",
@@ -106,10 +110,12 @@
         47,
         53,
         921,
-        922
+        922,
+        75
       ],
       "candidateTickets": [],
-      "formatMigrated": true
+      "formatMigrated": true,
+      "reviewNote": "2026-11-23 safety/ticket audit: added narrative breakdowns for official ticket #75; each states decisive condition, common wrong inference, and practical safety relevance without fabricated fine amounts."
     },
     {
       "id": "ep07",
@@ -122,10 +128,12 @@
       ],
       "integratedTickets": [
         886,
-        356
+        356,
+        357
       ],
       "candidateTickets": [],
-      "formatMigrated": true
+      "formatMigrated": true,
+      "reviewNote": "2026-11-23 safety/ticket audit: added narrative breakdowns for official ticket #357; each states decisive condition, common wrong inference, and practical safety relevance without fabricated fine amounts."
     },
     {
       "id": "ep08",
