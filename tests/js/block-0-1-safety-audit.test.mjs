@@ -89,7 +89,7 @@ test("safety guidance is integrated without inventing fine amounts", () => {
 
 test("ep04 railway scenarios teach transferable decisions, not memorized ticket answers", () => {
   const html=beforeTickets("ep04");
-  const section=html.split('<h2 id="railway">')[1]?.split('<h2 id="settlement">')[0];
+  const section=html.split('<h2 id="railway">')[1]?.split('<h2 id="town">')[0];
   assert.ok(section, "railway teaching section must exist");
   const prose=text(section);
   for(const pattern of [
