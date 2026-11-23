@@ -6,7 +6,7 @@ const read = p => readFileSync(p, "utf8");
 const episodes = [
   ["01", "plain", "ПДД легко принять", "одного правильного источника", 7, 6],
   ["02", "plain", "Закон помогает узнать", "самой дороги", 8, 7],
-  ["03", "plain", "Когда едешь по прямой улице", "Позже тот же способ наблюдения", 10, 4],
+  ["03", "plain", "Когда едешь по прямой улице", "Мы научились замечать не только машины", 10, 4],
   ["04", "plain", "После обычного перекрёстка", "Следующий шаг — понять", 8, 4],
   ["05", "plain", "У пешеходного перехода", "техническим характеристикам", 4, 4],
   ["06", "plain", "Мы увидели, что на дороге", "машина вообще перестаёт двигаться", 9, 5],
@@ -42,6 +42,7 @@ test("all eight main lessons open with a real situation, and answer an open ques
     } else {
       assert.ok(html.indexOf('data-editorial-role="narrative-bridge"') > html.indexOf("<!--AFTER-TICKETS-->"), id);
       assert.ok(html.lastIndexOf('data-editorial-role="recap"') > html.indexOf("<!--AFTER-TICKETS-->"), id);
+      assert.ok(html.lastIndexOf('data-editorial-role="narrative-bridge"') > html.lastIndexOf('data-editorial-role="recap"'), 'ep03: bridge should follow recap');
     }
   }
   assert.equal(new Set(openingStarts).size, 8, "one generic template repeated as eight prologues");
