@@ -63,9 +63,9 @@ test("the flow reads the plain lesson, not the film", () => {
 test("a published lesson is more than its lead", () => {
   const parts = lessonParts(readFileSync("site/lessons/ep08.html", "utf8"));
   assert.ok(parts.length >= 4);
-  assert.equal(parts[0].heading, "Поворот налево при зелёном");
+  assert.equal(parts[0].heading, "Зелёный свет ещё не означает свободный поворот");
   assert.match(parts[0].html, /<svg/);
-  assert.equal(parts[1].heading, "Расстояние и скорость");
-  assert.equal(parts[2].heading, "Уступить и преимущество");
-  assert.match(parts.at(-1).html, /кто едет первым/);
+  assert.equal(parts[1].heading, "Почему одного расстояния недостаточно");
+  assert.equal(parts[2].heading, "Две стороны одного отношения");
+  assert.match(parts.at(-1).html, /способ рассуждения останется тем же/);
 });

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dumps, parse } from "../packages/build/pyjson.ts";
@@ -9,7 +9,6 @@ import {
   lessonTicketIds,
   linkedTicketIds,
 } from "../packages/build/episodes.ts";
-import { lessonBundle } from "../packages/lesson/files.ts";
 import { loadWorld } from "./load-ontology.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,14 +25,6 @@ function ownItems() {
     for (const item of readJson(path.join("content/checkitems", file))) out.push({ lesson, id: item.id });
   }
   return out;
-}
-
-function edition(id, label, href) {
-  return new Map([
-    ["id", id],
-    ["label", label],
-    ["href", href],
-  ]);
 }
 
 export function episodesJson() {
@@ -64,28 +55,7 @@ export function episodesJson() {
     built.set("tickets_lesson", lessonIds);
     built.set("tickets_core", core);
     built.set("tickets_linked", linkedTicketIds(ep, questions, core, lessonIds));
-    const plainFile = existsSync(path.join(root, "content/lessons", ep.id, "plain.mjs"));
-    const plain = plainFile || Object.hasOwn(lessonBundle().raw, `${ep.id}-plain`);
-    if (plain && kind !== "text") {
-      built.set("editions", [
-        edition("plain", "Без персонажей", `lessons/${ep.id}-plain.html`),
-        edition("dialogue", "Ролик", ep.video),
-      ]);
-    }
-    if (kind === "text" && plain) {
-      const labels = ep.edition_labels;
-      const editions = Array.isArray(labels) && labels.length === 2
-        ? [
-          edition("short", labels[1], `lessons/${ep.id}-plain.html`),
-          edition("full", labels[0], ep.lesson),
-        ]
-        : [
-          edition("plain", "Без персонажей", `lessons/${ep.id}-plain.html`),
-          edition("dialogue", "С диалогом", ep.lesson),
-        ];
-      if (ep.video) editions.push(edition("film", "Ролик", ep.video));
-      built.set("editions", editions);
-    }
+    for (const key of ["video", "poster", "tickets_video", "video_note", "editions"]) built.delete(key);
   }
   return dumps(doc, { indent: 1 });
 }

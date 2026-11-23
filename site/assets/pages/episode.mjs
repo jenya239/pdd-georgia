@@ -5,7 +5,7 @@ import { header } from "../app/layout.mjs";
 import { store, summary } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { TYPE_LABEL } from "../domain/items.mjs";
-import { episodeKind, splitLesson, lessonEditions, pickEdition } from "../domain/episode.mjs";
+import { episodeKind, splitLesson } from "../domain/episode.mjs";
 import { lk, lawDetails } from "../domain/normlinks.mjs";
 import { mountIntersection, trainerShell } from "./intersection.mjs";
 (async () => {
@@ -20,75 +20,33 @@ import { mountIntersection, trainerShell } from "./intersection.mjs";
   const core = r.tickets_core.map(i => D.byId[i]), linked = r.tickets_linked.map(i => D.byId[i]);
   const own = (r.own_items || []).map(i => D.byId[i]);
   const isText = episodeKind(r) === "text";
-  const editions = lessonEditions(r);
-  const chosen = pickEdition(editions, new URLSearchParams(location.search).get("edition"));
-  const showFilm = editions.length
-    ? chosen?.id === "film" || (!isText && chosen?.id !== "plain")
-    : !isText;
-  const lessonHref = showFilm ? null : (chosen ? chosen.href : r.lesson);
-  const lesson = lessonHref ? splitLesson(await (await fetch(lessonHref)).text()) : null;
-  const others = editions.filter(e => e.id !== chosen?.id);
-  const editionBar = others.length
-    ? `<div class="editions" role="group" aria-label="Другие редакции">${others.map(e =>
-      `<button type="button" data-edition="${esc(e.id)}">${esc(e.label)}</button>`).join("")}</div>`
-    : "";
+  const lessonHref = r.lesson;
+  if (!lessonHref) { m.innerHTML = `<h1>У выпуска нет текста</h1><p><a href="course.html">К курсу</a></p>`; return; }
+  const lesson = splitLesson(await (await fetch(lessonHref)).text());
   const lawPart = `<h2>Главное</h2>
    <ol class="points">${r.points.map(p => `<li>${lk(p, "t")} <span class="cite">${lk(p, "c")}</span></li>`).join("")}</ol>
    <h3>Текст закона к выпуску</h3>
    <p class="small mut">Цитаты из русского перевода Matsne, ред. 25.06.2026. Юридическую силу имеет грузинский текст.</p>
    ${r.law_quotes.map(q => lawDetails(q)).join("")}`;
   const nav = `<div class="row" style="margin-top:24px">${prev ? `<a class="btn ghost" href="episode.html?id=${prev.id}">← Выпуск ${prev.num}</a>` : ""}${next ? `<a class="btn ghost" href="episode.html?id=${next.id}">Выпуск ${next.num} →</a>` : ""}</div>`;
-  const kindLine = `<div class="small mut"><a href="course.html">Курс</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")} · ${r.duration}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
-  const trainerInLesson = r.id === "ep03" && !showFilm && (chosen?.id === "plain" || (isText && !editions.length));
-  const trainer = trainerInLesson
+  const timing = r.duration ? ` · ${r.duration}` : "";
+  const kindLine = `<div class="small mut"><a href="course.html">Курс</a> · Выпуск ${r.num} · серии плана ${r.plan.join(", ")}${timing}${isText ? ` · <span class="badge kind text">текст</span>` : ""}</div>`;
+  const trainer = r.id === "ep03"
     ? `<section class="ix-lesson" id="trainer"><h2>Теперь попробуй сам</h2>
    <p>На схемах мы наблюдали, кто кому уступает. Теперь решение за тобой: выбери автомобиль, который может проехать. Если он должен уступить, разберём причину прямо на перекрёстке.</p>
    ${trainerShell({ embed: true })}</section>`
     : "";
-  const filmPointer = r.id === "ep03" && !trainerInLesson
-    ? `<p class="small"><a href="episode.html?id=ep03#trainer">Упражнение с двумя автомобилями</a> стоит в тексте выпуска, после объяснения проезда.</p>`
-    : "";
-  const filmNote = r.video_note ? `<p class="note">${lk(r, "video_note")}</p>` : "";
-  const ticketsFilm = r.tickets_video
-    ? `<video controls preload="metadata" poster="${r.poster}" src="${r.tickets_video}"></video>
-   <p class="small mut">Ролик по билетам выпуска: ситуация, признак, верный вариант. Под каждым билетом тот же разбор остаётся текстом.</p>`
-    : "";
-  // The illustrated editorial edition is a continuous article. Testing and the
-  // reference dossier stay accessible, but no longer interrupt the narrative.
-  const visualArticle = !showFilm && (chosen?.id === "plain" || (isText && !editions.length));
-  const visualMarkup = visualArticle ? `${kindLine}<h1>${esc(r.title)}</h1>
-   ${editionBar}
+  const visualMarkup = `${kindLine}<h1>${esc(r.title)}</h1>
    <article class="lesson visuallesson" id="lb">${lesson.before}${lesson.after}
    ${trainer}</article>
    <details class="lesson-appendix"><summary>Нормы, билеты и самопроверка</summary>
-     ${lawPart}${ticketsFilm}
+     ${lawPart}
      <h2>Билеты к выпуску</h2><div id="tk"></div><div id="own-items"></div>
      <div id="cum"></div>
-   </details>${nav}` : "";
-  m.innerHTML = visualArticle ? visualMarkup : showFilm
-    ? `${kindLine}<h1>${esc(r.title)}</h1>
-   ${editionBar}
-   ${filmPointer}
-   <video controls preload="metadata" poster="${r.poster}" src="${r.video}"></video>
-   ${filmNote}
-   <p class="small mut">Снятый ролик.</p>
-   <p>${lk(r, "lead")}</p>
-   ${lawPart}
-   ${ticketsFilm}
-   <h2>Билеты к выпуску</h2>
-   <div id="tk"></div>
-   <div id="own-items"></div>
-   <div id="cum"></div>${nav}`
-    : `${kindLine}<h1>${esc(r.title)}</h1><p class="lead">${lk(r, "lead")}</p>
-   ${editionBar}
-   <article class="lesson" id="lb">${lesson.before}</article>
-   ${lawPart}
-   ${ticketsFilm}
-   <h2>Билеты к выпуску</h2>
-   <div id="tk"></div>
-   <div id="own-items"></div>
-   <article class="lesson" id="la">${lesson.after}</article>
-   <div id="cum"></div>${nav}`;
+   </details>${nav}`;
+  m.innerHTML = visualMarkup;
+  const appendix = document.querySelector("details.lesson-appendix");
+  if (appendix && location.hash && appendix.querySelector(location.hash)) appendix.open = true;
   const { enhanceFigures } = await import("../app/figzoom.mjs");
   enhanceFigures(m);
   const trainerHost = document.getElementById("trainer");
@@ -96,17 +54,6 @@ import { mountIntersection, trainerShell } from "./intersection.mjs";
     mountIntersection(trainerHost, { embed: true });
     if (location.hash === "#trainer") trainerHost.scrollIntoView({ block: "start" });
   }
-  const bar = document.querySelector(".editions");
-  if (bar) bar.addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-edition]");
-    if (!b) return;
-    const ed = editions.find(x => x.id === b.dataset.edition);
-    if (!ed) return;
-    const u = new URL(location.href);
-    if (ed.id === editions[0].id) u.searchParams.delete("edition");
-    else u.searchParams.set("edition", ed.id);
-    location.assign(`${u.pathname}${u.search}${u.hash}`);
-  });
   // накопительная проверка: этот урок + все предыдущие
   const { cumulativeScope, scopeStatus } = await import("../domain/scope.mjs");
   const st = await store, withOwn = st.settings().own !== false;
