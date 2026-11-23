@@ -3,14 +3,14 @@ import { esc } from "../app/dom.mjs";
 import { header } from "../app/layout.mjs";
 import { KEYS } from "../domain/registry.mjs";
 import { leadFor, followUp } from "../intersection/counterfactual.mjs";
-import { closingNote } from "../intersection/explain.mjs";
 import { bugReport, generate } from "../intersection/generate.mjs";
 import { ROAD_HALF, VEHICLE_LENGTH, VEHICLE_WIDTH, forward, pathOf, pointAlong, rightVec } from "../intersection/geometry.mjs";
 import { MANEUVER_WORD } from "../intersection/model.mjs";
+import { advancePause, historyCursor } from "../intersection/playback.mjs";
 import {
   PALETTES, VIEW, carColor, creep, ease, frame, hotspots, labelPx, motionMs, signAnchors, styleName, toCanvas, treeSpots, waitingSample,
 } from "../intersection/picture.mjs";
-import { parseProgress, recordProgress } from "../intersection/progress.mjs";
+import { parseProgress, recordProgress, rememberSituation, situationSummary } from "../intersection/progress.mjs";
 import { openSession, reduce } from "../intersection/session.mjs";
 import { primaryConcept } from "../intersection/solver.mjs";
 
@@ -37,6 +37,13 @@ let followMeta = null;
 let missedId = null;
 let recorded = false;
 let nextAction = null;
+let steps = [];
+let pastSummary = null;
+let reviewing = false;
+let reviewEntry = null;
+let cursor = 0;
+let liveSnap = null;
+let advanceTimer = 0;
 let token = 0;
 let motion = null;
 let stage = null;
@@ -62,7 +69,13 @@ export function trainerShell({ embed: embedded = false } = {}) {
   </div>
   <div class="ix-panel">
     <h3 class="ix-question" id="ix-question">Кто может проехать сейчас?</h3>
-    <p class="ix-help">Нажми на машину или клавишу с её номером.</p>
+    <p class="ix-help" id="ix-help">Нажми на машину или клавишу с её номером.</p>
+    <div class="ix-history" role="group" aria-label="История ситуаций">
+      <button type="button" class="btn ghost" id="hist-back">Назад</button>
+      <span id="hist-pos"></span>
+      <button type="button" class="btn ghost" id="hist-forward">Вперёд</button>
+    </div>
+    <p id="past" class="ix-past" hidden></p>
     <p id="lead" class="ix-lead" hidden></p>
     <div id="explain" class="ix-explain"></div>
     <button type="button" class="btn ix-next" id="next" hidden>Следующая ситуация</button>
@@ -100,16 +113,29 @@ export function mountIntersection(root, options = {}) {
     report.hidden = false;
     report.textContent = `Скопируйте текст. В нём нет имени и истории ответов.\n${JSON.stringify(bugReport(session.scenario), null, 2)}`;
   });
-  q("next").addEventListener("click", goNext);
+  q("next").addEventListener("click", () => {
+    cancelAdvance();
+    goNext();
+  });
+  q("hist-back").addEventListener("click", goBack);
+  q("hist-forward").addEventListener("click", goForward);
   for (const button of host.querySelectorAll("[data-style]")) {
     button.addEventListener("click", () => setStyle(button.dataset.style));
   }
   document.addEventListener("keydown", (event) => {
     if (!ownsKeys(event)) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
-    if (event.key === "Enter" && nextAction && session.phase === "done") {
+    if (event.key === "Enter" && nextAction && !reviewing) {
       event.preventDefault();
+      cancelAdvance();
       goNext();
+      return;
+    }
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      const field = event.target;
+      if (field instanceof HTMLTextAreaElement || field instanceof HTMLInputElement || field instanceof HTMLSelectElement) return;
+      const moved = event.key === "ArrowLeft" ? goBack() : goForward();
+      if (moved) event.preventDefault();
       return;
     }
     if (!/^[1-9]$/.test(event.key)) return;
@@ -149,6 +175,7 @@ function rememberUrl(edit) {
 }
 
 function begin(scenario, nextSeed, meta) {
+  cancelAdvance();
   seed = nextSeed;
   task = scenario;
   session = openSession(scenario);
@@ -157,15 +184,29 @@ function begin(scenario, nextSeed, meta) {
   recorded = false;
   motion = null;
   nextAction = null;
+  steps = [];
+  reviewing = false;
+  reviewEntry = null;
+  pastSummary = situationSummary(progress.history.at(-1));
   rememberUrl((url) => url.searchParams.set("seed", String(seed)));
   render();
 }
 
 function choose(id) {
-  if (motion) return;
+  if (reviewing || motion) return;
   const next = reduce(session, { type: "select", id });
   if (next === session) return;
+  pastSummary = null;
   session = next;
+  if (session.explanation) {
+    steps.push({
+      vehicleId: id,
+      correct: session.outcome === "go",
+      text: session.explanation.text,
+      norms: session.explanation.norms,
+      highlight: session.explanation.highlight,
+    });
+  }
   if (session.outcome === "stop" && missedId == null) missedId = id;
   const vehicle = task.vehicles.find((item) => item.id === id);
   token += 1;
@@ -202,37 +243,100 @@ function finishMotion() {
 
 function onDone() {
   progress = recordProgress(progress, primaryConcept(session.opening), !session.firstTryWrong);
+  if (steps.length) progress = rememberSituation(progress, { scenario: task, steps });
   saveProgress();
-  const note = closingNote(session.opening);
   const nextSeed = seed + 1;
   if (followMeta) {
-    showText(followMeta.why, "ok");
-    armNext("Следующая ситуация", () => begin(generate(nextSeed).scenario, nextSeed, null));
+    armAuto("Следующая ситуация", () => begin(generate(nextSeed).scenario, nextSeed, null));
     return;
   }
   if (session.firstTryWrong && missedId) {
     const pair = followUp(session.scenario, missedId);
     if (pair) {
-      showText("Готово. Теперь изменим одну деталь и посмотрим, как изменится решение.", "ok");
       const scenario = { ...pair.after, id: "ix-after-" + seed + "-" + missedId, seed };
-      armNext("Сравнить ситуацию", () => begin(scenario, seed, { why: pair.why, lead: leadFor(pair.delta) }));
+      armAuto("Сравнить ситуацию", () => begin(scenario, seed, { why: pair.why, lead: leadFor(pair.delta) }));
       return;
     }
   }
-  showText(note || "Все автомобили проехали. Можно перейти к следующему перекрёстку.", "ok");
-  armNext("Следующая ситуация", () => begin(generate(nextSeed).scenario, nextSeed, null));
+  armAuto("Следующая ситуация", () => begin(generate(nextSeed).scenario, nextSeed, null));
 }
 
-function armNext(label, fn) {
+function armAuto(label, fn) {
   nextAction = fn;
-  q("next").textContent = label;
+  const button = q("next");
+  button.hidden = false;
+  button.textContent = label;
+  cancelAdvance();
+  advanceTimer = setTimeout(() => {
+    advanceTimer = 0;
+    goNext();
+  }, advancePause(motionQuery.matches));
+}
+
+function cancelAdvance() {
+  if (advanceTimer) clearTimeout(advanceTimer);
+  advanceTimer = 0;
 }
 
 function goNext() {
+  if (reviewing) return;
   const fn = nextAction;
   if (!fn) return;
   nextAction = null;
   fn();
+}
+
+function goBack() {
+  if (motion || !progress.history.length) return false;
+  const from = reviewing ? cursor : progress.history.length;
+  const next = historyCursor(from, progress.history.length, -1);
+  if (next === from) return false;
+  if (!reviewing) liveSnap = snapshotLive();
+  cancelAdvance();
+  openReview(next);
+  return true;
+}
+
+function goForward() {
+  if (motion || !reviewing) return false;
+  const next = historyCursor(cursor, progress.history.length, 1);
+  if (next === cursor) return false;
+  if (next === progress.history.length) returnLive();
+  else openReview(next);
+  return true;
+}
+
+function snapshotLive() {
+  return {
+    task, session, seed, followMeta, missedId, recorded,
+    steps: steps.slice(), nextAction, pastSummary,
+  };
+}
+
+function openReview(index) {
+  reviewing = true;
+  cursor = index;
+  reviewEntry = progress.history[index];
+  task = reviewEntry.scenario;
+  motion = null;
+  render();
+}
+
+function returnLive() {
+  const snap = liveSnap;
+  reviewing = false;
+  reviewEntry = null;
+  task = snap.task;
+  session = snap.session;
+  seed = snap.seed;
+  followMeta = snap.followMeta;
+  missedId = snap.missedId;
+  recorded = snap.recorded;
+  steps = snap.steps;
+  nextAction = snap.nextAction;
+  pastSummary = snap.pastSummary;
+  motion = null;
+  render();
 }
 function setStyle(next) {
   style = styleName(next);
@@ -249,23 +353,37 @@ function render() {
   placeHits();
   markStyles();
   const lead = q("lead");
-  lead.hidden = !(followMeta && session.phase !== "done");
+  lead.hidden = reviewing || !(followMeta && session.phase !== "done");
   if (!lead.hidden) lead.textContent = followMeta.lead;
-  const explanation = faultExplanation();
-  q("ix-question").textContent = session.remaining.length === 1
-    ? "Кто может ехать следующим?" : "Кто может проехать сейчас?";
-  if (explanation) showHtml(explanationHtml(explanation), "bad");
-  else if (session.phase === "ready" && session.remaining.length < task.vehicles.length) {
-    const note = closingNote(session.opening);
-    if (note) showText(note, "ok");
-    else if (session.remaining.length === 1 && session.decision.admissible.includes(session.remaining[0])) {
-      showText("Верно. Теперь может проехать оставшийся автомобиль.", "ok");
-    }
-  } else if (session.phase !== "done") clearExplain();
+  const explanation = shownExplanation();
+  const past = q("past");
+  const showPast = pastVisible();
+  past.hidden = !showPast;
+  if (showPast) past.innerHTML = pastHtml(pastSummary);
+  if (reviewing) {
+    q("ix-question").textContent = "Сохранённая ситуация";
+    q("ix-help").textContent = "Это уже решённая сцена: видны ответ и разбор. Новый ход не записывается.";
+    const last = reviewEntry.steps.at(-1);
+    showHtml(reviewHtml(reviewEntry), last.correct ? "ok" : "bad");
+  } else {
+    q("ix-help").textContent = "Нажми на машину или клавишу с её номером.";
+    q("ix-question").textContent = session.remaining.length === 1
+      ? "Кто может ехать следующим?" : "Кто может проехать сейчас?";
+    if (explanation) showHtml(explanationHtml(explanation), explanation.tone === "ok" ? "ok" : "bad");
+    else clearExplain();
+  }
   q("assume").textContent = STANDING;
-  q("next").hidden = !nextAction;
+  q("next").hidden = reviewing || !nextAction;
+  const total = progress.history.length;
+  q("hist-back").disabled = total === 0 || (reviewing && cursor === 0);
+  q("hist-forward").disabled = !reviewing;
+  q("hist-pos").textContent = !total ? "" : reviewing ? `${cursor + 1} из ${total}` : "сейчас";
   const flash = q("ix-flash");
-  if (explanation) {
+  if (reviewing) {
+    flash.textContent = "Просмотр";
+    flash.className = "ix-flash is-ok";
+    flash.hidden = false;
+  } else if (explanation && explanation.tone !== "ok") {
     const first = explanation.highlight.yieldTo[0];
     const cause = explanation.decisive === "автомобиль справа" ? ": он справа"
       : explanation.decisive === "знак главной дороги" ? ": он на главной"
@@ -284,16 +402,56 @@ function render() {
   } else {
     flash.hidden = true;
   }
-  announce(liveText(explanation));
+  if (reviewing) announce(reviewSpeech(reviewEntry));
+  else if (showPast) announce(`По прошлой задаче. ${pastSummary.text}`);
+  else announce(liveText(explanation));
   renderProgress();
-  stage.dataset.phase = session.phase;
+  stage.dataset.phase = reviewing ? "review" : session.phase;
   stage.dataset.task = task.id;
 }
-function faultExplanation() {
-  if (!session.explanation) return null;
-  if (session.phase === "error") return session.explanation;
-  if (session.phase === "moving" && session.outcome === "stop") return session.explanation;
-  return null;
+function shownExplanation() {
+  if (reviewing) return reviewMark();
+  return session?.explanation ?? null;
+}
+
+function pastVisible() {
+  return !reviewing && pastSummary && session.phase === "ready" && !motion && steps.length === 0;
+}
+
+function reviewMark() {
+  const step = [...reviewEntry.steps].reverse().find((item) => item.highlight.yieldTo.length > 0)
+    || reviewEntry.steps[reviewEntry.steps.length - 1];
+  return {
+    text: step.text,
+    tone: step.correct ? "ok" : "bad",
+    norms: step.norms,
+    assumption: "",
+    decisive: "",
+    highlight: step.highlight,
+  };
+}
+
+function reviewHtml(entry) {
+  return entry.steps.map((step) => {
+    const verdict = step.correct ? "верно" : "неверно";
+    const links = normLinks(step.norms);
+    return `<p>Автомобиль ${esc(step.vehicleId)} — ${verdict}. ${esc(step.text)}</p>${links}`;
+  }).join("");
+}
+
+function reviewSpeech(entry) {
+  return entry.steps.map((step) =>
+    `Автомобиль ${step.vehicleId}, ${step.correct ? "верно" : "неверно"}. ${step.text}`).join(" ");
+}
+
+function pastHtml(step) {
+  return `<p>По прошлой задаче. ${esc(step.text)}</p>${normLinks(step.norms)}`;
+}
+
+function normLinks(norms) {
+  const links = (norms || []).map((norm) =>
+    `<a class="nref" data-norm="${esc(norm.id)}" href="norm/${esc(norm.id)}.html">${esc(norm.label)}</a>`).join(" · ");
+  return links ? `<p class="small">${links}</p>` : "";
 }
 
 function liveText(explanation) {
@@ -306,15 +464,7 @@ function liveText(explanation) {
 }
 
 function explanationHtml(explanation) {
-  const links = explanation.norms.map((norm) =>
-    `<a class="nref" data-norm="${esc(norm.id)}" href="norm/${esc(norm.id)}.html">${esc(norm.label)}</a>`).join(" · ");
-  return `<p>${esc(explanation.text)}</p>${links ? `<p class="small">${links}</p>` : ""}`;
-}
-
-function showText(text, kind) {
-  const box = q("explain");
-  box.className = `ix-explain ${kind}`;
-  box.textContent = text;
+  return `<p>${esc(explanation.text)}</p>${normLinks(explanation.norms)}`;
 }
 
 function showHtml(html, kind) {
@@ -358,8 +508,9 @@ function placeHits() {
   const { width, height } = viewSize();
   const root = q("hits");
   root.replaceChildren();
-  const active = session.phase === "ready" || session.phase === "error";
-  for (const hit of hotspots(task, width, height, session.remaining)) {
+  const active = !reviewing && (session.phase === "ready" || session.phase === "error");
+  const remaining = reviewing ? task.vehicles.map((vehicle) => vehicle.id) : session.remaining;
+  for (const hit of hotspots(task, width, height, remaining)) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "ix-hit";
@@ -395,7 +546,7 @@ function paint() {
   const palette = PALETTES[style];
   const font = getComputedStyle(document.body).fontFamily || "sans-serif";
   const P = (point) => toCanvas(point, view);
-  const explanation = faultExplanation();
+  const explanation = shownExplanation();
 
   ctx.fillStyle = palette.grass;
   ctx.fillRect(0, 0, width, height);
@@ -409,7 +560,8 @@ function paint() {
     drawSign(ctx, P(anchor), view.scale, anchor.sign, emphasized);
   }
 
-  const visible = task.vehicles.filter((vehicle) => session.remaining.includes(vehicle.id) || motion?.id === vehicle.id);
+  const visible = task.vehicles.filter((vehicle) =>
+    reviewing || session.remaining.includes(vehicle.id) || motion?.id === vehicle.id);
   for (const vehicle of visible) {
     const samples = pathOf(vehicle.from, vehicle.maneuver);
     const color = carColor(task.vehicles.indexOf(vehicle), style);
