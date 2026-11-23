@@ -23,6 +23,10 @@ on:
       - 'tests/js/visual-editorial.test.mjs'
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
+      - 'tests/js/course-narrative-blocks.test.mjs'
+      - 'docs/course-narrative-blocks-0-1.md'
+      - 'packages/lesson/ep07.ts'
+      - 'packages/lesson/ep08.ts'
       - 'video/episodes/ep03/v2/**'
       - 'tools/ep03-v2.mjs'
       - 'AGENTS.md'
@@ -51,6 +55,10 @@ on:
       - 'tests/js/visual-editorial.test.mjs'
       - 'tests/js/ep01-editorial.test.mjs'
       - 'tests/js/ep02-editorial.test.mjs'
+      - 'tests/js/course-narrative-blocks.test.mjs'
+      - 'docs/course-narrative-blocks-0-1.md'
+      - 'packages/lesson/ep07.ts'
+      - 'packages/lesson/ep08.ts'
       - 'video/episodes/ep03/v2/**'
       - 'tools/ep03-v2.mjs'
       - 'AGENTS.md'
@@ -67,6 +75,8 @@ jobs:
           node-version: '24'
       - name: Verify visual lesson law links, accessibility, and ticket ontology
         run: node tools/visual-editorial-audit.mjs
+      - name: Check cross-episode contextual narrative (blocks 0–1)
+        run: node --test tests/js/course-narrative-blocks.test.mjs
       - name: Check episode 2 narrative and pedestrian evidence
         run: node --test tests/js/ep02-editorial.test.mjs
       - name: Check episode 1 narrative and evidence
