@@ -86,3 +86,20 @@ test("safety guidance is integrated without inventing fine amounts", () => {
     assert.doesNotMatch(hit,/\b\d+\s*(?:лари|GEL)\b/i,`${ep} #${ticket}: fine amount needs case-specific legal verification`);
   }
 });
+
+test("ep04 railway scenarios teach transferable decisions, not memorized ticket answers", () => {
+  const html=beforeTickets("ep04");
+  const section=html.split('<h2 id="railway">')[1]?.split('<h2 id="settlement">')[0];
+  assert.ok(section, "railway teaching section must exist");
+  const prose=text(section.replace(/<figure\\b[\\s\\S]*?<\\/figure>/g, ""));
+  for(const pattern of [
+    /брус поднят, но горит запрещающий сигнал/i,
+    /сигнал разрешает движение, но шлагбаум ещё поднимается/i,
+    /очередь сдвинулась и впереди появилось место/i,
+    /это устраняет именно препятствие за путями/i,
+    /остановиться не ближе пяти метров/i,
+    /не менее десяти метров до ближайшего рельса/i,
+    /№422/, /№418/,
+  ]) assert.match(prose, pattern, "railway transfer condition missing");
+  assert.ok(html.includes('norm/st39-p3.html'), "railway stop hierarchy must retain legal source");
+});
