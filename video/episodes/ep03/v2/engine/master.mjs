@@ -12,7 +12,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { ease, film, filmParts } from "./stories.mjs";
+import { directedState, film, filmParts } from "./stories.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const v2 = path.resolve(here, "..");
@@ -113,19 +113,35 @@ export function buildTimeline(voices, durations) {
   return { fps: 24, lead: LEAD, tail: TAIL, duration: clock, scenes, cues };
 }
 
-function visualLocal(scene, sceneLocal) {
-  const spoken = scene.end - scene.start - scene.lead - scene.tail;
-  if (sceneLocal <= scene.lead) return scene.pose;
-  if (sceneLocal >= scene.lead + spoken) return scene.oldDur;
-  const u = spoken <= 0 ? 1 : (sceneLocal - scene.lead) / spoken;
-  return scene.pose + (scene.oldDur - scene.pose) * ease(u);
+export function speechAt(scene, time, timeline) {
+  const cues = timeline.cues.filter((cue) => cue.id.startsWith(`${scene.id}.`));
+  const ids = [];
+  for (const cue of cues) if (!ids.includes(cue.id)) ids.push(cue.id);
+  if (time - scene.start <= scene.lead || ids.length === 0) {
+    return { id: ids[0] ?? null, u: 0, ordinal: 0, count: ids.length, inLead: true };
+  }
+  if (time >= scene.end - scene.tail) {
+    return { id: ids.at(-1), u: 1, ordinal: Math.max(0, ids.length - 1), count: ids.length, inLead: false };
+  }
+  const active = cues.find((cue) => time >= cue.start && time < cue.end) ?? cues.at(-1);
+  const group = cues.filter((cue) => cue.id === active.id);
+  const start = group[0].start;
+  const end = group.at(-1).end;
+  const u = end <= start ? 1 : (time - start) / (end - start);
+  return {
+    id: active.id,
+    u: Math.min(1, Math.max(0, u)),
+    ordinal: Math.max(0, ids.indexOf(active.id)),
+    count: ids.length,
+    inLead: false,
+  };
 }
 
 export function masterAt(timeline) {
-  const parts = filmParts();
   return (time) => {
     const scene = timeline.scenes.find((item) => time < item.end) ?? timeline.scenes.at(-1);
-    const frame = parts[scene.index].at(visualLocal(scene, time - scene.start), scene.oldDur);
+    const speech = speechAt(scene, time, timeline);
+    const frame = directedState(scene.index, speech);
     const cue = timeline.cues.find((item) => time >= item.start && time < item.end);
     const bend = frame.scene === "bend";
     return {
@@ -133,7 +149,7 @@ export function masterAt(timeline) {
       overlays: bend ? ["Не определено"] : [],
       subtitle: cue ? cue.lines : null,
       diagramProse: frame.scene === "stoppark" ? false : true,
-      t: visualLocal(scene, time - scene.start),
+      t: frame.t ?? speech.u,
     };
   };
 }
@@ -190,8 +206,9 @@ function silence(file, seconds) {
   ]);
 }
 
-export function writeTimeline() {
-  const work = "/tmp/ep03v2/review";
+export function writeTimeline(stem = "next") {
+  const paths = stemPaths(stem);
+  const work = paths.work;
   mkdirSync(work, { recursive: true });
   const { manifest, voices } = loadSources();
   const decoded = decodePhrases(voices, manifest, path.join(work, "phrases"));
@@ -229,14 +246,23 @@ export function writeTimeline() {
   writeFileSync(path.join(work, "session.json"), JSON.stringify(session));
   const portable = { ...timeline };
   delete portable.voiceWav;
-  writeFileSync(path.join(outDir, "timeline.json"), JSON.stringify(portable, null, 2));
-  writeFileSync(path.join(outDir, "final/ep03-v2-review.srt"), toSrt(timeline.cues));
+  writeFileSync(path.join(outDir, paths.timeline), JSON.stringify(portable, null, 2));
+  writeFileSync(path.join(outDir, paths.srt), toSrt(timeline.cues));
   process.stderr.write(`timeline ${timeline.duration.toFixed(3)}s audio ${timeline.measuredAudio.toFixed(3)}s cues ${timeline.cues.length}\n`);
   return timeline;
 }
 
-export function loadTimeline() {
-  return JSON.parse(readFileSync(path.join(v2, "render/timeline.json"), "utf8"));
+export function loadTimeline(file = path.join(v2, "render/timeline.json")) {
+  return JSON.parse(readFileSync(file, "utf8"));
+}
+
+function stemPaths(stem) {
+  const name = stem && stem !== "review" ? stem : "review";
+  return {
+    work: name === "review" ? "/tmp/ep03v2/review" : `/tmp/ep03v2/${name}`,
+    timeline: name === "review" ? "timeline.json" : `timeline-${name}.json`,
+    srt: name === "review" ? "final/ep03-v2-review.srt" : `final/ep03-v2-review-${name}.srt`,
+  };
 }
 
 function arg(name) {
@@ -246,8 +272,10 @@ function arg(name) {
 
 function mux() {
   const video = arg("video");
-  const out = arg("out") ?? path.join(v2, "render/final/ep03-v2-review.mp4");
-  const session = JSON.parse(readFileSync("/tmp/ep03v2/review/session.json", "utf8"));
+  const stem = arg("stem") ?? "next";
+  const paths = stemPaths(stem);
+  const out = arg("out") ?? path.join(v2, "render/final", stem === "review" ? "ep03-v2-review.mp4" : `ep03-v2-review-${stem}.mp4`);
+  const session = JSON.parse(readFileSync(path.join(paths.work, "session.json"), "utf8"));
   if (!existsSync(session.voiceWav)) throw new Error("voice wav missing; run --write on this machine");
   const videoDur = probe(video);
   mkdirSync(path.dirname(out), { recursive: true });
@@ -261,7 +289,7 @@ function mux() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  if (process.argv.includes("--write")) writeTimeline();
+  if (process.argv.includes("--write")) writeTimeline(arg("stem") ?? "next");
   else if (process.argv.includes("--mux")) mux();
   else if (process.argv.includes("--duration")) process.stdout.write(`${film().duration}\n`);
 }
