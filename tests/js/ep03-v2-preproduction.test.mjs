@@ -13,7 +13,20 @@ test("all 12 scenarios are stable and reading copies are generated, not hand-edi
   assert.match(out,/in sync/);
   assert.equal(scenario.schemaVersion,2);
   assert.equal(scenario.scenes.length,12);
-  assert.ok(scenario.narrativeArc?.centralQuestion?.includes("одно и то же"));
+  const opening = scenario.scenes[0];
+  assert.equal(opening.id, "S00");
+  assert.match(opening.voice[0], /^В учебных билетах/);
+  assert.doesNotMatch(opening.voice.slice(0, 2).join(" "), /перекрёсток/);
+  assert.match(opening.voice[2], /загородном перекрёстке/);
+  assert.ok(opening.shotPlan.length >= 4);
+  assert.deepEqual(opening.shotPlan.map(p=>p.voiceParagraph), [0, 0, 1, 2]);
+  assert.ok(opening.shotPlan[0].visual.includes("без перекрёстка"));
+  assert.ok(opening.shotPlan.at(-1).visual.includes("A0"));
+  assert.ok(scenario.narrativeArc?.prologueFunction?.length > 60);
+  assert.ok(scenario.narrativeArc?.visualThesis?.length > 60);
+  assert.ok(scenario.production.reviewVideoStatus.includes("outdated") || scenario.production.reviewVideoStatus.includes("built from earlier"));
+
+  assert.ok(scenario.narrativeArc?.centralQuestion?.includes("автомобилям"));
   assert.match(scenario.narrativeArc?.resolution ?? "", /[Пп]равило/);
   for (const scene of scenario.scenes) {
     assert.ok(scene.dramaticFunction?.length > 25, scene.id);
@@ -79,6 +92,8 @@ test("production document set is complete, and existing ep03 published assets st
   const docs=["README.md","SCREENPLAY.md","VOICE.txt","VISUAL_BIBLE.md","LEGAL_AND_EVIDENCE.md",
     "PRODUCTION.md","ACCEPTANCE.md","GROKBOT_START.md","design/worlds.json"];
   for(const name of docs)assert.ok(existsSync(base+name),name);
+  assert.ok(existsSync(base+"MOTION_DIRECTION.md"));
+  assert.match(read(base+"MOTION_DIRECTION.md"), /Первый кадр не должен быть верхним видом на перекрёсток/);
   assert.ok(existsSync(base+"NARRATIVE_BIBLE.md"));
   assert.ok(read(base+"NARRATIVE_BIBLE.md").includes("Тест А — слушать без изображения"));
   assert.ok(existsSync("video/episodes/ep03/scenes.py"));

@@ -1,5 +1,8 @@
 # Ep03 v2 — производственный план: от карты знаний до релизного MP4
 
+> **Коррекция 23.11.2026:** сценарий получил реальный пролог S00; рендер 517,042 с, `render/timeline.json`, `voice/manifest.json` и `render/final/ep03-v2-review.mp4` теперь **устарели по отношению к `scenario.json`**. Сначала прочитать [MOTION_DIRECTION.md](MOTION_DIRECTION.md) и [GROKBOT_CORRECTION.md](GROKBOT_CORRECTION.md). Новый renderer обязательно реализует самостоятельный вводный `prologue` до текущего `junction`, а не читает новые слова поверх старого кадра. Пересинтезировать речь и пересобрать таймлайн.
+
+
 **Это техническое ТЗ для Grokbot**, а не обещание, что фильм уже собран. Сценарий и изобразительная логика лежат в этой папке; старые `video/episodes/ep03/scenes.py`, `boards.py`, `timeline.json`, `content/media/ep03.mp4` не изменены. **Не публиковать**, пока новый ролик не выдержит приёмку.
 
 ## 1. Контракты и deliverables
