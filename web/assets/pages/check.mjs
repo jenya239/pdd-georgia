@@ -6,6 +6,7 @@ import { record, store } from "../app/progress.mjs";
 import { renderQuestion } from "../app/question.mjs";
 import { currentLesson, cumulativeScope, cumulativeOrder, scopeStatus } from "../domain/scope.mjs";
 import { idLabel, isOwnId } from "../domain/items.mjs";
+import { ticketHref } from "../domain/ticket-page.mjs";
 import { startRun, answerRun, nextTicket, isFinished, runResult, lessonTrend, answeredCount } from "../domain/run.mjs";
 
 header("course");
@@ -25,7 +26,7 @@ function trendHtml() {
   const tr = lessonTrend(st.runs(), L.id);
   if (!tr.length) return `<p class="small mut">Завершённых проверок пока нет.</p>`;
   return `<div class="card" style="padding:0;overflow:auto"><table class="plan trend"><tr><th>Дата</th><th>Результат</th><th>Верно</th><th>Ошибки (билеты)</th></tr>
-    ${tr.map(r => `<tr><td>${fmt(r.date)}</td><td><b>${r.score}%</b></td><td>${r.correct} из ${r.total}</td><td class="small">${r.wrong.length ? r.wrong.map(i => esc(idLabel(i))).join(", ") : "—"}</td></tr>`).join("")}</table></div>`;
+    ${tr.map(r => `<tr><td>${fmt(r.date)}</td><td><b>${r.score}%</b></td><td>${r.correct} из ${r.total}</td><td class="small">${r.wrong.length ? r.wrong.map(i => `<a href="${esc(ticketHref(i))}">${esc(idLabel(i))}</a>`).join(", ") : "—"}</td></tr>`).join("")}</table></div>`;
 }
 
 function intro() {
@@ -85,7 +86,7 @@ function finish(run) {
   m.innerHTML = `<div class="small mut"><a href="episode.html?id=${L.id}">Выпуск ${L.num}</a> · накопительная проверка</div>
    <h1>Проверка завершена</h1>
    <div class="result ${res.wrong.length ? "bad" : "ok"}">${res.correct} из ${res.total} верно (${res.score}%)</div>
-   ${res.wrong.length ? `<p>Ошибки: ${res.wrong.map(i => esc(idLabel(i))).join(", ")}.</p><div class="row"><a class="btn" href="errors.html?drill=1&ids=${res.wrong.join(",")}">Разобрать ошибки</a><a class="btn ghost" href="errors.html">Типичные ошибки</a></div>` : `<p>Без ошибок.</p>`}
+   ${res.wrong.length ? `<p>Ошибки: ${res.wrong.map(i => `<a href="${esc(ticketHref(i))}">${esc(idLabel(i))}</a>`).join(", ")}.</p><div class="row"><a class="btn" href="errors.html?drill=1&ids=${res.wrong.join(",")}">Разобрать ошибки</a><a class="btn ghost" href="errors.html">Типичные ошибки</a></div>` : `<p>Без ошибок.</p>`}
    <h2>Динамика</h2>${trendHtml()}
    <div class="row" style="margin-top:16px"><a class="btn ghost" href="check.html?lesson=${L.id}">Пройти ещё раз</a></div>`;
 }

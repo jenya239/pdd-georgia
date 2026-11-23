@@ -117,7 +117,8 @@ def test_norm_page_content(files):
 def test_backlinks_reach_lessons_items_and_tickets(files):
     f, _ = files
     p = f["norm/st5-p87.html"]
-    assert "../episode.html?id=ep05" in p and "../practice.html?ids=o-ep05" in p
+    assert "../episode.html?id=ep05" in p and "../ticket.html?id=o-ep05" in p
+    assert "../practice.html?ids=o-ep05" in p  # «Решить все» stays a set, not one ticket page
     tickets = [s for s in SLUGS if "Билеты" in f[f"norm/{s}.html"]]
     assert len(tickets) > 100
 

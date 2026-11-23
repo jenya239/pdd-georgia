@@ -21,7 +21,7 @@ test("episode 2 published HTML equals the canonical source and retains exact law
 
 test("narrative forms a justified sequence and integrates both tickets", () => {
   const markers = ["Улица шире проезжей части", "Одна линия меняется на разделитель",
-    "билетами №390 и №391", "Полосы не исчезают вместе с разметкой",
+    "ticket.html?id=390", "Полосы не исчезают вместе с разметкой",
     "У края дороги меняется назначение пространства", "Когда тротуар заканчивается",
     "Одна дорога — несколько разных границ"];
   const places = markers.map(s => html.indexOf(s));
@@ -53,4 +53,6 @@ test("recap has two different screen-specific SVGs and readable text", () => {
     assert.ok(fonts.length >= 12 && fonts.every(n => n >= 12),file);
   }
   assert.ok(html.includes("ep02-recap-mobile.svg") && html.includes("ep02-recap.svg"));
+  assert.match(html, /билетами <a href="ticket\.html\?id=390">№390<\/a> и <a href="ticket\.html\?id=391">№391<\/a>/);
+  assert.match(html, /<a href="ticket\.html\?id=265">билет №265<\/a>/);
 });

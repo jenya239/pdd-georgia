@@ -401,3 +401,26 @@ select{max-width:100%}
 .lessonpage .visual-story .fig, .lessonpage .visual-series .fig { margin: 8px 0 7px; }
 .lessonpage .visual-story .figcap, .lessonpage .figcap { color:var(--mut); font-size:14px; line-height:1.5; max-width:68ch; margin:6px 0 14px; }
 .lessonpage .visual-story .fig svg { display:block; width:100%; height:auto; }
+
+/* Permanent ticket page and the catalog. The question itself uses the flow's #stage styles. */
+.ticketpage,.ticketindex{overflow-wrap:break-word}
+.ticketnav{margin:4px 0 16px}
+.ticketrels{display:grid;gap:8px 28px;margin-top:28px}
+.ticketrels h2{font-size:18px;margin:8px 0 6px}
+.ticketrels ul{margin:0;padding-left:18px}
+.ticketrels li{margin:0 0 6px}
+.ticketfilters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:end;margin:8px 0 4px}
+.ticketfilters label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mut);min-width:0}
+.ticketfilters input,.ticketfilters select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.ticketfilters input[type=search]{min-width:min(100%,18rem)}
+.ticketlist{list-style:none;margin:12px 0 20px;padding:0;display:grid;gap:8px}
+.ticketlist a.ticketrow{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg2);color:inherit;text-decoration:none}
+.ticketlist a.ticketrow:hover{border-color:var(--acc)}
+.ticketrow .num{color:var(--acc);font-weight:700}
+.ticketrow .ask,.ticketrow .small{display:block;margin-top:3px}
+@media (min-width:760px){.ticketrels{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){
+  .ticketfilters{display:grid}
+  .ticketfilters input,.ticketfilters select{width:100%}
+  .atlas.ticketpage h1,.atlas.ticketindex h1{font-size:26px}
+}

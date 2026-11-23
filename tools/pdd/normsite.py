@@ -224,12 +224,12 @@ class Site:
         if b["items"]:
             ids = ",".join(it["id"] for it in b["items"])
             out.append(f'<h3>Наши вопросы ({len(b["items"])})</h3><ul>' + "".join(
-                f'<li><a href="../practice.html?ids={_e(it["id"])}">{_e(it["q"])}</a></li>' for it in b["items"]) + "</ul>"
+                f'<li><a href="../ticket.html?id={_e(it["id"])}">{_e(it["q"])}</a></li>' for it in b["items"]) + "</ul>"
                 + (f'<p><a class="btn ghost" href="../practice.html?ids={_e(ids)}">Решить все</a></p>' if len(b["items"]) > 1 else ""))
         if b["tickets"]:
             ids = ",".join(str(t) for t in b["tickets"])
             out.append(f'<h3>Билеты, которые на неё ссылаются ({len(b["tickets"])})</h3>'
-                       f'<p class="tlist">' + " ".join(f'<a href="../practice.html?ids={t}">№ {t}</a>' for t in b["tickets"]) + "</p>"
+                       f'<p class="tlist">' + " ".join(f'<a href="../ticket.html?id={t}">№ {t}</a>' for t in b["tickets"]) + "</p>"
                        f'<p><a class="btn ghost" href="../practice.html?ids={ids}">Решить эти билеты</a></p>'
                        '<p class="small mut">По ссылкам на закон в пояснениях базы (с учётом наших уточнений онтологии).</p>')
         if b["cited_by"]:

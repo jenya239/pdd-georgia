@@ -7,6 +7,7 @@ import { renderQuestion } from "../app/question.mjs";
 import { errorStats, groupStats, drillQueue, notedStats } from "../domain/errors.mjs";
 import { MASTERY_STREAK, streakOf } from "../domain/progress.mjs";
 import { idLabel, parseId, questionText } from "../domain/items.mjs";
+import { ticketHref } from "../domain/ticket-page.mjs";
 import { lk } from "../domain/normlinks.mjs";
 
 header("exam");
@@ -32,7 +33,7 @@ function item(s) {
   const t = D.byId[s.id];
   const picks = Object.entries(s.picks).sort((a, b) => b[1] - a[1]);
   return `<details class="err card" data-id="${s.id}"><summary>
-     <span class="errhead"><b>${esc(idLabel(s.id))}</b>${t.own ? ` <span class="badge own">наш вопрос</span>` : ""} <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">${s.wrong ? `ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}` : s.attempts ? `без ошибок · ответов ${s.attempts}` : "ответов нет"}</span>${s.noted ? ` <span class="badge note" title="У билета есть ваша заметка">заметка</span>` : ""}
+     <span class="errhead"><b><a href="${esc(ticketHref(s.id))}" onclick="event.stopPropagation()">${esc(idLabel(s.id))}</a></b>${t.own ? ` <span class="badge own">наш вопрос</span>` : ""} <span class="badge ${s.rate >= 0.5 ? "warn" : "grey"}">${s.wrong ? `ошибок ${s.wrong} из ${s.attempts} · ${pct(s.rate)}` : s.attempts ? `без ошибок · ответов ${s.attempts}` : "ответов нет"}</span>${s.noted ? ` <span class="badge note" title="У билета есть ваша заметка">заметка</span>` : ""}
      ${s.mastered ? `<span class="badge ok">исправлено: ${MASTERY_STREAK} верно подряд</span>` : ""}
      <span class="small mut">${s.wrong ? `последняя ошибка ${fmt(s.lastWrong)}` : ""}${s.ruleLabel ? " · " + esc(s.ruleLabel) : ""}</span></span>
      <span class="errq">${esc(questionText(t).q)}</span></summary>

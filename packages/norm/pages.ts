@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { ticketHref } from "../domain/ticket-page.ts";
 import { slug } from "../lesson/slug.ts";
 import { citation, escapeHtml, excerpt } from "./cite.ts";
 import { allNorms, linkedRu, type Norm } from "./text.ts";
@@ -109,13 +110,13 @@ function backlinks(norm: Norm, link: Backlink | undefined): string {
   }
   if (data.items.length) {
     const ids = data.items.map((item) => item.id).join(",");
-    const rows = data.items.map((item) => `<li><a href="../practice.html?ids=${escapeHtml(item.id)}">${escapeHtml(item.q)}</a></li>`).join("");
+    const rows = data.items.map((item) => `<li><a href="${ticketHref(item.id, "../")}">${escapeHtml(item.q)}</a></li>`).join("");
     const all = data.items.length > 1 ? `<p><a class="btn ghost" href="../practice.html?ids=${escapeHtml(ids)}">Решить все</a></p>` : "";
     out.push(`<h3>Наши вопросы (${data.items.length})</h3><ul>${rows}</ul>${all}`);
   }
   if (data.tickets.length) {
     const ids = data.tickets.join(",");
-    const rows = data.tickets.map((id) => `<a href="../practice.html?ids=${id}">№ ${id}</a>`).join(" ");
+    const rows = data.tickets.map((id) => `<a href="${ticketHref(id, "../")}">№ ${id}</a>`).join(" ");
     out.push(`<h3>Билеты, которые на неё ссылаются (${data.tickets.length})</h3><p class="tlist">${rows}</p><p><a class="btn ghost" href="../practice.html?ids=${ids}">Решить эти билеты</a></p><p class="small mut">По ссылкам на закон в пояснениях базы (с учётом наших уточнений онтологии).</p>`);
   }
   if (data.cited.length) {

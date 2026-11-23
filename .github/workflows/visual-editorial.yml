@@ -12,6 +12,10 @@ on:
       - 'site/norm/**'
       - 'site/index.html'
       - 'site/course.html'
+      - 'site/ticket.html'
+      - 'site/tickets.html'
+      - 'site/assets/pages/ticket.mjs'
+      - 'site/assets/pages/tickets.mjs'
       - 'web/**'
       - 'packages/intersection/**'
       - 'site/assets/intersection/**'
@@ -37,6 +41,8 @@ on:
       - 'AGENTS.md'
       - 'tests/js/ep03-v2-preproduction.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
+      - 'tests/js/ticket-page.test.mjs'
+      - 'packages/domain/ticket-page.ts'
       - '.github/workflows/visual-editorial.yml'
   pull_request:
     paths:
@@ -49,6 +55,10 @@ on:
       - 'site/norm/**'
       - 'site/index.html'
       - 'site/course.html'
+      - 'site/ticket.html'
+      - 'site/tickets.html'
+      - 'site/assets/pages/ticket.mjs'
+      - 'site/assets/pages/tickets.mjs'
       - 'web/**'
       - 'packages/intersection/**'
       - 'site/assets/intersection/**'
@@ -74,6 +84,8 @@ on:
       - 'AGENTS.md'
       - 'tests/js/ep03-v2-preproduction.test.mjs'
       - 'tests/js/lesson-quotes.test.mjs'
+      - 'tests/js/ticket-page.test.mjs'
+      - 'packages/domain/ticket-page.ts'
 jobs:
   editorial:
     runs-on: ubuntu-latest
@@ -103,6 +115,10 @@ jobs:
         run: |
           node --check web/assets/pages/intersection.mjs
           node --check web/assets/pages/episode.mjs
+          node --check web/assets/pages/ticket.mjs
+          node --check web/assets/pages/tickets.mjs
+      - name: Check ticket pages and single-ticket links
+        run: node --test tests/js/ticket-page.test.mjs
       - name: Check intersection trainer behavior and texts
         run: node --test tests/js/intersection-*.test.mjs
       - name: Install dependencies

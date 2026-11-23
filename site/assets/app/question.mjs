@@ -10,6 +10,10 @@ import { zoom } from "./layout.mjs";
 import { renderDetails } from "./details.mjs";
 import { figureSvg } from "../domain/figure.mjs";
 import { answerLead, questionText } from "../domain/items.mjs";
+import { ticketHref } from "../domain/ticket-page.mjs";
+
+const pageLink = (t, opts) => (opts.mode === "exam" || opts.standalone ? ""
+  : `<a class="small ticketlink" href="${esc(ticketHref(t.id, document.documentElement.dataset.root || ""))}">страница билета</a>`);
 
 const noteMark = (t, opts) => (opts.mode === "exam" ? ""
   : `<span class="badge note notemark" title="У этого билета есть ваша заметка (вкладка «Заметка» после ответа)"${store.notes()[t.id] ? "" : " hidden"}>заметка</span>`);
@@ -17,7 +21,7 @@ const noteMark = (t, opts) => (opts.mode === "exam" ? ""
 function head(t, opts, tx, toggle) {
   if (t.own) {
     return `${opts.index != null ? `<b>${opts.index + 1}${opts.total ? " / " + opts.total : ""}</b>` : ""}
-      <span class="badge own" title="Вопрос составлен нами по тексту закона; в официальной базе билетов его нет">наш вопрос</span><span class="badge grey">${esc(t.typeLabel)}</span>${noteMark(t, opts)}`;
+      <span class="badge own" title="Вопрос составлен нами по тексту закона; в официальной базе билетов его нет">наш вопрос</span><span class="badge grey">${esc(t.typeLabel)}</span>${noteMark(t, opts)}${pageLink(t, opts)}`;
   }
   const topic = loadedTickets().meta.topics[t.t] || "";
   return `${opts.index != null ? `<b>${opts.index + 1}${opts.total ? " / " + opts.total : ""}</b>` : ""}
@@ -25,7 +29,7 @@ function head(t, opts, tx, toggle) {
       ${tx.mt ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён; русский текст — автоматический перевод с грузинского, оригинал — кнопка «оригинал (KA)»">машинный перевод</span>`
         : tx.untranslated ? `<span class="badge warn" title="В исходной базе этот вопрос не переведён">нет перевода на русский — текст на грузинском</span>` : ""}
       ${toggle ? `<button type="button" class="katoggle" aria-pressed="false" title="Показать грузинский текст вопроса и ответов">оригинал (KA)</button>` : ""}
-      ${opts.mode !== "exam" ? `<a class="small" href="${esc(t.src)}" target="_blank" rel="noopener">источник</a>` : ""}`;
+      ${pageLink(t, opts)}${opts.mode !== "exam" && t.src ? `<a class="small" href="${esc(t.src)}" target="_blank" rel="noopener">источник</a>` : ""}`;
 }
 
 /**
@@ -102,8 +106,13 @@ export function renderQuestion(el, t, opts = {}) {
       placeUndo();
     });
   } else if (opts.reveal) {
-    reveal(opts.selected ?? null);
-    details(opts.selected ?? null);
+    reveal(opts.peek ? t.c : (opts.selected ?? null));
+    if (opts.peek) {
+      const verdict = el.querySelector(".verdict");
+      verdict.className = "verdict ok";
+      verdict.textContent = "Правильный ответ.";
+    }
+    details(opts.peek ? t.c : (opts.selected ?? null));
   } else {
     btns.forEach((b, i) => b.onclick = () => {
       if (state.answered) return;
