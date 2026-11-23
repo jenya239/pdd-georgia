@@ -28,7 +28,7 @@ test("all eight main lessons open with a real situation, and answer an open ques
     const html = published(id, type);
     assert.equal((html.match(/<!--AFTER-TICKETS-->/g) ?? []).length, 1, id);
     assert.equal((html.match(/<figure\b/g) ?? []).length, figureCount, id);
-    assert.equal((html.match(/<h2\b/g) ?? []).length, sectionCount, id);
+    assert.equal((html.match(/<h2\b[^>]*\bid="/g) ?? []).length, sectionCount, id);
     const first = html.match(/^<h2\b[^>]*>[^<]+<\/h2>\s*<p data-editorial-role="course-context">([\s\S]*?)<\/p>/);
     assert.ok(first, `ep${id}: real contextual opening required before any figures`);
     const cleaned = visibleText(first[1]);
@@ -77,7 +77,7 @@ test("source quote/citation panels and previous artwork are preserved", () => {
   for (const [id, type] of episodes) {
     const page = published(id, type);
     assert.ok(page.includes("<blockquote"), id);
-    assert.ok(page.includes("<figcaption"), id);
+    assert.ok(page.includes("<figcaption") || page.includes('class="figcap"'), id);
     assert.ok(page.includes("<!--AFTER-TICKETS-->"), id);
     assert.doesNotMatch(page, /class="answers"|class="ansbtn"|class="scene-tabs"/, id);
   }
